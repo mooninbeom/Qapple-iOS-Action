@@ -33,6 +33,8 @@ final class BulletinBoardUseCase: ObservableObject {
         
         let calendar = Calendar.current
         
+        
+        
         self.state = State(
             currentEvent: "Macro",
             startDate: calendar.date(from: startDateComponents)!,
