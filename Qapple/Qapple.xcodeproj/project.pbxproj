@@ -127,6 +127,7 @@
 		82D583B92B9852C4003CC424 /* QuestionResponse.swift in Sources */ = {isa = PBXBuildFile; fileRef = 82D583B82B9852C4003CC424 /* QuestionResponse.swift */; };
 		82D583BB2B985462003CC424 /* NetworkManager+Question.swift in Sources */ = {isa = PBXBuildFile; fileRef = 82D583BA2B985462003CC424 /* NetworkManager+Question.swift */; };
 		82D583BD2B9859D7003CC424 /* NetworkError.swift in Sources */ = {isa = PBXBuildFile; fileRef = 82D583BC2B9859D7003CC424 /* NetworkError.swift */; };
+		82EAE3AD2CF739D20079B61B /* AcademyEvent.swift in Sources */ = {isa = PBXBuildFile; fileRef = 82EAE3AC2CF739D20079B61B /* AcademyEvent.swift */; };
 		82F7041D2C6DD15000479206 /* TabBar.swift in Sources */ = {isa = PBXBuildFile; fileRef = 82F7041C2C6DD15000479206 /* TabBar.swift */; };
 		82F7041F2C6DD29D00479206 /* TabType.swift in Sources */ = {isa = PBXBuildFile; fileRef = 82F7041E2C6DD29D00479206 /* TabType.swift */; };
 		82FD93692C673E96007977D0 /* BulletinBoardCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 82FD93682C673E96007977D0 /* BulletinBoardCell.swift */; };
@@ -296,6 +297,7 @@
 		82D583B82B9852C4003CC424 /* QuestionResponse.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = QuestionResponse.swift; sourceTree = "<group>"; };
 		82D583BA2B985462003CC424 /* NetworkManager+Question.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "NetworkManager+Question.swift"; sourceTree = "<group>"; };
 		82D583BC2B9859D7003CC424 /* NetworkError.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NetworkError.swift; sourceTree = "<group>"; };
+		82EAE3AC2CF739D20079B61B /* AcademyEvent.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AcademyEvent.swift; sourceTree = "<group>"; };
 		82F7041C2C6DD15000479206 /* TabBar.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TabBar.swift; sourceTree = "<group>"; };
 		82F7041E2C6DD29D00479206 /* TabType.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TabType.swift; sourceTree = "<group>"; };
 		82FD93682C673E96007977D0 /* BulletinBoardCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BulletinBoardCell.swift; sourceTree = "<group>"; };
@@ -932,6 +934,7 @@
 				823736AA2C674B560057B9CF /* Post.swift */,
 				826933542C743D370004E0B5 /* Answer.swift */,
 				827169162C9EB68C00D8BF81 /* QappleNoti.swift */,
+				82EAE3AC2CF739D20079B61B /* AcademyEvent.swift */,
 			);
 			path = Entity;
 			sourceTree = "<group>";
@@ -1230,6 +1233,7 @@
 				07BF36432B8B8A970047F3F7 /* ActionButton.swift in Sources */,
 				4213DF782C6E1F8E007F433C /* NotificationListView.swift in Sources */,
 				F392AC462B8B2E370069AD7B /* SignUpTermsAgreementView.swift in Sources */,
+				82EAE3AD2CF739D20079B61B /* AcademyEvent.swift in Sources */,
 				07D96ED62B79E7C000754819 /* TodayQuestionViewModel.swift in Sources */,
 				F37C178A2B873436005E5072 /* MyPageView.swift in Sources */,
 				827169192C9EB8BC00D8BF81 /* NetworkManager+Notification.swift in Sources */,

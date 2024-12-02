@@ -19,24 +19,8 @@ final class BulletinBoardUseCase: ObservableObject {
     
     init() {
         
-        // 매크로 시작 날
-        var startDateComponents = DateComponents()
-        startDateComponents.year = 2024
-        startDateComponents.month = 9
-        startDateComponents.day = 2
-        
-        // 매크로 종료 날
-        var endDateComponents = DateComponents()
-        endDateComponents.year = 2024
-        endDateComponents.month = 11
-        endDateComponents.day = 29
-        
-        let calendar = Calendar.current
-        
         self.state = State(
-            currentEvent: "Macro",
-            startDate: calendar.date(from: startDateComponents)!,
-            endDate: calendar.date(from: endDateComponents)!,
+            academyEvents: [.macro, .epilogue],
             posts: [],
             searchPosts: [],
             searchHasNext: false,
@@ -64,9 +48,7 @@ final class BulletinBoardUseCase: ObservableObject {
 extension BulletinBoardUseCase {
     
     struct State {
-        let currentEvent: String
-        let startDate: Date
-        let endDate: Date
+        let academyEvents: [AcademyEvent]
         var posts: [Post]
         var searchPosts: [Post]
         var searchTheshold: Int?

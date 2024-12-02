@@ -66,13 +66,9 @@ private struct BoardView: View {
         VStack(spacing: 0) {
             NavigationBar()
             
-            AcademyPlanDayCounter(
-                currentEvent: bulletinBoardUseCase.state.currentEvent,
-                startDate: bulletinBoardUseCase.state.startDate,
-                endDate: bulletinBoardUseCase.state.endDate
-            )
-            .padding(.top, 8)
-            .padding(.horizontal, 16)
+            AcademyPlanDayCounter(academyEvents: bulletinBoardUseCase.state.academyEvents)
+                .padding(.top, 8)
+                .padding(.horizontal, 16)
             
             PostListView()
                 .padding(.top, 20)
