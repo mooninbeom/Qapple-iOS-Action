@@ -10,6 +10,7 @@
 		420D72052C71D5BB00B56439 /* FirebaseAuth in Frameworks */ = {isa = PBXBuildFile; productRef = 420D72042C71D5BB00B56439 /* FirebaseAuth */; };
 		420D720D2C71D8AC00B56439 /* FirebaseMessaging in Frameworks */ = {isa = PBXBuildFile; productRef = 420D720C2C71D8AC00B56439 /* FirebaseMessaging */; };
 		420D720F2C71DB7F00B56439 /* FirebaseAnalytics in Frameworks */ = {isa = PBXBuildFile; productRef = 420D720E2C71DB7F00B56439 /* FirebaseAnalytics */; };
+		820BDBA52D3E711700178F7E /* ComposableArchitecture in Frameworks */ = {isa = PBXBuildFile; productRef = 820BDBA42D3E711700178F7E /* ComposableArchitecture */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -38,6 +39,7 @@
 			files = (
 				420D720D2C71D8AC00B56439 /* FirebaseMessaging in Frameworks */,
 				420D720F2C71DB7F00B56439 /* FirebaseAnalytics in Frameworks */,
+				820BDBA52D3E711700178F7E /* ComposableArchitecture in Frameworks */,
 				420D72052C71D5BB00B56439 /* FirebaseAuth in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -84,6 +86,7 @@
 				420D72042C71D5BB00B56439 /* FirebaseAuth */,
 				420D720C2C71D8AC00B56439 /* FirebaseMessaging */,
 				420D720E2C71DB7F00B56439 /* FirebaseAnalytics */,
+				820BDBA42D3E711700178F7E /* ComposableArchitecture */,
 			);
 			productName = Capple;
 			productReference = F3EA66C82B7643EE002417CE /* Qapple.app */;
@@ -115,6 +118,7 @@
 			mainGroup = F3EA66BF2B7643EE002417CE;
 			packageReferences = (
 				420D72022C71D56400B56439 /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */,
+				820BDBA32D3E711700178F7E /* XCRemoteSwiftPackageReference "swift-composable-architecture" */,
 			);
 			productRefGroup = F3EA66C92B7643EE002417CE /* Products */;
 			projectDirPath = "";
@@ -375,6 +379,14 @@
 				minimumVersion = 11.0.0;
 			};
 		};
+		820BDBA32D3E711700178F7E /* XCRemoteSwiftPackageReference "swift-composable-architecture" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/pointfreeco/swift-composable-architecture.git";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 1.17.1;
+			};
+		};
 /* End XCRemoteSwiftPackageReference section */
 
 /* Begin XCSwiftPackageProductDependency section */
@@ -392,6 +404,11 @@
 			isa = XCSwiftPackageProductDependency;
 			package = 420D72022C71D56400B56439 /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */;
 			productName = FirebaseAnalytics;
+		};
+		820BDBA42D3E711700178F7E /* ComposableArchitecture */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 820BDBA32D3E711700178F7E /* XCRemoteSwiftPackageReference "swift-composable-architecture" */;
+			productName = ComposableArchitecture;
 		};
 /* End XCSwiftPackageProductDependency section */
 	};
