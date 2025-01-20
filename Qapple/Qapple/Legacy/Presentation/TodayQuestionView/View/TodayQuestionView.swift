@@ -38,7 +38,7 @@ struct TodayQuestionView: View {
             .refreshable {
                 Task {
                     await viewModel.updateTodayQuestionView()
-                    HapticManager.shared.impact(style: .light)
+                    HapticService.impact(style: .light)
                 }
             }
             .onAppear {

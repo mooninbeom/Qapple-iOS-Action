@@ -123,12 +123,12 @@ extension AppDelegate: UNUserNotificationCenterDelegate {
     
     if let questionId = userInfo["questionId"] {
         let idString = questionId as! String
-        PushNotificationManager.shared.questionId = Int(idString)
+        PushNotificationService.shared.questionId = Int(idString)
     }
       
     if let boardId = userInfo["boardId"] {
         let idString = boardId as! String
-        PushNotificationManager.shared.boardId = Int(idString)
+        PushNotificationService.shared.boardId = Int(idString)
     }
       
     print(userInfo)
@@ -142,12 +142,12 @@ extension AppDelegate: UNUserNotificationCenterDelegate {
         print(#function)
         if let questionId = userInfo["questionId"] {
             let idString = questionId as! String
-            PushNotificationManager.shared.questionId = Int(idString)
+            PushNotificationService.shared.questionId = Int(idString)
         }
         
         if let boardId = userInfo["boardId"] {
             let idString = boardId as! String
-            PushNotificationManager.shared.boardId = Int(idString)
+            PushNotificationService.shared.boardId = Int(idString)
         }
         
         completionHandler(.newData)

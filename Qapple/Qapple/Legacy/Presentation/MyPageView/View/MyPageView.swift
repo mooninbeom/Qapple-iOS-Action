@@ -115,7 +115,7 @@ private struct InquiriesReportsSection: View {
     
     @EnvironmentObject private var pathModel: Router
     
-    @State private var mailResult: Result<MFMailComposeResult, Error>? = nil
+    @State private var mailResult: Result<MFMailComposeResult, Error>?
     @State private var isShowingMailView = false
     @State private var isEmailDisabledAlert = false
     
@@ -142,7 +142,7 @@ private struct InquiriesReportsSection: View {
             Text("메일 앱에 로그인하거나\n공식 메일 주소로 문의주세요\n(0.team.capple@gmail.com)")
         }
         .sheet(isPresented: $isShowingMailView) {
-            MailView(result: $mailResult)
+            MailService.makeMailView(result: $mailResult)
         }
     }
 }
@@ -168,7 +168,7 @@ private struct AccountSection: View {
                 icon: .signOutIcon,
                 tapAction: {
                     isLogOutAlertPresented.toggle()
-                    HapticManager.shared.notification(type: .warning)
+                    HapticService.notification(type: .warning)
                 }
             )
             
@@ -178,7 +178,7 @@ private struct AccountSection: View {
                 isDistructive: true,
                 tapAction: {
                     isResignAlertPresented.toggle()
-                    HapticManager.shared.notification(type: .warning)
+                    HapticService.notification(type: .warning)
                 }
             )
         }
@@ -215,7 +215,7 @@ private struct AccountSection: View {
 private struct BottomSection: View {
     
     private var appVersion: String {
-        VersionManager.deviceAppVersion
+        VersionService.deviceAppVersion
     }
     
     var body: some View {

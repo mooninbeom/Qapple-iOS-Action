@@ -29,7 +29,7 @@ struct SignUpPrivacyView: View {
             
             VStack(alignment: .leading, spacing: 0) {
                 ScrollView {
-                    Text(privacyText)
+                    Text(Constant.privacyPolicy)
                         .font(.pretendard(.medium, size: 16))
                         .foregroundStyle(TextLabel.sub2)
                 }

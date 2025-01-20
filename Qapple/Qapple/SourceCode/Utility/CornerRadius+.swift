@@ -1,5 +1,5 @@
 //
-//  View+Extension.swift
+//  CornerRadius+.swift
 //  Capple
 //
 //  Created by 김민준 on 2/13/24.
@@ -12,14 +12,6 @@ extension View {
     /// 특정 부분 CornerRadius 적용을 위한 Extension 메서드입니다.
     public func cornerRadius(_ radius: CGFloat, corners: UIRectCorner) -> some View {
         clipShape(RoundedCorner(radius: radius, corners: corners))
-    }
-    
-    func popGestureDisabled() -> some View {
-        modifier(PopGestureDisabledViewModifier())
-    }
-    
-    func hideKeyboard() {
-        UIApplication.shared.sendAction(#selector(UIResponder.resignFirstResponder), to: nil, from: nil, for: nil)
     }
 }
 

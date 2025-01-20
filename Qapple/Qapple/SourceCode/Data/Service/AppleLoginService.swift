@@ -5,19 +5,16 @@
 //  Created by 김민준 on 8/4/24.
 //
 
-import Foundation
 import AuthenticationServices
 
-final class AppleLoginService {
-    
-    static let shared = AppleLoginService()
+struct AppleLoginService {
     private init() {}
     
-     func autoLogin(completion: @escaping (Bool) -> Void) {
+    static func autoLogin(completion: @escaping (Bool) -> Void) {
         let appleIDProvider = ASAuthorizationAppleIDProvider()
         let userID = try? SignInInfo.shared.userID()
         
-        appleIDProvider.getCredentialState(forUserID: userID ?? "") { (credentialState, error) in
+        appleIDProvider.getCredentialState(forUserID: userID ?? "") { credentialState, error in
             switch credentialState {
             case .authorized:
                 Task {
@@ -39,7 +36,8 @@ final class AppleLoginService {
                 print("❌ [Auto Login Failed]\n")
                 return completion(false)
                 
-            default: return completion(false)
+            default:
+                return completion(false)
             }
         }
     }

@@ -147,7 +147,7 @@ private struct RemoteView: View {
             LikeButton(
                 post: post,
                 tapAction: {
-                    if !post.isLiked { HapticManager.shared.impact(style: .light) }
+                    if !post.isLiked { HapticService.impact(style: .light) }
                     bulletinBoardUseCase.effect(.likePost(postId: post.boardId))
                 }
             )

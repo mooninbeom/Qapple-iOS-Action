@@ -1,5 +1,5 @@
 //
-//  NotificationName+Extension.swift
+//  NotificationName+.swift
 //  Qapple
 //
 //  Created by 김민준 on 4/12/24.

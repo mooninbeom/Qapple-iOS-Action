@@ -166,7 +166,7 @@ struct CommentCell: View {
                 Button {
                     if !comment.isReport {
                         Task {
-                            if !comment.isLiked { HapticManager.shared.impact(style: .light) }
+                            if !comment.isLiked { HapticService.impact(style: .light) }
                             await commentViewModel.act(.like(id: comment.id))
                             await commentViewModel.refreshComments(boardId: post.boardId)
                             while commentViewModel.hasNext {
@@ -214,7 +214,7 @@ struct CommentCell: View {
     private var deleteBtn: some View {
         Button {
             self.isDelete.toggle()
-            HapticManager.shared.notification(type: .error)
+            HapticService.notification(type: .error)
         } label: {
             ZStack {
                 Color.delete

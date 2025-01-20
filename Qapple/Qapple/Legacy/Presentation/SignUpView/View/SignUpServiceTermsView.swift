@@ -28,7 +28,7 @@ struct SignUpServiceTermsView: View {
             
             VStack(alignment: .leading, spacing: 0) {
                 ScrollView {
-                    Text(serviceTermsText)
+                    Text(Constant.serviceTermsText)
                         .font(.pretendard(.medium, size: 16))
                         .foregroundStyle(TextLabel.sub2)
                 }

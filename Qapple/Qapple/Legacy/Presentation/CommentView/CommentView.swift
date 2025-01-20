@@ -147,7 +147,7 @@ struct CommentView: View {
             
             Button {
                 Task.init {
-                    HapticManager.shared.notification(type: .success)
+                    HapticService.notification(type: .success)
                     await commentViewModel.act(.upload(id: post.boardId, request: .init(comment: self.text)))
                     bulletinBoardUseCase.effect(.fetchSinglePost(postId: post.boardId))
                     await self.refreshComments()

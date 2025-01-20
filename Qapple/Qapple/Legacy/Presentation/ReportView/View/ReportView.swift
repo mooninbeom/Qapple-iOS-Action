@@ -55,7 +55,7 @@ struct ReportView: View {
                         Button {
                             reportType = ReportType.allCases[index]
                             isReportAlertPresented.toggle()
-                            HapticManager.shared.notification(type: .warning)
+                            HapticService.notification(type: .warning)
                             print("신고타입: \(reportType)")
                         } label: {
                             Text(report)

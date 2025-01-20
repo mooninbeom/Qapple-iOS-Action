@@ -179,7 +179,7 @@ struct SignUpTermsAgreementView: View {
                 Spacer()
                 
                 ActionButton("다음", isActive: $isAllChecked, action: {
-                    HapticManager.shared.notification(type: .success)
+                    HapticService.notification(type: .success)
                     pathModel.paths.append(.signUpCompleted)
                 })
                 .animation(.easeIn, value: isAllChecked)

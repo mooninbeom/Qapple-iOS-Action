@@ -88,7 +88,7 @@ struct TodayQuestionListView: View {
                                     // 만약 답변 안했다면 경고 창 띄우기
                                     if !question.isAnswered {
                                         isAnsweredAlert.toggle()
-                                        HapticManager.shared.notification(type: .warning)
+                                        HapticService.notification(type: .warning)
                                         return
                                     }
                                     
@@ -125,7 +125,7 @@ struct TodayQuestionListView: View {
                 .refreshable {
                     Task {
                         await viewModel.refreshGetQuestions()
-                        HapticManager.shared.impact(style: .light)
+                        HapticService.impact(style: .light)
                     }
                 }
             }

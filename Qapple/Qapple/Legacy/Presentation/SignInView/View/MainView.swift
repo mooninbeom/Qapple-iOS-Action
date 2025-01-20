@@ -26,7 +26,7 @@ struct MainView: View {
                     .environmentObject(authViewModel)
                     .onAppear {
                         if authViewModel.isAutoSignInMode {
-                            AppleLoginService.shared.autoLogin { isSingIn in
+                            AppleLoginService.autoLogin { isSingIn in
                                 if isSingIn {
                                     DispatchQueue.main.async {
                                         authViewModel.isAutoSignInMode = false
@@ -44,7 +44,7 @@ struct MainView: View {
             }
         }
         .task {
-            let isRecentVersion = await VersionManager.isRecentVersion()
+            let isRecentVersion = await VersionService.isRecentVersion()
             switch isRecentVersion {
             case .success(let isRecent):
                 if !isRecent {
@@ -59,7 +59,7 @@ struct MainView: View {
             HStack {
                 Button("취소", role: .cancel) {}
                 Button("업데이트", role: .none) {
-                    VersionManager.openAppStore()
+                    VersionService.openAppStore()
                 }
             }
         } message: {
@@ -77,7 +77,7 @@ private struct MainTabView: View {
     @StateObject private var activePathModel: Router = .init(pathType: .questionList)
     @StateObject var answerViewModel: AnswerViewModel = .init()
     @StateObject private var bulletinBoardUseCase = BulletinBoardUseCase()
-    @StateObject private var pushNotificationManager: PushNotificationManager = .shared
+    @StateObject private var pushNotificationManager: PushNotificationService = .shared
     
     var body: some View {
         NavigationStack(path: $activePathModel.route) {
@@ -246,11 +246,11 @@ private struct HomeView: View {
             .edgesIgnoringSafeArea(.all)
         }
         .onAppear {
-            NotificationManager.shared.requestNotificationPermission()
+            PushNotificationService.shared.requestNotificationPermission()
         }
         .tabViewStyle(PageTabViewStyle(indexDisplayMode: .never))
         .onChange(of: tab) { _, _ in
-            HapticManager.shared.impact(style: .light)
+            HapticService.impact(style: .light)
         }
     }
 }
