@@ -13,6 +13,8 @@ enum QappleAPI {
     
     private static let baseUrl = URL(string: "http://api.capple.shop:8080")
     
+    // MARK: - Answer
+    
     enum Answer: RawRepresentable, API {
         static let baseUrl = QappleAPI.baseUrl?
             .appendingPathComponent("answers")
@@ -21,10 +23,6 @@ enum QappleAPI {
         case delete(answerId: Int)
         case listOfQuestion(questionId: Int, threshold: Int?, pageSize: Int32 = 30)
         case post(questionId: Int)
-        
-//        case fetch(answerId: Int64) // 답변 수정 사용하지 않음
-//        case heart(answerId: Int64) // 답변 좋아요/취소 사용하지 않음
-//        case getHeart(threshold: Int64?, pageSize: Int32 = 30) // 좋아요한 답변 조회 사용하지 않음
         
         var rawValue: RawValue {
             switch self {
@@ -48,6 +46,8 @@ enum QappleAPI {
             }
         }
     }
+    
+    // MARK: - Member
     
     enum Member: RawRepresentable, API {
         static let baseUrl = QappleAPI.baseUrl?
@@ -104,6 +104,8 @@ enum QappleAPI {
         
     }
     
+    // MARK: - Board
+    
     enum Board: RawRepresentable, API {
         static let baseUrl = QappleAPI.baseUrl?
             .appendingPathComponent("boards")
@@ -145,14 +147,14 @@ enum QappleAPI {
         }
     }
     
+    // MARK: - Question
+    
     enum Question: RawRepresentable, API {
         static let baseUrl = QappleAPI.baseUrl?
             .appendingPathComponent("questions")
         
         case listOfMain
         case list(threshold: String?, pageSize: Int32 = 30)
-        
-//        case heart(qusetionId: Int64) // 질문 좋아요 사용하지 않음
         
         var rawValue: RawValue {
             switch self {
@@ -167,6 +169,8 @@ enum QappleAPI {
             }
         }
     }
+    
+    // MARK: - BoardComment
     
     enum BoardComment: RawRepresentable, API {
         static let baseUrl = QappleAPI.baseUrl?
@@ -197,6 +201,8 @@ enum QappleAPI {
         }
     }
     
+    // MARK: - Notification
+    
     enum Notification: RawRepresentable, API {
         static let baseUrl = QappleAPI.baseUrl?
             .appendingPathComponent("notifications")
@@ -214,6 +220,8 @@ enum QappleAPI {
             }
         }
     }
+    
+    // MARK: - Reports
     
     enum Reports: RawRepresentable, API {
         static let baseUrl = QappleAPI.baseUrl?
@@ -236,6 +244,8 @@ enum QappleAPI {
             }
         }
     }
+    
+    // MARK: - Token
     
     enum Token: RawRepresentable, API {
         static let baseUrl = QappleAPI.baseUrl?
