@@ -9,7 +9,23 @@ import Foundation
 import ComposableArchitecture
 
 struct QappleRepository {
+    static let networkClient = NetworkClient()
     
+    var fetchQuestionList: (_ threshold: String?) async throws -> ([Question], QappleAPI.PaginationInfo)
+    var fetchAnswerList: (_ questionId: Int, _ threshold: String?) async throws -> ([Answer2])
 }
 
+extension QappleRepository: DependencyKey {
+    
+    static let liveValue = Self(
+        fetchQuestionList: makeFetchQuestionList(),
+        fetchAnswerList: makeFetchAnswerList()
+    )
+}
 
+extension DependencyValues {
+    var qappleRepository: QappleRepository {
+        get { self[QappleRepository.self] }
+        set { self[QappleRepository.self] = newValue }
+    }
+}
