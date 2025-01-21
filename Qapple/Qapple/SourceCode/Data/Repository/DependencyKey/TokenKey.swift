@@ -9,6 +9,7 @@ import Foundation
 
 extension QappleRepository {
     
+    /// 토큰 재발급
     static func makeRefreshToken() -> () async throws -> RefreshToken {
         return {
             let url = try QappleAPI.Token.refresh.url()

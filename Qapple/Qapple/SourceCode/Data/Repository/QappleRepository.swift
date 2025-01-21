@@ -19,6 +19,8 @@ struct QappleRepository {
     var fetchAnswerListOfQuestion: (_ questionId: Int, _ threshold: Int?) async throws -> ([AnswerOfQuestion], QappleAPI.PaginationInfo)
     var registerAnswer: (_ questionId: Int, _ answer: String) async throws -> RegisterAnswerDTO
     
+    var qappleNotificationList: (_ threshold: Int?) async throws -> ([QappleNotification], QappleAPI.PaginationInfo)
+    
     var reportsBoard: (_ boardId: Int, _ boardReportType: String) async throws -> BoardReportsDTO
     var reportsBoardComment: (_ boardCommentId: Int, _ boardCommentReportType: String) async throws -> BoardCommentReportsDTO
     var reportsAnswer: (_ answerId: Int, _ reportType: String) async throws -> AnswerReportsDTO
@@ -36,6 +38,8 @@ extension QappleRepository: DependencyKey {
         deleteAnswer: makeDeleteAnswer(),
         fetchAnswerListOfQuestion: makeFetchAnswerListOfQuestion(),
         registerAnswer: makeRegisterAnswer(),
+        
+        qappleNotificationList: makeNotification(),
         
         reportsBoard: makeReportsBoard(),
         reportsBoardComment: makeReportsBoardComment(),

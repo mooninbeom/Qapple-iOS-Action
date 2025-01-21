@@ -52,7 +52,7 @@ enum QappleAPI {
         
         var rawValue: RawValue {
             switch self {
-            case .listOfProfile(threshold: let threshold, pageSize: let pageSize):
+            case let .listOfProfile(threshold, pageSize):
                 appending(urlQueryItems: [
                     .init(key: "threshold", value: threshold),
                     .init(key: "pageSize", value: pageSize),
@@ -69,6 +69,25 @@ enum QappleAPI {
                 
             case let .register(questionId, answer):
                 appending(baseString: "question/\(questionId)")
+            }
+        }
+    }
+    
+    enum Notification: RawRepresentable, API {
+        
+        static let baseUrl = QappleAPI.baseUrl?
+            .appendingPathComponent("notifications")
+        
+        case notification(threshold: Int?, pageSize: Int32 = 30)
+        
+        var rawValue: RawValue {
+            switch self {
+            case let .notification(threshold, pageSize):
+                appending(urlQueryItems: [
+                    .init(key: "threshold", value: threshold),
+                    .init(key: "pageSize", value: pageSize),
+                ])
+                
             }
         }
     }
