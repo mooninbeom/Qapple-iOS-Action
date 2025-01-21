@@ -8,7 +8,7 @@
 import SwiftUI
 
 struct CommentCell: View {
-    let comment: CommentResponse.Comment
+    let comment: CommentEntity
     let cellIndex: Int
     
     let screenWidth: CGFloat = UIScreen.main.bounds.width
@@ -231,7 +231,8 @@ struct CommentCell: View {
     
     private var reportBtn: some View {
         Button {
-            pathModel.pushView(screen: BulletinBoardPathType.commentReport(comment: comment))
+            // TODO: 네비게이션 연결 필요
+//            pathModel.pushView(screen: BulletinBoardPathType.commentReport(comment: comment))
         } label: {
             ZStack {
                 Color.report

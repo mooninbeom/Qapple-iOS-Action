@@ -7,7 +7,7 @@
 
 import SwiftUI
 
-struct CommentView: View {
+struct LegacyCommentView: View {
     
     @EnvironmentObject private var pathModel: Router
     @EnvironmentObject private var bulletinBoardUseCase: BulletinBoardUseCase
@@ -207,7 +207,7 @@ private struct HeaderView: View {
 }
 
 // MARK: View 업데이트 관련 메소드
-extension CommentView {
+extension LegacyCommentView {
     
     private func refreshComments() async {
         await commentViewModel.refreshComments(boardId: post.boardId)

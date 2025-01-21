@@ -72,7 +72,7 @@ final class Router: ObservableObject, NavigationRouter {
             case .alert:
                 AlertView()
             case .comment(post: let post):
-                CommentView(post: post)
+                LegacyCommentView(post: post)
             case .report(answerId: let answerId, isComment: let isComment):
                 ReportView(answerId: answerId, boardId: -1, isComment: isComment)
             }
@@ -89,7 +89,7 @@ final class Router: ObservableObject, NavigationRouter {
             case .search:
                 BulletinSearchView()
             case .comment(post: let post):
-                CommentView(post: post)
+                LegacyCommentView(post: post)
             case .commentReport(comment: let comment):
                 CommentReportView(comment: comment)
             case .report(boardId: let boardId, isComment: let isComment):
