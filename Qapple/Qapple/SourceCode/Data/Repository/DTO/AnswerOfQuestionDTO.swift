@@ -27,9 +27,9 @@ struct AnswersOfQuestionDTO: Codable {
         let writeAt: String
     }
     
-    var toEntity: [Answer] {
+    var toEntity: [Answer2] {
         content.map {
-            Answer(
+            Answer2(
                 id: $0.answerId,
                 content: $0.content,
                 publishedDate: .now, // $0.writeAt
