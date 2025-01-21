@@ -7,7 +7,7 @@
 
 import SwiftUI
 
-struct TodayQuestionView: View {
+struct LegacyTodayQuestionView: View {
     
     @EnvironmentObject private var homePathModel: Router
     @EnvironmentObject private var authViewModel: AuthViewModel
@@ -377,5 +377,5 @@ private struct AnswerPreview: View {
 }
 
 #Preview {
-    TodayQuestionView(viewModel: TodayQuestionViewModel())
+    LegacyTodayQuestionView(viewModel: TodayQuestionViewModel())
 }

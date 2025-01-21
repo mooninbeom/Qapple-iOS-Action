@@ -1,0 +1,227 @@
+//
+//  TodayQuestionView.swift
+//  Qapple
+//
+//  Created by 김민준 on 1/21/25.
+//
+
+import ComposableArchitecture
+import SwiftUI
+
+struct TodayQuestionView: View {
+    
+    let store: StoreOf<TodayQuestionFeature>
+    
+    var body: some View {
+        VStack(spacing: 0) {
+            HeaderView(store: store)
+            QuestionButton(store: store)
+            AnswerPreviewList(store: store)
+        }
+        .ignoresSafeArea()
+    }
+}
+
+// MARK: - HeaderView
+
+private struct HeaderView: View {
+    
+    let store: StoreOf<TodayQuestionFeature>
+    
+    var body: some View {
+        VStack(spacing: 0) {
+            Image(store.questionState.graphicImage)
+                .resizable()
+                .scaledToFill()
+                .frame(width: 120, height: 120)
+            
+            Text(store.questionState.mainTitle)
+                .font(.pretendard(.bold, size: 23))
+                .foregroundStyle(.wh)
+                .tracking(-1)
+                .padding(.top, 16)
+            
+            if store.questionState == .creating {
+                Text("00:00:00")
+                    .font(.pretendard(.bold, size: 38))
+                    .foregroundStyle(LinearGradient.timerGradient)
+                    .frame(height: 27)
+                    .padding(.top, 12)
+                    .monospacedDigit()
+                    .kerning(-2)
+            }
+        }
+        .frame(maxWidth: .infinity)
+        .frame(height: store.questionState == .creating ? 270 : 230)
+        .background(.second)
+    }
+}
+
+// MARK: - QuestionButton
+
+private struct QuestionButton: View {
+    
+    let store: StoreOf<TodayQuestionFeature>
+    
+    var body: some View {
+        ZStack(alignment: .top) {
+            Rectangle()
+                .frame(height: 28)
+                .foregroundStyle(.second)
+                .cornerRadius(32, corners: [.bottomLeft, .bottomRight])
+            
+            Button {
+                store.send(.questionButtonTapped)
+            } label: {
+                Text(title)
+                    .font(.pretendard(.semiBold, size: 17))
+                    .frame(width: 168)
+                    .padding(.vertical, 14)
+                    .foregroundStyle(.main)
+                    .background(backgroundColor)
+                    .clipShape(RoundedRectangle(cornerRadius: 20))
+            }
+        }
+        .frame(maxWidth: .infinity)
+        .background(.first)
+    }
+    
+    /// 버튼 제목
+    private var title: String {
+        store.questionState.buttonTitle(
+            isAnswerd: store.todayQuestion.isAnswered
+        )
+    }
+    
+    /// 버튼 배경 색상
+    private var backgroundColor: Color {
+        switch store.questionState {
+        case .creating:
+            store.todayQuestion.isAnswered ? .secondaryButton : .button
+        case .ready: .button
+        case .complete: .secondaryButton
+        }
+    }
+}
+
+// MARK: - AnswerPreviewList
+
+private struct AnswerPreviewList: View {
+    
+    let store: StoreOf<TodayQuestionFeature>
+    
+    var body: some View {
+        VStack(spacing: 0) {
+            Title()
+                .padding(.top, 40)
+                .padding(.horizontal, 20)
+            
+            SubTitle()
+                .padding(.top, 20)
+                .padding(.horizontal, 20)
+            
+            if store.answerPreviewList.isEmpty {
+                Spacer()
+                
+                Text("아직 답변이 달리지않았어요\n첫 답변을 달아보세요!")
+                    .font(.pretendard(.semiBold, size: 14))
+                    .foregroundStyle(.sub4)
+                    .multilineTextAlignment(.center)
+                    .lineSpacing(6)
+            } else {
+                PreviewList()
+            }
+            
+            Spacer()
+        }
+        .frame(maxWidth: .infinity)
+        .background(.first)
+    }
+    
+    private func Title() -> some View {
+        HStack(alignment: .top, spacing: 2) {
+            Text("Q.")
+                .foregroundStyle(.text)
+            
+            Text(store.todayQuestion.content)
+                .foregroundStyle(.main)
+            
+            Spacer()
+        }
+        .font(.pretendard(.bold, size: 20))
+        .lineSpacing(4)
+    }
+    
+    private func SubTitle() -> some View {
+        HStack {
+            Text("답변 미리보기")
+                .font(.pretendard(.medium, size: 14))
+                .foregroundStyle(.sub3)
+            
+            Spacer()
+            
+            if store.todayQuestion.isAnswered {
+                SeeAllButton {
+                    store.send(.seeAllAnswerButtonTapped)
+                }
+            }
+        }
+    }
+    
+    private func PreviewList() -> some View {
+        VStack(spacing: 0) {
+            ForEach(enumerated(store.answerPreviewList), id: \.element.id) {
+                index, answer in
+                EmptyView()
+            }
+        }
+    }
+}
+
+// MARK: - Preview
+
+#Preview {
+    let question = QuestionEntity(
+        id: 0,
+        content: "테스트 질문입니다.",
+        publishedDate: .now,
+        isAnswered: true,
+        isLived: true
+    )
+    let store = Store(
+        initialState: TodayQuestionFeature.State(
+            questionState: .creating,
+            todayQuestion: question,
+            answerPreviewList: [
+                AnswerEntity(
+                    id: 0,
+                    content: "테스트 답변 01",
+                    publishedDate: .now,
+                    isReported: false,
+                    isMine: false
+                ),
+                AnswerEntity(
+                    id: 1,
+                    content: "테스트 답변 02",
+                    publishedDate: .now,
+                    isReported: false,
+                    isMine: false
+                ),
+                AnswerEntity(
+                    id: 2,
+                    content: "테스트 답변 03",
+                    publishedDate: .now,
+                    isReported: false,
+                    isMine: false
+                )
+            ]
+        )
+    ) {
+        TodayQuestionFeature()
+    }
+    return NavigationStack {
+        VStack {
+            TodayQuestionView(store: store)
+        }
+    }
+}
