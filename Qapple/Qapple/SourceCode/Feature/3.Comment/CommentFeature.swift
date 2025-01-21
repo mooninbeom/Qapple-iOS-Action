@@ -13,7 +13,7 @@ import ComposableArchitecture
 struct CommentFeature {
     @ObservableState
     struct State: Equatable {
-        var post: Post?
+        var post: Post = samplePost
         
         var text: String = ""
         
@@ -33,7 +33,7 @@ struct CommentFeature {
         case paginationCellAppeared
         
         case likeButtonTapped(id: Int)
-        case uploadButtonTapped(id: Int, content: String)
+        case uploadButtonTapped(content: String)
         case deleteButtonTapped(id: Int)
         case reportButtonTapped(id: Int)
         
@@ -54,7 +54,7 @@ struct CommentFeature {
                 
             case let .likeButtonTapped(id: id):
                 return .none
-            case let .uploadButtonTapped(id: id, content: content):
+            case let .uploadButtonTapped(content: content):
                 return .none
             case let .deleteButtonTapped(id: id):
                 return .none
@@ -125,3 +125,17 @@ extension CommentFeature {
         return result
     }
 }
+
+
+
+private let samplePost = Post(
+    boardId: 1,
+    writerId: 1,
+    writerNickname: "이호창",
+    content: "특전사",
+    heartCount: 10,
+    commentCount: 13,
+    createAt: .init(),
+    isMine: false,
+    isReported: false,
+    isLiked: true)

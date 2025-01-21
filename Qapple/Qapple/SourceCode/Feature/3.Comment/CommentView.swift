@@ -9,16 +9,6 @@ import SwiftUI
 import ComposableArchitecture
 
 struct CommentView: View {
-    
-    @EnvironmentObject private var pathModel: Router
-//    @EnvironmentObject private var bulletinBoardUseCase: BulletinBoardUseCase
-    
-//    @State private var selectedPost: Post?
-    
-//    @State var post: Post
-    
-//    @State private var scrollIndex: Int?
-    
     @Bindable var store: StoreOf<CommentFeature> = .init(initialState: CommentFeature.State()) {
         CommentFeature()
     }
@@ -30,7 +20,7 @@ struct CommentView: View {
             HeaderView()
             
             BulletinBoardCell(
-                post: self.post,
+                post: store.post,
                 seeMoreAction: {
                     // TODO: 추후 수정 필요
                 })
@@ -53,30 +43,25 @@ struct CommentView: View {
         .task {
             store.send(.commentViewAppeared)
         }
-        .sheet(item: $selectedPost) { post in
-            BulletinBoardSeeMoreSheetView(
-                sheetType: post.isMine ? .mine : .others,
-                post: post,
-                isComment: true
-            )
-            .presentationDetents([.height(84)])
-            .presentationDragIndicator(.visible)
-        }
-        .onChange(of: bulletinBoardUseCase.state.posts) { _, newPosts in
-            if let updatedPost = newPosts.first(where: { $0.boardId == post.boardId }) {
-                self.post = updatedPost
-            }
-        }
+        // MARK: - Post ellipsis 버튼
+//        .sheet(item: $selectedPost) { post in
+//            BulletinBoardSeeMoreSheetView(
+//                sheetType: post.isMine ? .mine : .others,
+//                post: post,
+//                isComment: true
+//            )
+//            .presentationDetents([.height(84)])
+//            .presentationDragIndicator(.visible)
+//        }
         .onReceive(NotificationCenter.default.publisher(for: .updateViewNotification)) { _ in
-            Task {
-                await self.refreshComments()
-            }
+            store.send(.refreshCommentList)
         }
-        .alert("게시글이 삭제됐거나 오류가 발생했습니다.", isPresented: $commentViewModel.isPostDeletedAlertPresented) {
-            Button("확인", role: .none) {
-                pathModel.pop()
-            }
-        }
+        // MARK: - 게시글 에러 대응 alert
+//        .alert("게시글이 삭제됐거나 오류가 발생했습니다.", isPresented: $commentViewModel.isPostDeletedAlertPresented) {
+//            Button("확인", role: .none) {
+//                
+//            }
+//        }
     }
     
     var commentList: some View {
@@ -86,10 +71,9 @@ struct CommentView: View {
                     // 데이터 연결
                     ForEach(Array(self.store.comments.enumerated()), id: \.offset) { index, comment in
                         CommentCell(
+                            store: self.store,
                             comment: comment,
-                            cellIndex: index,
-                            commentViewModel: commentViewModel,
-                            post: self.$post
+                            cellIndex: index
                         )
                         .onAppear {
                             store.send(.paginationCellAppeared)
@@ -134,7 +118,7 @@ struct CommentView: View {
             Button {
                 Task.init {
                     HapticService.notification(type: .success)
-                    store.send(.uploadButtonTapped(id: post.boardId, content: ""))
+                    store.send(.uploadButtonTapped(content: ""))
                 }
             } label: {
                 Image(systemName: "paperplane")

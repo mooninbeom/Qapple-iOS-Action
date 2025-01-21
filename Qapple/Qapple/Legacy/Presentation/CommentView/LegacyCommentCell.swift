@@ -1,5 +1,5 @@
 //
-//  CommentCell.swift
+//  LegacyCommentCell.swift
 //  Qapple
 //
 //  Created by 문인범 on 8/8/24.
@@ -7,8 +7,8 @@
 
 import SwiftUI
 
-struct CommentCell: View {
-    let comment: CommentEntity
+struct LegacyCommentCell: View {
+    let comment: CommentResponse.Comment
     let cellIndex: Int
     
     let screenWidth: CGFloat = UIScreen.main.bounds.width
@@ -231,8 +231,7 @@ struct CommentCell: View {
     
     private var reportBtn: some View {
         Button {
-            // TODO: 네비게이션 연결 필요
-//            pathModel.pushView(screen: BulletinBoardPathType.commentReport(comment: comment))
+            pathModel.pushView(screen: BulletinBoardPathType.commentReport(comment: comment))
         } label: {
             ZStack {
                 Color.report
@@ -245,4 +244,3 @@ struct CommentCell: View {
         .frame(width: 73)
     }
 }
-

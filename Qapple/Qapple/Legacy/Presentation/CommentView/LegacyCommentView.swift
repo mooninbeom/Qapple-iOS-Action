@@ -87,7 +87,7 @@ struct LegacyCommentView: View {
                         comment in
                         seperator
                         
-                        CommentCell(
+                        LegacyCommentCell(
                             comment: comment,
                             cellIndex: index,
                             commentViewModel: commentViewModel,
