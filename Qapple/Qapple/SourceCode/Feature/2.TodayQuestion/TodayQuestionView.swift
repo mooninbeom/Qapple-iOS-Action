@@ -13,12 +13,24 @@ struct TodayQuestionView: View {
     let store: StoreOf<TodayQuestionFeature>
     
     var body: some View {
-        VStack(spacing: 0) {
-            HeaderView(store: store)
-            QuestionButton(store: store)
-            AnswerPreviewList(store: store)
+        ZStack {
+            Color.second.ignoresSafeArea()
+            
+            ScrollView {
+                VStack(spacing: 0) {
+                    HeaderView(store: store)
+                    QuestionButton(store: store)
+                    AnswerPreviewList(store: store)
+                }
+            }
+            .scrollIndicators(.hidden)
         }
-        .ignoresSafeArea()
+        .onAppear {
+            store.send(.onAppear)
+        }
+        .refreshable {
+            store.send(.refresh)
+        }
     }
 }
 
@@ -111,31 +123,35 @@ private struct AnswerPreviewList: View {
     let store: StoreOf<TodayQuestionFeature>
     
     var body: some View {
-        VStack(spacing: 0) {
-            Title()
-                .padding(.top, 40)
-                .padding(.horizontal, 20)
+        ZStack {
+            Color(Background.first)
+                .padding(.bottom, -720)
             
-            SubTitle()
-                .padding(.top, 20)
-                .padding(.horizontal, 20)
-            
-            if store.answerPreviewList.isEmpty {
-                Spacer()
+            VStack(spacing: 0) {
+                Title()
+                    .padding(.top, 40)
+                    .padding(.horizontal, 20)
                 
-                Text("아직 답변이 달리지않았어요\n첫 답변을 달아보세요!")
-                    .font(.pretendard(.semiBold, size: 14))
-                    .foregroundStyle(.sub4)
-                    .multilineTextAlignment(.center)
-                    .lineSpacing(6)
-            } else {
-                PreviewList()
+                SubTitle()
+                    .padding(.top, 20)
+                    .padding(.horizontal, 20)
+                
+                if store.answerPreviewList.isEmpty {
+                    Spacer()
+                    
+                    Text("아직 답변이 달리지않았어요\n첫 답변을 달아보세요!")
+                        .font(.pretendard(.semiBold, size: 14))
+                        .foregroundStyle(.sub4)
+                        .multilineTextAlignment(.center)
+                        .lineSpacing(6)
+                        .padding(.top, 120)
+                } else {
+                    PreviewList()
+                        .padding(.top, 14)
+                }
             }
-            
-            Spacer()
+            .frame(maxWidth: .infinity)
         }
-        .frame(maxWidth: .infinity)
-        .background(.first)
     }
     
     private func Title() -> some View {
@@ -172,7 +188,13 @@ private struct AnswerPreviewList: View {
         VStack(spacing: 0) {
             ForEach(enumerated(store.answerPreviewList), id: \.element.id) {
                 index, answer in
-                EmptyView()
+                AnswerCell(
+                    answer: answer,
+                    state: .normal(index: index),
+                    seeMoreAction: {
+                        
+                    }
+                )
             }
         }
     }

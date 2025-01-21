@@ -12,7 +12,6 @@ struct AnswerCell: View {
     enum State {
         case normal(index: Int)
         case written
-        case reported(index: Int)
     }
     
     let answer: AnswerEntity
@@ -22,23 +21,24 @@ struct AnswerCell: View {
     var body: some View {
         switch state {
         case let .normal(index):
-            NormalCell(
-                answer: answer,
-                author: author(index: index),
-                seeMoreAction: seeMoreAction
-            )
+            if answer.isReported {
+                ReportedCell(
+                    answer: answer,
+                    author: author(index: index)
+                )
+            } else {
+                NormalCell(
+                    answer: answer,
+                    author: author(index: index),
+                    seeMoreAction: seeMoreAction
+                )
+            }
             
         case .written:
             NormalCell(
                 answer: answer,
                 author: answer.authorNickname,
                 seeMoreAction: seeMoreAction
-            )
-            
-        case let .reported(index):
-            ReportedCell(
-                answer: answer,
-                author: author(index: index)
             )
         }
     }
@@ -67,7 +67,7 @@ private struct NormalCell: View {
                 .padding(.horizontal, 16)
             
             Content()
-                .padding(.bottom, 0)
+                .padding(.bottom, 16)
                 .padding(.horizontal, 16)
         }
         .background(.first)
@@ -167,7 +167,7 @@ private struct ReportedCell: View {
                 
                 Spacer()
             }
-            .padding(.bottom, 8)
+            .padding(.bottom, 24)
             .padding(.horizontal, 16)
         }
         .background(.first)
@@ -186,6 +186,7 @@ private struct ReportedCell: View {
                 .padding(.horizontal, 16)
         }
         .background(.first)
+        .padding(.bottom, 16)
     }
     
     private func Header() -> some View {
@@ -274,11 +275,11 @@ private struct ReportedCell: View {
     ZStack {
         Color.first.ignoresSafeArea()
         
-        VStack(alignment: .leading, spacing: 20) {
+        VStack(alignment: .leading, spacing: 0) {
             AnswerCell(answer: answers[0], state: .normal(index: 0)) {}
             AnswerCell(answer: answers[1], state: .normal(index: 1)) {}
             AnswerCell(answer: answers[2], state: .normal(index: 2)) {}
-            AnswerCell(answer: answers[3], state: .reported(index: 3)) {}
+            AnswerCell(answer: answers[3], state: .normal(index: 3)) {}
             AnswerCell(answer: answers[1], state: .written) {}
         }
     }
