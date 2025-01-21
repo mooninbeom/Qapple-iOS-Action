@@ -22,6 +22,8 @@ struct QappleRepository {
     var reportsBoard: (_ boardId: Int, _ boardReportType: String) async throws -> BoardReportsDTO
     var reportsBoardComment: (_ boardCommentId: Int, _ boardCommentReportType: String) async throws -> BoardCommentReportsDTO
     var reportsAnswer: (_ answerId: Int, _ reportType: String) async throws -> AnswerReportsDTO
+    
+    var refreshToken: () async throws -> RefreshToken
 }
 
 extension QappleRepository: DependencyKey {
@@ -37,7 +39,9 @@ extension QappleRepository: DependencyKey {
         
         reportsBoard: makeReportsBoard(),
         reportsBoardComment: makeReportsBoardComment(),
-        reportsAnswer: makeReportsAnswer()
+        reportsAnswer: makeReportsAnswer(),
+        
+        refreshToken: makeRefreshToken()
     )
 }
 

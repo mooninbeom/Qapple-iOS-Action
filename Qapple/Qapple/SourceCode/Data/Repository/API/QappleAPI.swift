@@ -95,5 +95,20 @@ enum QappleAPI {
             }
         }
     }
+    
+    enum Token: RawRepresentable, API {
+        
+        static let baseUrl = QappleAPI.baseUrl?
+            .appendingPathComponent("token")
+        
+        case refresh
+        
+        var rawValue: RawValue {
+            switch self {
+            case .refresh:
+                appending(baseString: "refresh")
+            }
+        }
+    }
 }
 
