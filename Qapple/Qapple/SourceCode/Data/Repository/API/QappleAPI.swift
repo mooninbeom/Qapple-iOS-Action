@@ -109,8 +109,38 @@ enum QappleAPI {
             case let .list(threshold, pageSize):
                 appending(urlQueryItems: [
                     .init(key: "threshold", value: threshold),
-                    .init(key: "pageSize", value: pageSize)
+                    .init(key: "pageSize", value: pageSize),
                 ])
+            }
+        }
+    }
+    
+    enum BoardComment: RawRepresentable, API {
+        
+        static let baseUrl = QappleAPI.baseUrl?
+            .appendingPathComponent("board-comments")
+        
+        case list(boardId: Int, threshold: Int?, pageSize: Int32 = 30)
+        case delete(commentId: Int)
+        case post(boardId: Int)
+        case like(commentId: Int)
+        
+        var rawValue: RawValue {
+            switch self {
+            case let .list(boardId, threshold, pageSize):
+                appending(baseString: "\(boardId)", urlQueryItems: [
+                    .init(key: "threshold", value: threshold),
+                    .init(key: "pageSize", value: pageSize),
+                ])
+                
+            case let .delete(commentId):
+                appending(baseString: "\(commentId)")
+                
+            case let .post(boardId):
+                appending(baseString: "board/\(boardId)")
+                
+            case let .like(commentId):
+                appending(baseString: "heart/\(commentId)")
             }
         }
     }

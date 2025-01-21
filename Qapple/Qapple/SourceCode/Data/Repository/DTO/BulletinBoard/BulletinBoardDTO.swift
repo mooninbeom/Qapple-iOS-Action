@@ -10,12 +10,12 @@ import Foundation
 struct BulletinBoardDTO: Codable {
     let total: Int
     let size: Int
-    let content: [content]
+    let content: [Content]
     let numberOfElements: Int
     let threshold: String
     let hasNext: Bool
     
-    struct content: Codable {
+    struct Content: Codable {
         let boardId: Int
         let writerId: Int
         let writerNickname: String

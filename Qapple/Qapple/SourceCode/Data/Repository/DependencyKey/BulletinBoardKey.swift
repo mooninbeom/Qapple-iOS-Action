@@ -10,7 +10,7 @@ import Foundation
 extension QappleRepository {
     
     /// 게시글 조회
-    static func makeFetchBulletinBoard() -> (_ threshold: Int?) async throws -> ([BulletinBoard], QappleAPI.PaginationInfo) {
+    static func makeFetchBulletinBoardList() -> (_ threshold: Int?) async throws -> ([BulletinBoard], QappleAPI.PaginationInfo) {
         return { threshold in
             let url = try QappleAPI.Board.list(threshold: threshold, pageSize: 10).url()
             let response: BaseResponse<BulletinBoardDTO> = try await networkClient.get(url: url)
@@ -32,7 +32,7 @@ extension QappleRepository {
     static func makeFetchSingleBoard() -> (_ boardId: Int) async throws -> BulletinBoard {
         return { boardId in
             let url = try QappleAPI.Board.single(boardId: boardId).url()
-            let response: BaseResponse<BulletinBoardDTO.content> = try await networkClient.get(url: url)
+            let response: BaseResponse<BulletinBoardDTO.Content> = try await networkClient.get(url: url)
             return response.result.toEntity
         }
     }

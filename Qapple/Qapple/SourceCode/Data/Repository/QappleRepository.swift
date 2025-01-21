@@ -16,7 +16,7 @@ struct QappleRepository {
     var fetchAnswerListOfQuestion: (_ questionId: Int, _ threshold: Int?) async throws -> ([AnswerOfQuestion], QappleAPI.PaginationInfo)
     var postAnswer: (_ questionId: Int, _ answer: String) async throws -> PostAnswerDTO
     
-    var fetchBulletinBoard: (_ threshold: Int?) async throws -> ([BulletinBoard], QappleAPI.PaginationInfo)
+    var fetchBulletinBoardList: (_ threshold: Int?) async throws -> ([BulletinBoard], QappleAPI.PaginationInfo)
     var postBoard: (_ content: String) async throws -> PostBoardDTO
     var fetchSingleBoard: (_ boardId: Int) async throws -> BulletinBoard
     var deleteBoard: (_ boardId: Int) async throws -> DeleteBoardDTO
@@ -25,6 +25,11 @@ struct QappleRepository {
     
     var fetchQuestionList: (_ threshold: String?) async throws -> ([Question], QappleAPI.PaginationInfo)
     var fetchMainQuestionList: () async throws -> QuestionOfMain
+    
+    var fetchBoardCommentList: (_ boardId: Int, _ threshold: Int?) async throws -> ([BoardComment], QappleAPI.PaginationInfo)
+    var deleteBoardComment: (_ boardCommentId: Int) async throws -> DeleteBoardCommentsDTO
+    var postBoardComment: (_ boardId: Int, _ content: String) async throws -> PostBoardCommentsDTO
+    var likeBoardComment: (_ boardCommentId: Int) async throws -> LikeBoardCommentsDTO
     
     var fetchNotificationList: (_ threshold: Int?) async throws -> ([QappleNotification], QappleAPI.PaginationInfo)
     
@@ -43,7 +48,7 @@ extension QappleRepository: DependencyKey {
         fetchAnswerListOfQuestion: makeFetchAnswerListOfQuestion(),
         postAnswer: makePostAnswer(),
         
-        fetchBulletinBoard: makeFetchBulletinBoard(),
+        fetchBulletinBoardList: makeFetchBulletinBoardList(),
         postBoard: makePostBoard(),
         fetchSingleBoard: makeFetchSingleBoard(),
         deleteBoard: makeDeleteBoard(),
@@ -52,6 +57,11 @@ extension QappleRepository: DependencyKey {
         
         fetchQuestionList: makeFetchQuestionList(),
         fetchMainQuestionList: makeFetchMainQuestionList(),
+        
+        fetchBoardCommentList: makeFetchBoardCommentList(),
+        deleteBoardComment: makeDeleteBoardComment(),
+        postBoardComment: makePostBoardComment(),
+        likeBoardComment: makeLikeBoardComment(),
         
         fetchNotificationList: makeFetchNotificationList(),
         
