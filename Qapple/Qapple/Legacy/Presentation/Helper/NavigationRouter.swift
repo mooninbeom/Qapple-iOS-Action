@@ -91,7 +91,7 @@ final class Router: ObservableObject, NavigationRouter {
             case .comment(post: let post):
                 LegacyCommentView(post: post)
             case .commentReport(comment: let comment):
-                CommentReportView(comment: comment)
+                LegacyCommentReportView(comment: comment)
             case .report(boardId: let boardId, isComment: let isComment):
                 ReportView(answerId: -1, boardId: boardId, isComment: isComment)
             case .answer(let questionId, let questionContent):
