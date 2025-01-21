@@ -44,7 +44,7 @@ enum QappleAPI {
         case listOfProfile(threshold: Int?, pageSize: Int32 = 30)
         case delete(answerId: Int)
         case listOfQuestion(questionId: Int, threshold: Int?, pageSize: Int32 = 30)
-        case register(questionId: Int, answer: String)
+        case post(questionId: Int)
         
 //        case fetch(answerId: Int64) // 답변 수정 사용하지 않음
 //        case heart(answerId: Int64) // 답변 좋아요/취소 사용하지 않음
@@ -67,7 +67,7 @@ enum QappleAPI {
                     .init(key: "pageSize", value: pageSize),
                 ])
                 
-            case let .register(questionId, answer):
+            case let .post(questionId):
                 appending(baseString: "question/\(questionId)")
             }
         }
@@ -78,11 +78,11 @@ enum QappleAPI {
         static let baseUrl = QappleAPI.baseUrl?
             .appendingPathComponent("notifications")
         
-        case notification(threshold: Int?, pageSize: Int32 = 30)
+        case list(threshold: Int?, pageSize: Int32 = 30)
         
         var rawValue: RawValue {
             switch self {
-            case let .notification(threshold, pageSize):
+            case let .list(threshold, pageSize):
                 appending(urlQueryItems: [
                     .init(key: "threshold", value: threshold),
                     .init(key: "pageSize", value: pageSize),
@@ -97,19 +97,19 @@ enum QappleAPI {
         static let baseUrl = QappleAPI.baseUrl?
             .appendingPathComponent("reports")
         
-        case board(boardId: Int, boardReportType: String)
-        case boardComment(boardCommentId: Int, boardCommentReportType: String)
-        case answer(answerId: Int, reportType: String)
+        case board
+        case boardComment
+        case answer
         
         var rawValue: RawValue {
             switch self {
-            case let .board(boardId, boardReportType):
+            case .board:
                 appending(baseString: "board")
                 
-            case let .boardComment(boardCommentId, boardCommentReportType):
+            case .boardComment:
                 appending(baseString: "board-comment")
                 
-            case let .answer(answerId, reportType):
+            case .answer:
                 appending()
             }
         }

@@ -17,9 +17,9 @@ struct QappleRepository {
     var fetchAnswerListOfProfile: (_ threshold: Int?) async throws -> ([AnswerOfProfile], QappleAPI.PaginationInfo)
     var deleteAnswer: (_ answerId: Int) async throws -> DeleteAnswerDTO
     var fetchAnswerListOfQuestion: (_ questionId: Int, _ threshold: Int?) async throws -> ([AnswerOfQuestion], QappleAPI.PaginationInfo)
-    var registerAnswer: (_ questionId: Int, _ answer: String) async throws -> RegisterAnswerDTO
+    var postAnswer: (_ questionId: Int, _ answer: String) async throws -> PostAnswerDTO
     
-    var qappleNotificationList: (_ threshold: Int?) async throws -> ([QappleNotification], QappleAPI.PaginationInfo)
+    var fetchNotificationList: (_ threshold: Int?) async throws -> ([QappleNotification], QappleAPI.PaginationInfo)
     
     var reportsBoard: (_ boardId: Int, _ boardReportType: String) async throws -> BoardReportsDTO
     var reportsBoardComment: (_ boardCommentId: Int, _ boardCommentReportType: String) async throws -> BoardCommentReportsDTO
@@ -37,9 +37,9 @@ extension QappleRepository: DependencyKey {
         fetchAnswerListOfProfile: makeFetchAnswerListOfProfile(),
         deleteAnswer: makeDeleteAnswer(),
         fetchAnswerListOfQuestion: makeFetchAnswerListOfQuestion(),
-        registerAnswer: makeRegisterAnswer(),
+        postAnswer: makePostAnswer(),
         
-        qappleNotificationList: makeNotification(),
+        fetchNotificationList: makeFetchNotificationList(),
         
         reportsBoard: makeReportsBoard(),
         reportsBoardComment: makeReportsBoardComment(),

@@ -38,11 +38,11 @@ extension QappleRepository {
     }
     
     /// 답변 생성
-    static func makeRegisterAnswer() -> (_ questionId: Int, _ answer: String) async throws -> RegisterAnswerDTO {
+    static func makePostAnswer() -> (_ questionId: Int, _ answer: String) async throws -> PostAnswerDTO {
         return { questionId, answer in
-            let url = try QappleAPI.Answer.register(questionId: questionId, answer: answer).url()
-            let requestBody: RegisterAnswerRequest = RegisterAnswerRequest(answer: answer)
-            let response: BaseResponse<RegisterAnswerDTO> = try await networkClient.post(url: url, body: requestBody)
+            let url = try QappleAPI.Answer.post(questionId: questionId).url()
+            let requestBody: PostAnswerRequest = PostAnswerRequest(answer: answer)
+            let response: BaseResponse<PostAnswerDTO> = try await networkClient.post(url: url, body: requestBody)
             return response.result
         }
     }

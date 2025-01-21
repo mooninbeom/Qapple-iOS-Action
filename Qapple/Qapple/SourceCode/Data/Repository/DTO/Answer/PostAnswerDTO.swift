@@ -7,10 +7,10 @@
 
 import Foundation
 
-struct RegisterAnswerDTO: Codable {
+struct PostAnswerDTO: Codable {
     let answerId: Int
 }
 
-struct RegisterAnswerRequest: Codable {
+struct PostAnswerRequest: Codable {
     let answer: String
 }
