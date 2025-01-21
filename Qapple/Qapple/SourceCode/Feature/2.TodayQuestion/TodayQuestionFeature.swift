@@ -12,7 +12,8 @@ struct TodayQuestionFeature {
     
     @ObservableState
     struct State: Equatable {
-        var answerPreviewList: [Answer]
+        var todayQuestion: 
+        var answerPreviewList: [AnswerEntity]
     }
     
     enum Action {
