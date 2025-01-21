@@ -54,7 +54,7 @@ private struct HeaderView: View {
                 .padding(.top, 16)
             
             if store.questionState == .creating {
-                Text("00:00:00")
+                Text(store.timeRemainingForQuestion.timerFormat)
                     .font(.pretendard(.bold, size: 38))
                     .foregroundStyle(LinearGradient.timerGradient)
                     .frame(height: 27)
@@ -192,7 +192,7 @@ private struct AnswerPreviewList: View {
                     answer: answer,
                     state: .normal(index: index),
                     seeMoreAction: {
-                        
+                        store.send(.seeMoreAnswerButtonTapped(answer))
                     }
                 )
             }

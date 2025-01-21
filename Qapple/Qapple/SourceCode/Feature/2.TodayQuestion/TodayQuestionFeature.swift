@@ -6,6 +6,7 @@
 //
 
 import ComposableArchitecture
+import Foundation
 
 @Reducer
 struct TodayQuestionFeature {
@@ -15,6 +16,7 @@ struct TodayQuestionFeature {
         var questionState: QuestionState
         var todayQuestion: QuestionEntity
         var answerPreviewList: [AnswerEntity] = []
+        var timeRemainingForQuestion: TimeInterval = 0
     }
     
     enum Action {
@@ -22,14 +24,27 @@ struct TodayQuestionFeature {
         case refresh
         case questionButtonTapped
         case seeAllAnswerButtonTapped
-        case seeMoreAnswerButtonTapped(Answer)
+        case seeMoreAnswerButtonTapped(AnswerEntity)
+        case questionTimerTick
     }
+    
+    enum CancelID {
+        case questionTimer
+    }
+    
+    @Dependency(\.continuousClock) var clock
     
     var body: some ReducerOf<Self> {
         Reduce { state, action in
             switch action {
             case .onAppear:
-                return .none
+                return .run { send in
+                    // TODO: 오후 1시 ~ 오후 8시 질문 생성 시간에만 작동하게 만들기
+                    for await _ in clock.timer(interval: .seconds(1)) {
+                        await send(.questionTimerTick)
+                    }
+                }
+                .cancellable(id: CancelID.questionTimer)
                 
             case .refresh:
                 return .none
@@ -42,6 +57,10 @@ struct TodayQuestionFeature {
                 
             case let .seeMoreAnswerButtonTapped(answer):
                 print(answer)
+                return .none
+                
+            case .questionTimerTick:
+                state.timeRemainingForQuestion += 1
                 return .none
             }
         }
