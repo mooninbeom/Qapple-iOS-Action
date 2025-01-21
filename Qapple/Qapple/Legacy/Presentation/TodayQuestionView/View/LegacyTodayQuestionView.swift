@@ -334,7 +334,7 @@ private struct AnswerPreview: View {
                     // 답변 있는 케이스
                     VStack(spacing: 0) {
                         ForEach(Array(viewModel.answerList.enumerated()), id: \.offset) { index, answer in
-                            AnswerCell(
+                            LegacyAnswerCell(
                                 answer: Answer(
                                     id: answer.answerId,
                                     writerId: answer.writerId,

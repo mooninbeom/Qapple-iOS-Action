@@ -17,6 +17,9 @@ struct AnswerEntity: Identifiable, Equatable {
     /// 답변 내용
     let content: String
     
+    /// 작성자 닉네임
+    let authorNickname: String
+    
     /// 답변 게시 날짜
     let publishedDate: Date
     
@@ -25,4 +28,7 @@ struct AnswerEntity: Identifiable, Equatable {
     
     /// 현재 사용자가 작성한 답변인지 여부
     let isMine: Bool
+    
+    /// 탈퇴한 사용자의 답변인지 여부
+    let isResignMember: Bool
 }

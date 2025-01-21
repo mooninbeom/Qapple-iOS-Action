@@ -196,30 +196,36 @@ private struct AnswerPreviewList: View {
                 AnswerEntity(
                     id: 0,
                     content: "테스트 답변 01",
+                    authorNickname: "테스트 러너 1",
                     publishedDate: .now,
                     isReported: false,
-                    isMine: false
+                    isMine: false,
+                    isResignMember: false
                 ),
                 AnswerEntity(
                     id: 1,
                     content: "테스트 답변 02",
+                    authorNickname: "테스트 러너 2",
                     publishedDate: .now,
                     isReported: false,
-                    isMine: false
+                    isMine: false,
+                    isResignMember: false
                 ),
                 AnswerEntity(
                     id: 2,
                     content: "테스트 답변 03",
+                    authorNickname: "테스트 러너 3",
                     publishedDate: .now,
                     isReported: false,
-                    isMine: false
+                    isMine: false,
+                    isResignMember: false
                 )
             ]
         )
     ) {
         TodayQuestionFeature()
     }
-    return NavigationStack {
+    NavigationStack {
         VStack {
             TodayQuestionView(store: store)
         }
