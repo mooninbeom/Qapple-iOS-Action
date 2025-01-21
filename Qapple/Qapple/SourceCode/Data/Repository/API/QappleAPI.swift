@@ -18,11 +18,15 @@ enum QappleAPI {
         static let baseUrl = QappleAPI.baseUrl?
             .appendingPathComponent("questions")
         
-        case list(threshold: String?, pageSize: Int = 30)
+        case mainList
+        case allList(threshold: String?, pageSize: Int = 30)
+//        case heart(qusetionId: Int64) // 질문 좋아요 사용하지 않음
         
         var rawValue: RawValue {
             switch self {
-            case let .list(threshold, pageSize):
+            case .mainList:
+                appending(baseString: "main")
+            case let .allList(threshold, pageSize):
                 appending(urlQueryItems: [
                     .init(key: "threshold", value: threshold),
                     .init(key: "pageSize", value: pageSize)
