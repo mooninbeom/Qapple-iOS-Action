@@ -27,15 +27,17 @@ struct AnswersOfQuestionDTO: Codable {
         let writeAt: String
     }
     
-    var toEntity: [Answer2] {
-        content.map {
-            Answer2(
+    var toEntityWithThreshold: ([AnswerOfQuestion], QappleAPI.PaginationInfo) {
+        let answerListOfQuestion = self.content.map {
+            AnswerOfQuestion(
                 id: $0.answerId,
                 content: $0.content,
                 publishedDate: .now, // $0.writeAt
                 isReported: $0.isReported
             )
         }
+        
+        return(answerListOfQuestion, (threshold, hasNext))
     }
 }
 

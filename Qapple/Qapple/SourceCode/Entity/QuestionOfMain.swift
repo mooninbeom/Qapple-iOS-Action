@@ -7,7 +7,7 @@
 
 import Foundation
 
-struct MainQuestion: Identifiable, Equatable {
+struct QuestionOfMain: Identifiable, Equatable {
     let id: Int
     let title: String
     var isAnswered: Bool

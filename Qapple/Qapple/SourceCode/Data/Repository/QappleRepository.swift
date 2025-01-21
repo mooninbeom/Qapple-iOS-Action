@@ -12,17 +12,24 @@ struct QappleRepository {
     static let networkClient = NetworkClient()
     
     var fetchQuestionList: (_ threshold: String?) async throws -> ([Question], QappleAPI.PaginationInfo)
-    var fetchMainQuestionList: () async throws -> MainQuestion
-    var fetchAnswerList: (_ questionId: Int, _ threshold: String?) async throws -> ([Answer2])
+    var fetchMainQuestionList: () async throws -> QuestionOfMain
+    
+    var fetchAnswerListOfProfile: (_ threshold: Int?) async throws -> ([AnswerOfProfile], QappleAPI.PaginationInfo)
+    var deleteAnswer: (_ answerId: Int) async throws -> DeleteAnswerDTO
+    var fetchAnswerListOfQuestion: (_ questionId: Int, _ threshold: Int?) async throws -> ([AnswerOfQuestion], QappleAPI.PaginationInfo)
+    var registerAnswer: (_ questionId: Int, _ answer: String) async throws -> RegisterAnswerDTO
 }
 
 extension QappleRepository: DependencyKey {
     
-    static let liveValue = Self(
+    static let liveValue = Self (
         fetchQuestionList: makeFetchQuestionList(),
         fetchMainQuestionList: makeFetchMainQuestionList(),
         
-        fetchAnswerList: makeFetchAnswerList()
+        fetchAnswerListOfProfile: makeFetchAnswerListOfProfile(),
+        deleteAnswer: makeDeleteAnswer(),
+        fetchAnswerListOfQuestion: makeFetchAnswerListOfQuestion(),
+        registerAnswer: makeRegisterAnswer()
     )
 }
 

@@ -7,7 +7,7 @@
 
 import Foundation
 
-struct Answer2: Identifiable, Equatable {
+struct AnswerOfQuestion: Identifiable, Equatable {
     let id: Int
     let content: String
     let publishedDate: Date
