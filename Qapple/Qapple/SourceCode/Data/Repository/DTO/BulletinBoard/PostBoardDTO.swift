@@ -6,3 +6,12 @@
 //
 
 import Foundation
+
+struct PostBoardDTO: Codable {
+    let boardId: Int
+}
+
+struct PostBoardRequest: Codable {
+    let content: String
+    let boardType: String
+}

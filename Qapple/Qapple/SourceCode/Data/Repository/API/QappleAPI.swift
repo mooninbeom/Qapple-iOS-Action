@@ -13,30 +13,6 @@ enum QappleAPI {
     
     private static let baseUrl = URL(string: "http://api.capple.shop:8080")
     
-    enum Question: RawRepresentable, API {
-        
-        static let baseUrl = QappleAPI.baseUrl?
-            .appendingPathComponent("questions")
-        
-        case listOfMain
-        case list(threshold: String?, pageSize: Int = 30)
-        
-//        case heart(qusetionId: Int64) // 질문 좋아요 사용하지 않음
-        
-        var rawValue: RawValue {
-            switch self {
-            case .listOfMain:
-                appending(baseString: "main")
-                
-            case let .list(threshold, pageSize):
-                appending(urlQueryItems: [
-                    .init(key: "threshold", value: threshold),
-                    .init(key: "pageSize", value: pageSize)
-                ])
-            }
-        }
-    }
-    
     enum Answer: RawRepresentable, API {
         static let baseUrl = QappleAPI.baseUrl?
             .appendingPathComponent("answers")
@@ -69,6 +45,72 @@ enum QappleAPI {
                 
             case let .post(questionId):
                 appending(baseString: "question/\(questionId)")
+            }
+        }
+    }
+    
+    enum Board: RawRepresentable, API {
+        
+        static let baseUrl = QappleAPI.baseUrl?
+            .appendingPathComponent("boards")
+        
+        case list(threshold: Int?, pageSize: Int32 = 30)
+        case post
+        case single(boardId: Int)
+        case delete(boardId: Int)
+        case like(boardId: Int)
+        case search(keyword: String?, threshold: Int?, pageSize: Int32 = 30)
+        
+        var rawValue: RawValue {
+            switch self {
+            case let .list(threshold, pageSize):
+                appending(urlQueryItems: [
+                    .init(key: "threshold", value: threshold),
+                    .init(key: "pageSize", value: pageSize),
+                ])
+                
+            case .post:
+                appending()
+                
+            case let .single(boardId):
+                appending(baseString: "\(boardId)")
+                
+            case let .delete(boardId):
+                appending(baseString: "\(boardId)")
+                
+            case let .like(boardId):
+                appending(baseString: "\(boardId)")
+                
+            case let .search(keyword, threshold, pageSize):
+                appending(urlQueryItems: [
+                    .init(key: "keyword", value: keyword),
+                    .init(key: "threshold", value: threshold),
+                    .init(key: "pageSize", value: pageSize),
+                ])
+            }
+        }
+    }
+    
+    enum Question: RawRepresentable, API {
+        
+        static let baseUrl = QappleAPI.baseUrl?
+            .appendingPathComponent("questions")
+        
+        case listOfMain
+        case list(threshold: String?, pageSize: Int32 = 30)
+        
+//        case heart(qusetionId: Int64) // 질문 좋아요 사용하지 않음
+        
+        var rawValue: RawValue {
+            switch self {
+            case .listOfMain:
+                appending(baseString: "main")
+                
+            case let .list(threshold, pageSize):
+                appending(urlQueryItems: [
+                    .init(key: "threshold", value: threshold),
+                    .init(key: "pageSize", value: pageSize)
+                ])
             }
         }
     }

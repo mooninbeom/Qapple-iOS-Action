@@ -6,3 +6,12 @@
 //
 
 import Foundation
+
+struct LikeBoardDTO: Codable {
+    let boardId: Int
+    let isLiked: Bool
+}
+
+struct LikeBoardRequest: Codable {
+    let boardId: Int
+}

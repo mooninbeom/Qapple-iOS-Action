@@ -11,13 +11,20 @@ import ComposableArchitecture
 struct QappleRepository {
     static let networkClient = NetworkClient()
     
-    var fetchQuestionList: (_ threshold: String?) async throws -> ([Question], QappleAPI.PaginationInfo)
-    var fetchMainQuestionList: () async throws -> QuestionOfMain
-    
     var fetchAnswerListOfProfile: (_ threshold: Int?) async throws -> ([AnswerOfProfile], QappleAPI.PaginationInfo)
     var deleteAnswer: (_ answerId: Int) async throws -> DeleteAnswerDTO
     var fetchAnswerListOfQuestion: (_ questionId: Int, _ threshold: Int?) async throws -> ([AnswerOfQuestion], QappleAPI.PaginationInfo)
     var postAnswer: (_ questionId: Int, _ answer: String) async throws -> PostAnswerDTO
+    
+    var fetchBulletinBoard: (_ threshold: Int?) async throws -> ([BulletinBoard], QappleAPI.PaginationInfo)
+    var postBoard: (_ content: String) async throws -> PostBoardDTO
+    var fetchSingleBoard: (_ boardId: Int) async throws -> BulletinBoard
+    var deleteBoard: (_ boardId: Int) async throws -> DeleteBoardDTO
+    var likeBoard: (_ boardId: Int) async throws -> LikeBoardDTO
+    var searchBoard: (_ keyword: String?, _ threshold: Int?) async throws -> ([BulletinBoard], QappleAPI.PaginationInfo)
+    
+    var fetchQuestionList: (_ threshold: String?) async throws -> ([Question], QappleAPI.PaginationInfo)
+    var fetchMainQuestionList: () async throws -> QuestionOfMain
     
     var fetchNotificationList: (_ threshold: Int?) async throws -> ([QappleNotification], QappleAPI.PaginationInfo)
     
@@ -31,13 +38,20 @@ struct QappleRepository {
 extension QappleRepository: DependencyKey {
     
     static let liveValue = Self (
-        fetchQuestionList: makeFetchQuestionList(),
-        fetchMainQuestionList: makeFetchMainQuestionList(),
-        
         fetchAnswerListOfProfile: makeFetchAnswerListOfProfile(),
         deleteAnswer: makeDeleteAnswer(),
         fetchAnswerListOfQuestion: makeFetchAnswerListOfQuestion(),
         postAnswer: makePostAnswer(),
+        
+        fetchBulletinBoard: makeFetchBulletinBoard(),
+        postBoard: makePostBoard(),
+        fetchSingleBoard: makeFetchSingleBoard(),
+        deleteBoard: makeDeleteBoard(),
+        likeBoard: makeLikeBoard(),
+        searchBoard: makeSearchBoard(),
+        
+        fetchQuestionList: makeFetchQuestionList(),
+        fetchMainQuestionList: makeFetchMainQuestionList(),
         
         fetchNotificationList: makeFetchNotificationList(),
         

@@ -6,3 +6,7 @@
 //
 
 import Foundation
+
+struct DeleteBoardDTO: Codable {
+    let boardId: Int
+}
