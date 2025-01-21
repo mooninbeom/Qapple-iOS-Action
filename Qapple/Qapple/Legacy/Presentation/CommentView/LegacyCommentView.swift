@@ -12,7 +12,7 @@ struct LegacyCommentView: View {
     @EnvironmentObject private var pathModel: Router
     @EnvironmentObject private var bulletinBoardUseCase: BulletinBoardUseCase
     
-    @StateObject private var commentViewModel: CommentViewModel = .init()
+    @StateObject private var commentViewModel: LegacyCommentViewModel = .init()
     @State private var text: String = ""
     @State private var selectedPost: Post?
     

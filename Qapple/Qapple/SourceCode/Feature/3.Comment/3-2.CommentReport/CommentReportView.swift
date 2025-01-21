@@ -9,10 +9,24 @@ import SwiftUI
 import ComposableArchitecture
 
 struct CommentReportView: View {
-    @Bindable var store: StoreOf<CommentReportFeature> = .init(
-        initialState: CommentReportFeature.State(commentId: 0)) {
-            CommentReportFeature()
-        }
+    @Bindable var store: StoreOf<CommentReportFeature>
+    
+    init(commentId: Int) {
+        self.store = .init(
+            initialState: CommentReportFeature.State(commentId: commentId)) {
+                CommentReportFeature()
+            }
+    }
+    
+    private let reportList = [
+        "불법촬영물 등의 유통",
+        "상업적 광고 및 판매",
+        "게시판 성격에 부적절함",
+        "욕설/비하",
+        "정당/정치인 비하 및 선거운동",
+        "유출/사칭/사기",
+        "낚시/놀림/도배"
+    ]
     
     var body: some View {
         ZStack {
@@ -36,13 +50,10 @@ struct CommentReportView: View {
                 )
                 
                 VStack(alignment: .leading) {
-                    ForEach(Array(store.reportList.enumerated()), id: \.offset) { index, report in
+                    ForEach(Array(self.reportList.enumerated()), id: \.offset) { index, report in
                         Button {
-                            store.send(.reportButtonTapped(index))
-//                            reportType = CommentReportType.allCases[index]
-//                            isReportAlertPresented.toggle()
+                            store.send(.reportListItemTapped(index))
                             HapticService.notification(type: .warning)
-//                            print("신고타입: \(reportType)")
                         } label: {
                             Text(report)
                                 .font(.pretendard(.medium, size: 16))
@@ -73,26 +84,12 @@ struct CommentReportView: View {
             }
         }
         .navigationBarBackButtonHidden()
-        // TODO: 답변 신고 Alert
-//        .alert("답변을 신고하시겠어요?", isPresented: $isReportAlertPresented) {
-//            Button("취소", role: .cancel) {}
-//            Button("신고하기", role: .destructive) {
-//                Task {
-//                    self.isLoading = true
-//                    await self.reportComment()
-//                    self.isLoading = false
-//                    sendUpdateViewNotification()
-//                    self.isReportCompleteAlertPresented.toggle()
-//                }
-//            }
-//        }
-        // TODO: 신고 완료 Alert
-//        .alert("신고가 완료됐어요", isPresented: $isReportCompleteAlertPresented) {
-//            Button("확인", role: .none) {
-//                // TODO: 네비게이션 수정 필요
-//            }
-//        } message: {
-//            Text("신고한 댓글은 블라인드 처리 되며, 관리자 검토 후 최대 24시간 이내에 조치 될 예정이에요")
-//        }
+        .alert($store.scope(state: \.alert, action: \.alert))
     }
+}
+
+
+
+#Preview {
+    CommentReportView(commentId: 0)
 }

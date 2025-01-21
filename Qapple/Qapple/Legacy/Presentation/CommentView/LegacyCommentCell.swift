@@ -23,7 +23,7 @@ struct LegacyCommentCell: View {
     
     @EnvironmentObject private var pathModel: Router
     
-    @ObservedObject var commentViewModel: CommentViewModel
+    @ObservedObject var commentViewModel: LegacyCommentViewModel
     
     @Binding var post: Post
     
