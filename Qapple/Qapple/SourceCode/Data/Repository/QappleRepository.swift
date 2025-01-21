@@ -16,6 +16,15 @@ struct QappleRepository {
     var fetchAnswerListOfQuestion: (_ questionId: Int, _ threshold: Int?) async throws -> ([AnswerOfQuestion], QappleAPI.PaginationInfo)
     var postAnswer: (_ questionId: Int, _ answer: String) async throws -> PostAnswerDTO
     
+    var certification: (_ signUpToken: String, _ email: String) async throws -> Bool
+    var certificationCodeCheck: (_ signUpToken: String, _ email: String, _ certCode: String) async throws -> Bool
+    var fetchMyPage: () async throws -> MyProfile
+    var editMyPage: (_ nickname: String, _ profileImage: String?) async throws -> EditProfileDTO
+    var nicknameCheck: (_ nickname: String) async throws -> Bool
+    var resign: () async throws -> Bool
+    var signIn: (_ code: String, _ diviceToken: String) async throws -> SignInDTO
+    var signUp: (_ signUpToken: String, _ email: String, _ nickname: String, _ profileImage: String?, _ deviceToken: String) async throws -> SignUpDTO
+    
     var fetchBulletinBoardList: (_ threshold: Int?) async throws -> ([BulletinBoard], QappleAPI.PaginationInfo)
     var postBoard: (_ content: String) async throws -> PostBoardDTO
     var fetchSingleBoard: (_ boardId: Int) async throws -> BulletinBoard
@@ -47,6 +56,15 @@ extension QappleRepository: DependencyKey {
         deleteAnswer: makeDeleteAnswer(),
         fetchAnswerListOfQuestion: makeFetchAnswerListOfQuestion(),
         postAnswer: makePostAnswer(),
+        
+        certification: makeCertification(),
+        certificationCodeCheck: makeCertificationCodeCheck(),
+        fetchMyPage: makeFetchMyPage(),
+        editMyPage: makeEditMyPage(),
+        nicknameCheck: makeNicknameCheck(),
+        resign: makeResign(),
+        signIn: makeSignIn(),
+        signUp: makeSignUp(),
         
         fetchBulletinBoardList: makeFetchBulletinBoardList(),
         postBoard: makePostBoard(),

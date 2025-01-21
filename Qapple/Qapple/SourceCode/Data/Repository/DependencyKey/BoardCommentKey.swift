@@ -9,6 +9,7 @@ import Foundation
 
 extension QappleRepository {
     
+    /// 게시글 댓글 리스트 조회
     static func makeFetchBoardCommentList() -> (_ boardId: Int, _ threshold: Int?) async throws -> ([BoardComment], QappleAPI.PaginationInfo) {
         return { boardId, threshold in
             let url = try QappleAPI.BoardComment.list(boardId: boardId, threshold: threshold, pageSize: 10).url()
@@ -17,6 +18,7 @@ extension QappleRepository {
         }
     }
     
+    /// 게시글 댓글 삭제
     static func makeDeleteBoardComment() -> (_ commentId: Int) async throws -> DeleteBoardCommentsDTO {
         return { commentId in
             let url = try QappleAPI.BoardComment.delete(commentId: commentId).url()
@@ -25,6 +27,7 @@ extension QappleRepository {
         }
     }
     
+    /// 게시글 댓글 생성
     static func makePostBoardComment() -> (_ boardId: Int, _ comment: String) async throws -> PostBoardCommentsDTO {
         return { boardId, comment in
             let url = try QappleAPI.BoardComment.post(boardId: boardId).url()
@@ -34,6 +37,7 @@ extension QappleRepository {
         }
     }
     
+    /// 게시글 댓글 좋아요/취소 토글
     static func makeLikeBoardComment() -> (_ commentId: Int) async throws -> LikeBoardCommentsDTO {
         return { commentId in
             let url = try QappleAPI.BoardComment.like(commentId: commentId).url()

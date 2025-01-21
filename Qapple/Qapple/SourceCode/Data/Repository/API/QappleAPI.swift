@@ -49,8 +49,62 @@ enum QappleAPI {
         }
     }
     
-    enum Board: RawRepresentable, API {
+    enum Member: RawRepresentable, API {
+        static let baseUrl = QappleAPI.baseUrl?
+            .appendingPathComponent("members")
         
+        case certification(signUpToken: String, email: String)
+        case certificationCodeCheck(signUpToken: String, email: String, certCode: String)
+        case myPage
+        case myPageEdit
+        case nicknameCheck(nickname: String)
+        case resign
+        case signIn(code: String, deviceToken: String)
+        case signUp
+        
+        var rawValue: RawValue {
+            switch self {
+            case let .certification(signUpToken, email):
+                appending(baseString: "email/certification", urlQueryItems: [
+                    .init(key: "signUpToken", value: signUpToken),
+                    .init(key: "email", value: email),
+                ])
+                
+            case let .certificationCodeCheck(signUpToken, email, certCode):
+                appending(baseString: "email/certification/check", urlQueryItems: [
+                    .init(key: "signUpToken", value: signUpToken),
+                    .init(key: "email", value: email),
+                    .init(key: "certCode", value: certCode),
+                ])
+                
+            case .myPage:
+                appending(baseString: "mypage")
+                
+            case .myPageEdit:
+                appending(baseString: "mypage")
+                
+            case let .nicknameCheck(nickname):
+                appending(baseString: "nickname/check", urlQueryItems: [
+                    .init(key: "nickname", value: nickname),
+                ])
+                
+            case .resign:
+                appending(baseString: "resign")
+                
+            case let .signIn(code, deviceToken):
+                appending(baseString: "sign-in", urlQueryItems: [
+                    .init(key: "code", value: code),
+                    .init(key: "deviceToken", value: deviceToken),
+                ])
+                
+            case .signUp:
+                appending(baseString: "sign-up")
+            }
+        }
+        
+    }
+    
+    enum Board: RawRepresentable, API {
         static let baseUrl = QappleAPI.baseUrl?
             .appendingPathComponent("boards")
         
@@ -92,7 +146,6 @@ enum QappleAPI {
     }
     
     enum Question: RawRepresentable, API {
-        
         static let baseUrl = QappleAPI.baseUrl?
             .appendingPathComponent("questions")
         
@@ -116,7 +169,6 @@ enum QappleAPI {
     }
     
     enum BoardComment: RawRepresentable, API {
-        
         static let baseUrl = QappleAPI.baseUrl?
             .appendingPathComponent("board-comments")
         
@@ -146,7 +198,6 @@ enum QappleAPI {
     }
     
     enum Notification: RawRepresentable, API {
-        
         static let baseUrl = QappleAPI.baseUrl?
             .appendingPathComponent("notifications")
         
@@ -165,7 +216,6 @@ enum QappleAPI {
     }
     
     enum Reports: RawRepresentable, API {
-        
         static let baseUrl = QappleAPI.baseUrl?
             .appendingPathComponent("reports")
         
@@ -188,7 +238,6 @@ enum QappleAPI {
     }
     
     enum Token: RawRepresentable, API {
-        
         static let baseUrl = QappleAPI.baseUrl?
             .appendingPathComponent("token")
         
