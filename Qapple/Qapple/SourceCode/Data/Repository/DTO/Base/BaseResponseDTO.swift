@@ -1,16 +1,15 @@
 //
-//  BaseResponse.swift
-//  Capple
+//  BaseResponseDTO.swift
+//  Qapple
 //
-//  Created by Kyungsoo Lee on 2/9/24.
+//  Created by Simmons on 1/21/25.
 //
 
 import Foundation
 
-struct BaseResponse<ResultType: Codable>: Codable {
+struct BaseResponse<ResultType: Decodable>: Decodable {
     let timeStamp: String
     let code: String
     let message: String
     let result: ResultType
 }
-

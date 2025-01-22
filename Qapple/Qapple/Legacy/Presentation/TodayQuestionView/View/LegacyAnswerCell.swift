@@ -9,7 +9,7 @@ import SwiftUI
 
 // MARK: - TodayQuestionCell
 
-struct AnswerCell: View {
+struct LegacyAnswerCell: View {
     
     let answer: Answer
     let isWrittenAnswerCell: Bool
@@ -115,11 +115,7 @@ private struct HeaderView: View {
             Button {
                 seeMoreAction()
             } label: {
-                Image(systemName: "ellipsis")
-                    .resizable()
-                    .aspectRatio(contentMode: .fit)
-                    .frame(width: 18, height: 18)
-                    .foregroundStyle(GrayScale.icon)
+                
             }
         }
     }
@@ -268,7 +264,7 @@ private struct ReportShowView: View {
         Background.second
         
         VStack {
-            AnswerCell(
+            LegacyAnswerCell(
                 answer: Answer(
                     id: 0,
                     writerId: 0,
@@ -281,7 +277,7 @@ private struct ReportShowView: View {
                 )
             ) {}
             
-            AnswerCell(
+            LegacyAnswerCell(
                 answer: Answer(
                     id: 0,
                     writerId: 0,
