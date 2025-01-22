@@ -21,6 +21,9 @@ struct QuestionListView: View {
                 .padding(.top, 8)
         }
         .background(.first)
+        .onAppear {
+            store.send(.onAppear)
+        }
     }
     
     private func QuestionCountLabel() -> some View {
@@ -45,15 +48,30 @@ private struct QuestionList: View {
             LazyVStack(spacing: 8) {
                 ForEach(enumerated(store.questionList), id: \.element.id) {
                     index, question in
-                    QuestionCell(
-                        question: question,
-                        answerButtonTapped: {
-                            store.send(.answerButtonTapped(question))
+                    Button {
+                        store.send(.questionCellTapped(question))
+                    } label: {
+                        QuestionCell(
+                            question: question,
+                            answerButtonTapped: {
+                                store.send(.answerButtonTapped(question))
+                            }
+                        )
+                    }
+                    .padding(.horizontal, 12)
+                    .configurePagination(
+                        store.questionList,
+                        currentIndex: index,
+                        hasNext: store.haxNext,
+                        pagination: {
+                            store.send(.pagination)
                         }
                     )
-                    .padding(.horizontal, 12)
                 }
             }
+        }
+        .refreshable {
+            store.send(.refresh)
         }
     }
 }
@@ -151,6 +169,7 @@ extension QuestionCell {
                     .background(question.isAnswered ? .secondaryButton : .button)
                     .cornerRadius(30, corners: .allCorners)
             }
+            .disabled(question.isAnswered)
         }
     }
 }

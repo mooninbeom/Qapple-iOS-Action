@@ -20,7 +20,9 @@ struct QuestionListFeature {
     
     enum Action {
         case onAppear
+        case refresh
         case pagination
+        case questionCellTapped(QuestionEntity)
         case answerButtonTapped(QuestionEntity)
     }
     
@@ -30,7 +32,14 @@ struct QuestionListFeature {
             case .onAppear:
                 return .none
                 
+            case .refresh:
+                return .none
+                
             case .pagination:
+                return .none
+                
+            case let .questionCellTapped(question):
+                print(question)
                 return .none
                 
             case let .answerButtonTapped(question):
