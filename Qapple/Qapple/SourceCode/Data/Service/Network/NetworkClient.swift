@@ -102,8 +102,7 @@ extension NetworkClient {
         do {
             var request = URLRequest(url: url)
             request.httpMethod = method
-            request.setValue( // TODO: 실제 토큰으로 변경
-                "Bearer eyJhbGciOiJIUzUxMiJ9.eyJ0b2tlblR5cGUiOiJhY2Nlc3MiLCJtZW1iZXJJZCI6MTU0LCJyb2xlIjoiQUNBREVNSUVSIiwiaWF0IjoxNzM2OTE1ODMyLCJleHAiOjE3Mzc3Nzk4MzJ9.x2qe-8kZ3wyl0JGsNOfCmKoioEXoZS9H5liwG2A1bWDgeJk3JPkPPKm86Hbu5B_VD1UK5nJ_JxwQm1wTen04Hg",
+            request.setValue(try SignInInfo.shared.token(.access),
                 forHTTPHeaderField: "Authorization"
             )
             
