@@ -38,9 +38,6 @@ struct CommentReportFeature {
     var body: some ReducerOf<Self> {
         Reduce { state, action in
             switch action {
-            case .alert(.dismiss):
-                return .none
-                
             // 첫번째 Alert(신고 하시겠습니까?)
             case let .reportListItemTapped(index):
                 state.alert = AlertState {
@@ -71,6 +68,9 @@ struct CommentReportFeature {
                 
             case .alert(.presented(.completionButtonTapped)):
                 // TODO: 네비게이션 pop
+                return .none
+                
+            case .alert:
                 return .none
             }
         }

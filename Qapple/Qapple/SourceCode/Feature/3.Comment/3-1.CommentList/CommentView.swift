@@ -22,18 +22,19 @@ struct CommentView: View {
             BulletinBoardCell(
                 post: store.post,
                 seeMoreAction: {
-                    // TODO: 추후 수정 필요
+                    // TODO: Post Ellipsis 버튼 action
                 })
             .frame(width: UIScreen.main.bounds.width)
             .disabled(store.isLoading)
             
-            commentList
+            CommentListView(store: store)
             
             Spacer()
             
-            addComment
+            AddCommentView(store: store)
                 .frame(width: screenWidth)
                 .padding(.bottom, 8)
+
         }
         .background(Color.bk)
         .onTapGesture {
@@ -41,9 +42,10 @@ struct CommentView: View {
         }
         .navigationBarBackButtonHidden()
         .task {
+            // TODO: 초기 데이터 fetch
             store.send(.commentViewAppeared)
         }
-        // MARK: - Post ellipsis 버튼
+        // TODO: - Post ellipsis 버튼 대응
 //        .sheet(item: $selectedPost) { post in
 //            BulletinBoardSeeMoreSheetView(
 //                sheetType: post.isMine ? .mine : .others,
@@ -56,15 +58,42 @@ struct CommentView: View {
         .onReceive(NotificationCenter.default.publisher(for: .updateViewNotification)) { _ in
             store.send(.refreshCommentList)
         }
-        // MARK: - 게시글 에러 대응 alert
-//        .alert("게시글이 삭제됐거나 오류가 발생했습니다.", isPresented: $commentViewModel.isPostDeletedAlertPresented) {
-//            Button("확인", role: .none) {
-//                
-//            }
-//        }
     }
     
-    var commentList: some View {
+    private var seperator: some View {
+        Rectangle()
+            .foregroundStyle(Color.placeholder)
+            .frame(height: 1)
+    }
+}
+
+/**
+ 상단 네비게이션 View
+ */
+private struct HeaderView: View {
+    var body: some View {
+        CustomNavigationBar(
+            leadingView: {
+                CustomNavigationBackButton(buttonType: .arrow) {
+                    // TODO: 네비게이션 수정 필요
+                }
+            },
+            principalView: {
+                Text("댓글")
+                    .font(.pretendard(.semiBold, size: 17))
+            },
+            trailingView: {},
+            backgroundColor: Color.Background.first)
+    }
+}
+
+/**
+ 댓글 리스트 View
+ */
+private struct CommentListView: View {
+    @Bindable var store: StoreOf<CommentFeature>
+    
+    var body: some View {
         ZStack {
             ScrollView {
                 LazyVStack(spacing: 0) {
@@ -105,9 +134,17 @@ struct CommentView: View {
             }
         }
     }
+}
+
+
+
+/**
+ 댓글 작성 View
+ */
+private struct AddCommentView: View {
+    @Bindable var store: StoreOf<CommentFeature>
     
-    // 댓글 작성 View
-    var addComment: some View {
+    var body: some View {
         HStack(alignment: .bottom) {
             TextField("댓글 추가", text: $store.text.sending(\.commentTextChanged), axis: .vertical)
                 .font(.pretendard(.regular, size: 17))
@@ -116,10 +153,8 @@ struct CommentView: View {
                 .padding(.vertical, 12)
             
             Button {
-                Task.init {
                     HapticService.notification(type: .success)
-                    store.send(.uploadButtonTapped(content: ""))
-                }
+                    store.send(.uploadButtonTapped)
             } label: {
                 Image(systemName: "paperplane")
                     .font(.system(size: 20))
@@ -136,33 +171,4 @@ struct CommentView: View {
         .frame(minHeight: 50)
         .padding(.horizontal, 16)
     }
-    
-    
-    private var seperator: some View {
-        Rectangle()
-            .foregroundStyle(Color.placeholder)
-            .frame(height: 1)
-    }
 }
-
-
-private struct HeaderView: View {
-    
-    @EnvironmentObject private var pathModel: Router
-    
-    var body: some View {
-        CustomNavigationBar(
-            leadingView: {
-                CustomNavigationBackButton(buttonType: .arrow) {
-                    // TODO: 네비게이션 수정 필요
-                }
-            },
-            principalView: {
-                Text("댓글")
-                    .font(.pretendard(.semiBold, size: 17))
-            },
-            trailingView: {},
-            backgroundColor: Color.Background.first)
-    }
-}
-

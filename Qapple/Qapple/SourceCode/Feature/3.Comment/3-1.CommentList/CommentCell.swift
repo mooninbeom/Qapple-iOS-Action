@@ -10,8 +10,9 @@ import ComposableArchitecture
 
 
 struct CommentCell: View {
-    var store: StoreOf<CommentFeature>
+    @Bindable var store: StoreOf<CommentFeature>
     
+    // TODO: 추후 property 정리 필요
     let comment: CommentEntity
     let cellIndex: Int
     
@@ -47,29 +48,6 @@ struct CommentCell: View {
                 reportCell
             }
         }
-        // TODO: Alert 처리 필요
-//        .alert("정말로 댓글을 삭제하시겠습니까?", isPresented: $isDelete) {
-//            Button("삭제", role: .destructive, action: {
-//                Task {
-//                    await commentViewModel.act(.delete(id: comment.id))
-//                    self.isDeleteComplete.toggle()
-//                }
-//            })
-//            Button("취소", role: .cancel, action: {})
-//        }
-        // TODO: Alert 처리 필요
-//        .alert("댓글이 삭제되었습니다", isPresented: $isDeleteComplete) {
-//            Button("확인", role: .none) {
-//                Task {
-//                    await commentViewModel.refreshComments(boardId: self.post.boardId)
-//                    while commentViewModel.hasNext {
-//                        await commentViewModel.loadComments(boardId: post.boardId)
-//                    }
-//                    commentViewModel.scrollIndex = self.cellIndex - 1
-//                    self.post.commentCount = commentViewModel.comments.count
-//                }
-//            }
-//        }
         .onAppear {
             if comment.isReport {
                 self.isReportedComment = true
@@ -204,7 +182,7 @@ struct CommentCell: View {
     
     private var deleteBtn: some View {
         Button {
-            self.isDelete.toggle()
+            store.send(.deleteButtonTapped(id: self.comment.id))
             HapticService.notification(type: .error)
         } label: {
             ZStack {
@@ -218,12 +196,13 @@ struct CommentCell: View {
             }
         }
         .frame(width: 73)
+        .alert($store.scope(state: \.alert, action: \.alert))
     }
     
     private var reportBtn: some View {
         Button {
             // TODO: 네비게이션 연결 필요
-//            pathModel.pushView(screen: BulletinBoardPathType.commentReport(comment: comment))
+            store.send(.reportButtonTapped(id: self.comment.id))
         } label: {
             ZStack {
                 Color.report
@@ -235,4 +214,23 @@ struct CommentCell: View {
         }
         .frame(width: 73)
     }
+}
+
+
+#Preview {
+    var store = StoreOf<CommentFeature>(initialState: CommentFeature.State()) {
+        CommentFeature()
+    }
+    
+    let comment = CommentEntity(
+        id: 4,
+        writerId: 5,
+        content: "테스트입니다",
+        createdAt: "2025-01-01T00:00:00Z",
+        heartCount: 20,
+        isLiked: false,
+        isMine: true,
+        isReport: false)
+    
+    CommentCell(store: store, comment: comment, cellIndex: 1)
 }

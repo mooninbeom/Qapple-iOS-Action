@@ -8,7 +8,9 @@
 import Foundation
 import ComposableArchitecture
 
-
+/**
+ 게시판 댓글(CommentView) Reducer
+ */
 @Reducer
 struct CommentFeature {
     @ObservableState
@@ -26,20 +28,30 @@ struct CommentFeature {
         
         var threshold: Int?
         var hasNext: Bool = false
+        
+        @Presents var alert: AlertState<Action.Alert>?
     }
     
-    enum Action {
+    enum Action: Equatable {
         case commentViewAppeared
         case paginationCellAppeared
         
         case likeButtonTapped(id: Int)
-        case uploadButtonTapped(content: String)
+        case uploadButtonTapped
         case deleteButtonTapped(id: Int)
         case reportButtonTapped(id: Int)
         
         case refreshCommentList
         
         case commentTextChanged(text: String)
+        
+        case alert(PresentationAction<Alert>)
+        
+        @CasePathable
+        enum Alert: Equatable {
+            case boardLoadError
+            case deleteComment(Int)
+        }
     }
     
     
@@ -47,25 +59,52 @@ struct CommentFeature {
         Reduce { state, action in
             switch action {
             case .commentViewAppeared, .refreshCommentList:
+                // TODO: 데이터 fetch, 게시글 에러 대응(AlertState)
                 return .none
                 
             case .paginationCellAppeared:
                 return .none
                 
-            case let .likeButtonTapped(id: id):
+            case .likeButtonTapped(id: _):
                 return .none
-            case let .uploadButtonTapped(content: content):
-                return .none
-            case let .deleteButtonTapped(id: id):
-                return .none
-            case let .reportButtonTapped(id: id):
+            case .uploadButtonTapped:
+                // 댓글 업로드(state.text 사용)
                 return .none
                 
             case let .commentTextChanged(text: text):
                 state.text = text
                 return .none
+            
+            case .reportButtonTapped(id: _):
+                // TODO: CommentReportView로 navigating
+                return .none
+                
+            // Delete 버튼 alert
+            case let .deleteButtonTapped(id: id):
+                state.alert = AlertState {
+                    TextState("정말로 댓글을 삭제하시겠습니까?")
+                } actions: {
+                    ButtonState(role: .destructive, action: .deleteComment(id), label: { TextState("삭제") })
+                    ButtonState(role: .cancel, label: { TextState("취소") })
+                }
+                return .none
+                
+            case let .alert(.presented(.deleteComment(id))):
+                // TODO: 댓글 삭제 구현
+                print("댓글 아이디: \(id) 삭제")
+                
+                state.alert = AlertState {
+                    TextState("댓글이 삭제되었습니다")
+                } actions: {
+                    ButtonState(label: { TextState("확인")})
+                }
+                return .none
+                
+            case .alert:
+                return .none
             }
         }
+        .ifLet(\.$alert, action: \.alert)
     }
 }
 
