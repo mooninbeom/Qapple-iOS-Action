@@ -7,16 +7,20 @@
 
 import ComposableArchitecture
 
+
+/**
+ Comment 신고 Reducer
+ */
 @Reducer
 struct CommentReportFeature {
     @ObservableState
     struct State: Equatable {
-        let commentId: Int
+        @Presents var alert: AlertState<Action.Alert>?  // 신고 버튼 눌렀을 때 Alert
+
+        let commentId: Int  // 신고하려는 Comment id
         
-        @Presents var alert: AlertState<Action.Alert>?
-        
-        var isLoading: Bool = false
-        var reportType: CommentReportType = .DISTRIBUTION_OF_ILLEGAL_PHOTOGRAPHS
+        var isLoading: Bool = false // 로딩 변수
+        var reportType: CommentReportType = .DISTRIBUTION_OF_ILLEGAL_PHOTOGRAPHS // 신고 타입 변수
     }
     
     enum Action {
@@ -37,6 +41,7 @@ struct CommentReportFeature {
             case .alert(.dismiss):
                 return .none
                 
+            // 첫번째 Alert(신고 하시겠습니까?)
             case let .reportListItemTapped(index):
                 state.alert = AlertState {
                     TextState("답변을 신고하시겠어요?")
@@ -50,6 +55,7 @@ struct CommentReportFeature {
                 }
                 return .none
                 
+            // 두번째 Alert(신고가 완료되었습니다.)
             case let .alert(.presented(.deleteButtonTapped(index))):
                 // TODO: 삭제 버튼 눌렀을 떄 action
                 state.alert = AlertState {
