@@ -28,7 +28,7 @@ struct QuestionsDTO: Decodable {
             Question(
                 id: $0.questionId,
                 title: $0.content,
-                publishedDate: .now, // livedAt
+                publishedDate: $0.livedAt,
                 isAnswered: $0.isAnswered,
                 isLived: false // questionStatus
             )

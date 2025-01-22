@@ -12,7 +12,7 @@ extension QappleRepository {
     /// (자신의) 작성한 답변 조회
     static func makeFetchAnswerListOfProfile() -> (_ threshold: Int?) async throws -> ([AnswerOfProfile], QappleAPI.PaginationInfo) {
         return { threshold in
-            let url = try QappleAPI.Answer.listOfProfile(threshold: threshold, pageSize: 10).url()
+            let url = try QappleAPI.Answer.listOfProfile(threshold: threshold, pageSize: 25).url()
             let response: BaseResponse<AnswersOfProfileDTO> = try await networkClient.get(url: url)
             return response.result.toEntityWithThreshold
             
@@ -31,7 +31,7 @@ extension QappleRepository {
     /// 질문에 대한 답변 조회
     static func makeFetchAnswerListOfQuestion() -> (_ questionId: Int, _ threshold: Int?) async throws -> ([AnswerOfQuestion], QappleAPI.PaginationInfo) {
         return { questionId, threshold in
-            let url = try QappleAPI.Answer.listOfQuestion(questionId: Int(questionId), threshold: threshold, pageSize: 10).url()
+            let url = try QappleAPI.Answer.listOfQuestion(questionId: Int(questionId), threshold: threshold, pageSize: 25).url()
             let response: BaseResponse<AnswersOfQuestionDTO> = try await networkClient.get(url: url)
             return response.result.toEntityWithThreshold
         }

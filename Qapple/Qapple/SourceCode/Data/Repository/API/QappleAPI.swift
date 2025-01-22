@@ -11,7 +11,7 @@ enum QappleAPI {
     
     typealias PaginationInfo = (threshold: String, hasNext: Bool)
     
-    private static let baseUrl = URL(string: "http://api.capple.shop:8080")
+    private static let baseUrl = URL(string: basicURLString())
     
     // MARK: - Answer
     
@@ -19,9 +19,9 @@ enum QappleAPI {
         static let baseUrl = QappleAPI.baseUrl?
             .appendingPathComponent("answers")
         
-        case listOfProfile(threshold: Int?, pageSize: Int32 = 30)
+        case listOfProfile(threshold: Int?, pageSize: Int32 = 25)
         case delete(answerId: Int)
-        case listOfQuestion(questionId: Int, threshold: Int?, pageSize: Int32 = 30)
+        case listOfQuestion(questionId: Int, threshold: Int?, pageSize: Int32 = 25)
         case post(questionId: Int)
         
         var rawValue: RawValue {
@@ -110,12 +110,12 @@ enum QappleAPI {
         static let baseUrl = QappleAPI.baseUrl?
             .appendingPathComponent("boards")
         
-        case list(threshold: Int?, pageSize: Int32 = 30)
+        case list(threshold: Int?, pageSize: Int32 = 25)
         case post
         case single(boardId: Int)
         case delete(boardId: Int)
         case like(boardId: Int)
-        case search(keyword: String?, threshold: Int?, pageSize: Int32 = 30)
+        case search(keyword: String?, threshold: Int?, pageSize: Int32 = 25)
         
         var rawValue: RawValue {
             switch self {
@@ -154,7 +154,7 @@ enum QappleAPI {
             .appendingPathComponent("questions")
         
         case listOfMain
-        case list(threshold: String?, pageSize: Int32 = 30)
+        case list(threshold: String?, pageSize: Int32 = 25)
         
         var rawValue: RawValue {
             switch self {
@@ -176,7 +176,7 @@ enum QappleAPI {
         static let baseUrl = QappleAPI.baseUrl?
             .appendingPathComponent("board-comments")
         
-        case list(boardId: Int, threshold: Int?, pageSize: Int32 = 30)
+        case list(boardId: Int, threshold: Int?, pageSize: Int32 = 25)
         case delete(commentId: Int)
         case post(boardId: Int)
         case like(commentId: Int)
@@ -207,7 +207,7 @@ enum QappleAPI {
         static let baseUrl = QappleAPI.baseUrl?
             .appendingPathComponent("notifications")
         
-        case list(threshold: Int?, pageSize: Int32 = 30)
+        case list(threshold: Int?, pageSize: Int32 = 25)
         
         var rawValue: RawValue {
             switch self {
@@ -262,3 +262,18 @@ enum QappleAPI {
     }
 }
 
+extension QappleAPI {
+    
+    private static let scheme: String = "http"
+    
+    /// 기본 URL 주소 문자열을 반환합니다.
+    static func basicURLString() -> String {
+        guard let host = Bundle.main
+            .object(forInfoDictionaryKey: "HOST_URL") as? String,
+              let port = Bundle.main
+            .object(forInfoDictionaryKey: "PORT_NUM") as? String
+        else { return "" }
+        
+        return "\(scheme)://\(host):\(port)"
+    }
+}

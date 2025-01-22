@@ -10,7 +10,7 @@ import Foundation
 struct Question: Identifiable, Equatable {
     let id: Int
     let title: String
-    let publishedDate: Date
+    let publishedDate: String?
     var isAnswered: Bool
     var isLived: Bool
 }

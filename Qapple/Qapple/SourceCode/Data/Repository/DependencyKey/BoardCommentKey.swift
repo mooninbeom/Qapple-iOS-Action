@@ -12,7 +12,7 @@ extension QappleRepository {
     /// 게시글 댓글 리스트 조회
     static func makeFetchBoardCommentList() -> (_ boardId: Int, _ threshold: Int?) async throws -> ([BoardComment], QappleAPI.PaginationInfo) {
         return { boardId, threshold in
-            let url = try QappleAPI.BoardComment.list(boardId: boardId, threshold: threshold, pageSize: 10).url()
+            let url = try QappleAPI.BoardComment.list(boardId: boardId, threshold: threshold, pageSize: 25).url()
             let response: BaseResponse<BoardCommentsDTO> = try await networkClient.get(url: url)
             return response.result.toEntityWithThreshold
         }

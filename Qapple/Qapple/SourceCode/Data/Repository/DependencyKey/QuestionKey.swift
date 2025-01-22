@@ -12,7 +12,7 @@ extension QappleRepository {
     /// 모든 질문 조회
     static func makeFetchQuestionList() -> (_ threshold: String?) async throws -> ([Question], QappleAPI.PaginationInfo) {
         return { threshold in
-            let url = try QappleAPI.Question.list(threshold: threshold, pageSize: 10).url()
+            let url = try QappleAPI.Question.list(threshold: threshold, pageSize: 25).url()
             let response: BaseResponse<QuestionsDTO> = try await networkClient.get(url: url)
             return response.result.toEntityWithThreshold
         }

@@ -8,8 +8,7 @@
 import Foundation
 
 struct BulletinBoard: Identifiable, Equatable {
-    let id = UUID()
-    let boardId: Int
+    let id: Int
     let writerId: Int
     let writerNickname: String
     let content: String

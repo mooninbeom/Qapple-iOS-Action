@@ -8,8 +8,7 @@
 import Foundation
 
 struct QappleNotification: Identifiable, Equatable {
-    let id = UUID()
-    let questionId: String
+    let id: String
     let boardId: String
     let boardCommentId: String?
     let title: String

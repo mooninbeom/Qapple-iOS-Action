@@ -31,7 +31,7 @@ struct SearchBoardDTO: Codable {
     var toEntityWithThreshold: ([BulletinBoard], QappleAPI.PaginationInfo) {
         let bulletinBoardList = self.content.map {
             BulletinBoard(
-                boardId: $0.boardId,
+                id: $0.boardId,
                 writerId: $0.writerId,
                 writerNickname: $0.writerNickname,
                 content: $0.content,

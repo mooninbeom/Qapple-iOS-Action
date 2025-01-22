@@ -28,7 +28,7 @@ struct NotificationsDTO: Codable {
     var toEntityWithThreshold: ([QappleNotification], QappleAPI.PaginationInfo) {
         let qappleNotificationList = self.content.map {
             QappleNotification(
-                questionId: $0.questionId ?? "",
+                id: $0.questionId ?? "",
                 boardId: $0.boardId ?? "",
                 boardCommentId: $0.boardCommentId,
                 title: $0.title,

@@ -12,7 +12,7 @@ extension QappleRepository {
     /// 게시글 조회
     static func makeFetchBulletinBoardList() -> (_ threshold: Int?) async throws -> ([BulletinBoard], QappleAPI.PaginationInfo) {
         return { threshold in
-            let url = try QappleAPI.Board.list(threshold: threshold, pageSize: 10).url()
+            let url = try QappleAPI.Board.list(threshold: threshold, pageSize: 25).url()
             let response: BaseResponse<BulletinBoardDTO> = try await networkClient.get(url: url)
             return response.result.toEntityWithThreshold
         }
@@ -59,7 +59,7 @@ extension QappleRepository {
     /// 게시글 검색
     static func makeSearchBoard() -> (_ keyword: String?, _ threshold: Int?) async throws -> ([BulletinBoard], QappleAPI.PaginationInfo) {
         return { keyword, threshold in
-            let url = try QappleAPI.Board.search(keyword: keyword, threshold: threshold, pageSize: 100).url()
+            let url = try QappleAPI.Board.search(keyword: keyword, threshold: threshold, pageSize: 25).url()
             let response: BaseResponse<SearchBoardDTO> = try await networkClient.get(url: url)
             return response.result.toEntityWithThreshold
         }

@@ -32,7 +32,7 @@ struct AnswersOfQuestionDTO: Codable {
             AnswerOfQuestion(
                 id: $0.answerId,
                 content: $0.content,
-                publishedDate: .now, // $0.writeAt
+                publishedDate: $0.writeAt.ISO8601ToDate,
                 isReported: $0.isReported
             )
         }
