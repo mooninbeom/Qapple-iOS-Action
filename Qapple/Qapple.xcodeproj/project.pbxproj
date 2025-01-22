@@ -22,7 +22,6 @@
 			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
 			membershipExceptions = (
 				QappleBox/Info.plist,
-				QappleBox/Secrets.xcconfig,
 			);
 			target = F3EA66C72B7643EE002417CE /* Qapple */;
 		};
