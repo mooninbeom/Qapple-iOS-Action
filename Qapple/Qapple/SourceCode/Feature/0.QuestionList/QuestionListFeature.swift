@@ -12,6 +12,7 @@ struct QuestionListFeature {
     
     @ObservableState
     struct State: Equatable {
+        @Presents var alert: AlertState<Action.Alert>?
         var questionList: [QuestionEntity] = []
         var totalCount: QappleAPI.TotalCount = 0
         var paginationInfo = QappleAPI.PaginationInfo(threshold: "", hasNext: false)
@@ -25,6 +26,11 @@ struct QuestionListFeature {
         case paginationResponse([QuestionEntity], QappleAPI.PaginationInfo)
         case questionCellTapped(QuestionEntity)
         case answerButtonTapped(QuestionEntity)
+        case alert(PresentationAction<Alert>)
+        
+        enum Alert: Equatable {
+            case confirmButtonTapped
+        }
     }
     
     @Dependency(\.questionRepository.fetchQuestionList) var fetchQuestionList
@@ -64,13 +70,33 @@ struct QuestionListFeature {
                 return .none
                 
             case let .questionCellTapped(question):
-                print(question)
+                if !question.isAnswered {
+                    state.alert = .answeringCheck
+                }
                 return .none
                 
             case let .answerButtonTapped(question):
                 print(question)
                 return .none
+                
+            case .alert:
+                return .none
             }
         }
+        .ifLet(\.$alert, action: \.alert)
+    }
+}
+
+// MARK: - Alert
+
+extension AlertState where Action == QuestionListFeature.Action.Alert {
+    static let answeringCheck = AlertState {
+        TextState("답변하면 확인이 가능해요 😀")
+    } actions: {
+        ButtonState(role: .none) {
+            TextState("확인")
+        }
+    } message: {
+        TextState("즐거운 커뮤니티 운영을 위해\n여러분의 답변을 들려주세요")
     }
 }

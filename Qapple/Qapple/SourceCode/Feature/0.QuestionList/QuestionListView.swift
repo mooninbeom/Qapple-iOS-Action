@@ -10,7 +10,7 @@ import SwiftUI
 
 struct QuestionListView: View {
     
-    let store: StoreOf<QuestionListFeature>
+    @Bindable var store: StoreOf<QuestionListFeature>
     
     var body: some View {
         VStack(spacing: 0) {
@@ -24,6 +24,7 @@ struct QuestionListView: View {
         .onAppear {
             store.send(.onAppear)
         }
+        .alert($store.scope(state: \.alert, action: \.alert))
     }
     
     private func QuestionCountLabel() -> some View {

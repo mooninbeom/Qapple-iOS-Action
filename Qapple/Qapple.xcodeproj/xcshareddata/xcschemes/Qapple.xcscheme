@@ -26,15 +26,20 @@
       buildConfiguration = "Debug"
       selectedDebuggerIdentifier = "Xcode.DebuggerFoundation.Debugger.LLDB"
       selectedLauncherIdentifier = "Xcode.DebuggerFoundation.Launcher.LLDB"
-      shouldUseLaunchSchemeArgsEnv = "YES"
-      shouldAutocreateTestPlan = "YES">
+      shouldUseLaunchSchemeArgsEnv = "YES">
+      <TestPlans>
+         <TestPlanReference
+            reference = "container:Qapple.xctestplan"
+            default = "YES">
+         </TestPlanReference>
+      </TestPlans>
       <Testables>
          <TestableReference
             skipped = "NO"
             parallelizable = "YES">
             <BuildableReference
                BuildableIdentifier = "primary"
-               BlueprintIdentifier = "F3EA66D72B7643F0002417CE"
+               BlueprintIdentifier = "829A87A22D423DCA00808E43"
                BuildableName = "QappleTests.xctest"
                BlueprintName = "QappleTests"
                ReferencedContainer = "container:Qapple.xcodeproj">
@@ -45,7 +50,7 @@
             parallelizable = "YES">
             <BuildableReference
                BuildableIdentifier = "primary"
-               BlueprintIdentifier = "F3EA66E12B7643F0002417CE"
+               BlueprintIdentifier = "829A87AF2D423E0F00808E43"
                BuildableName = "QappleUITests.xctest"
                BlueprintName = "QappleUITests"
                ReferencedContainer = "container:Qapple.xcodeproj">
