@@ -1,5 +1,5 @@
 //
-//  QuestionFeature.swift
+//  QuestionTabFeature.swift
 //  Qapple
 //
 //  Created by 김민준 on 1/23/25.
@@ -8,7 +8,7 @@
 import ComposableArchitecture
 
 @Reducer
-struct QuestionFeature {
+struct QuestionTabFeature {
     
     @ObservableState
     struct State: Equatable {
@@ -59,7 +59,7 @@ struct QuestionFeature {
 
 // MARK: - QuestionTab
 
-extension QuestionFeature {
+extension QuestionTabFeature {
     
     enum QuestionTab {
         case todayQuestion

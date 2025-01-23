@@ -8,9 +8,9 @@
 import ComposableArchitecture
 import SwiftUI
 
-struct QuestionView: View {
+struct QuestionTabView: View {
     
-    @Bindable var store: StoreOf<QuestionFeature>
+    @Bindable var store: StoreOf<QuestionTabFeature>
     
     var body: some View {
         VStack(spacing: 0) {
@@ -23,7 +23,7 @@ struct QuestionView: View {
                         action: \.todayQuestion
                     )
                 )
-                .tag(QuestionFeature.QuestionTab.todayQuestion)
+                .tag(QuestionTabFeature.QuestionTab.todayQuestion)
                 
                 QuestionListView(
                     store: store.scope(
@@ -31,9 +31,8 @@ struct QuestionView: View {
                         action: \.questionList
                     )
                 )
-                .tag(QuestionFeature.QuestionTab.questionList)
+                .tag(QuestionTabFeature.QuestionTab.questionList)
             }
-            .ignoresSafeArea()
         }
         .tabViewStyle(PageTabViewStyle(indexDisplayMode: .never))
     }
@@ -43,7 +42,7 @@ struct QuestionView: View {
 
 private struct HeaderTabBar: View {
     
-    let store: StoreOf<QuestionFeature>
+    let store: StoreOf<QuestionTabFeature>
     
     var body: some View {
         ZStack(alignment: .trailing) {
@@ -91,7 +90,7 @@ private struct HeaderTabBar: View {
 // MARK: - Preview
 
 #Preview {
-    QuestionView(store: Store(initialState: QuestionFeature.State()) {
-        QuestionFeature()
+    QuestionTabView(store: Store(initialState: QuestionTabFeature.State()) {
+        QuestionTabFeature()
     })
 }

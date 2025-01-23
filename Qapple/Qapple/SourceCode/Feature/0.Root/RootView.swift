@@ -9,11 +9,30 @@ import ComposableArchitecture
 import SwiftUI
 
 struct RootView: View {
+    
+    @Bindable var store: StoreOf<RootFeature>
+    
     var body: some View {
-        Text(/*@START_MENU_TOKEN@*/"Hello, World!"/*@END_MENU_TOKEN@*/)
+        NavigationStack(path: $store.scope(state: \.path, action: \.path)) {
+            TabView {
+                QuestionTabView(store: store.scope(state: \.questionTab, action: \.questionTab))
+                    .tabItem {
+                        Image(systemName: "questionmark.bubble.fill")
+                        Text("오늘의 질문")
+                    }
+            }
+            .tint(.button)
+            .fixedTabBarBackground(color: .first)
+        } destination: { store in
+            EmptyView()
+        }
     }
 }
 
+// MARK: - Preview
+
 #Preview {
-    RootView()
+    RootView(store: Store(initialState: RootFeature.State()) {
+        RootFeature()
+    })
 }

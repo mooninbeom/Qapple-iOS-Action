@@ -13,13 +13,18 @@ struct RootFeature {
     @ObservableState
     struct State: Equatable {
         var path = StackState<Path.State>()
+        var questionTab = QuestionTabFeature.State()
     }
     
     enum Action {
         case path(StackActionOf<Path>)
+        case questionTab(QuestionTabFeature.Action)
     }
     
     var body: some ReducerOf<Self> {
+        Scope(state: \.questionTab, action: \.questionTab) {
+            QuestionTabFeature()
+        }
         Reduce { state, action in
             switch action {
             default: return .none
