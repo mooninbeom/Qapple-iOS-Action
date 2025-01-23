@@ -13,7 +13,7 @@ struct CommentCell: View {
     @Bindable var store: StoreOf<CommentFeature>
     
     // TODO: 추후 property 정리 필요
-    let comment: CommentEntity
+    let comment: BoardComment
     let cellIndex: Int
     
     let screenWidth: CGFloat = UIScreen.main.bounds.width
@@ -112,12 +112,12 @@ struct CommentCell: View {
             VStack(alignment: .leading, spacing: 5) {
                 HStack(spacing: 10) {
                     // 사용자 이름
-                    if self.comment.writerId == -1 {
+                    if self.comment.writeId == -1 {
                         Text("작성자")
                             .font(.pretendard(.semiBold, size: 14))
                             .foregroundStyle(.text)
                     } else {
-                        Text("러너 \(self.comment.writerId)")
+                        Text("러너 \(self.comment.writeId)")
                             .font(.pretendard(.semiBold, size: 14))
                             .foregroundStyle(.icon)
                     }
@@ -222,15 +222,15 @@ struct CommentCell: View {
         CommentFeature()
     }
     
-    let comment = CommentEntity(
+    let comment = BoardComment(
         id: 4,
-        writerId: 5,
+        writeId: 5,
         content: "테스트입니다",
-        createdAt: "2025-01-01T00:00:00Z",
         heartCount: 20,
-        isLiked: false,
-        isMine: true,
-        isReport: false)
+        isLiked: true,
+        isMine: false,
+        isReport: true,
+        createdAt: "2025-01-01T00:00:00Z")
     
     CommentCell(store: store, comment: comment, cellIndex: 1)
 }

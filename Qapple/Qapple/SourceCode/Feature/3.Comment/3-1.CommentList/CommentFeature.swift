@@ -15,11 +15,12 @@ import ComposableArchitecture
 struct CommentFeature {
     @ObservableState
     struct State: Equatable {
+        // TODO: 수정 예정
         var post: Post = samplePost
         
         var text: String = ""
         
-        var comments: [CommentEntity] = []
+        var comments: [BoardComment] = []
         
         var postWriterId: Int = -1
         
@@ -35,6 +36,7 @@ struct CommentFeature {
     enum Action: Equatable {
         case commentViewAppeared
         case paginationCellAppeared
+        case fetchCommentData([BoardComment], String, Bool)
         
         case likeButtonTapped(id: Int)
         case uploadButtonTapped
@@ -54,15 +56,35 @@ struct CommentFeature {
         }
     }
     
+    @Dependency(\.commentRepository) var commentRepository
     
     var body: some ReducerOf<Self> {
         Reduce { state, action in
             switch action {
             case .commentViewAppeared, .refreshCommentList:
-                // TODO: 데이터 fetch, 게시글 에러 대응(AlertState)
-                return .none
+                state.isLoading = true
+                
+                state.comments.removeAll()
+                state.threshold = nil
+                state.hasNext = false
+                return .run { [boardId = state.postWriterId] send in
+                    do {
+                        let result = try await commentRepository.fetchBoardCommentList(boardId, nil)
+                        await send(.fetchCommentData(result.0, result.1.threshold, result.1.hasNext))
+                    } catch {
+                        
+                    }
+                }
                 
             case .paginationCellAppeared:
+                return .none
+                
+            case let .fetchCommentData(comments, threshold, hasNext):
+                state.comments.append(contentsOf: comments)
+                state.threshold = Int(threshold)
+                state.hasNext = hasNext
+                
+                state.isLoading = false
                 return .none
                 
             case .likeButtonTapped(id: _):
