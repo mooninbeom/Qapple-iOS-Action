@@ -14,7 +14,7 @@ extension QappleRepository {
         return { threshold in
             let url = try QappleAPI.Question.list(threshold: threshold, pageSize: 25).url()
             let response: BaseResponse<QuestionsDTO> = try await networkClient.get(url: url)
-            return response.result.toEntityWithThreshold
+            return response.result.toEntityWithInfo
         }
     }
     

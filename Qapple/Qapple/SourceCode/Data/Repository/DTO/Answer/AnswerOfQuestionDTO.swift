@@ -27,13 +27,30 @@ struct AnswersOfQuestionDTO: Codable {
         let writeAt: String
     }
     
-    var toEntityWithThreshold: ([AnswerOfQuestion], QappleAPI.PaginationInfo) {
-        let answerListOfQuestion = self.content.map {
-            AnswerOfQuestion(
+    var toEntity: [AnswerEntity] {
+        self.content.map {
+            AnswerEntity(
                 id: $0.answerId,
                 content: $0.content,
+                authorNickname: $0.nickname,
                 publishedDate: $0.writeAt.ISO8601ToDate,
-                isReported: $0.isReported
+                isReported: $0.isReported,
+                isMine: $0.isMine,
+                isResignMember: $0.nickname == "알 수 없음"
+            )
+        }
+    }
+    
+    var toEntityWithInfo: ([AnswerEntity], QappleAPI.TotalCount, QappleAPI.PaginationInfo) {
+        let answerList = self.content.map {
+            AnswerEntity(
+                id: $0.answerId,
+                content: $0.content,
+                authorNickname: $0.nickname,
+                publishedDate: $0.writeAt.ISO8601ToDate,
+                isReported: $0.isReported,
+                isMine: $0.isMine,
+                isResignMember: $0.nickname == "알 수 없음"
             )
         }
         
@@ -42,7 +59,6 @@ struct AnswersOfQuestionDTO: Codable {
             hasNext: self.hasNext
         )
         
-        return(answerListOfQuestion, paginationInfo)
+        return(answerList, total, paginationInfo)
     }
 }
-

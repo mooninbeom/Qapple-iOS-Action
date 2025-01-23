@@ -32,7 +32,7 @@ extension QappleRepository {
         return { questionId, threshold in
             let url = try QappleAPI.Answer.listOfQuestion(questionId: Int(questionId), threshold: threshold, pageSize: 25).url()
             let response: BaseResponse<AnswersOfQuestionDTO> = try await networkClient.get(url: url)
-            return response.result.toEntityWithThreshold
+            return ([], .init(threshold: "", hasNext: false))
         }
     }
     

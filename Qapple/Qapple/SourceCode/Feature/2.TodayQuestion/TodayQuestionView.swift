@@ -31,6 +31,9 @@ struct TodayQuestionView: View {
         .refreshable {
             store.send(.refresh)
         }
+        .onDisappear {
+            store.send(.onDisappear)
+        }
     }
 }
 

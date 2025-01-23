@@ -25,4 +25,15 @@ struct QuestionEntity: Identifiable, Equatable {
     
     /// 현재 LIVE 상태인지 여부
     var isLived: Bool
+    
+    /// 초기화용 질문 엔티티
+    static var initialState: QuestionEntity {
+        QuestionEntity(
+            id: 0,
+            content: "",
+            publishedDate: .now,
+            isAnswered: false,
+            isLived: false
+        )
+    }
 }

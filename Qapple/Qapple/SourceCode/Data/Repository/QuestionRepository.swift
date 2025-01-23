@@ -23,7 +23,7 @@ extension QuestionRepository: DependencyKey {
         fetchQuestionList: { threshold in
             let url = try QappleAPI.Question.list(threshold: threshold, pageSize: 25).url()
             let response: BaseResponse<QuestionsDTO> = try await networkService.get(url: url)
-            return response.result.toEntityWithThreshold
+            return response.result.toEntityWithInfo
         },
         fetchMainQuestion: {
             let url = try QappleAPI.Question.listOfMain.url()
@@ -68,7 +68,7 @@ extension QuestionRepository {
                 QuestionEntity(
                     id: i,
                     content: "테스트 질문 \(i)",
-                    publishedDate: .init(timeIntervalSinceNow: TimeInterval(i*10000)),
+                    publishedDate: .init(timeIntervalSinceNow: TimeInterval(i*(-10000))),
                     isAnswered: i % 2 == 1,
                     isLived: i == 0
                 )
