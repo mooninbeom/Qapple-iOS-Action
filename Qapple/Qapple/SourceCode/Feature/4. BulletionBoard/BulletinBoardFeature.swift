@@ -12,7 +12,7 @@ import ComposableArchitecture
 struct BulletinBoardFeature {
     @ObservableState
     struct State: Equatable {
-        
+        var isLoading: Bool = false
     }
     
     enum Action {
@@ -47,6 +47,7 @@ struct BulletinBoardFeature {
                 return .none
                 
             case .postBoardButtonTapped:
+                // TODO: Navigiation 처리
                 return .none
             }
         }

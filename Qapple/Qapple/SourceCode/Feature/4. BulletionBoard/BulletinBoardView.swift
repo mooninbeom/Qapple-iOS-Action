@@ -6,10 +6,12 @@
 //
 
 import SwiftUI
+import ComposableArchitecture
 
 // MARK: - BulletinBoardView
 
 struct BulletinBoardView: View {
+    @Binding var store: StoreOf<BulletinBoardFeature>
     
     @EnvironmentObject private var pathModel: Router
     @EnvironmentObject private var bulletinBoardUseCase: BulletinBoardUseCase
@@ -22,7 +24,7 @@ struct BulletinBoardView: View {
                 NewPostButton(
                     title: "게시글 작성",
                     tapAction: {
-                        pathModel.pushView(screen: BulletinBoardPathType.bulletinPosting)
+                        store.send(.postBoardButtonTapped)
                     }
                 )
                 .position(
@@ -32,16 +34,13 @@ struct BulletinBoardView: View {
                     )
                 )
                 
-                if bulletinBoardUseCase.isLoading {
+                if store.isLoading {
                     ProgressView()
                         .progressViewStyle(.circular)
                         .tint(.primary)
                 }
             }
             .background(Background.first)
-            .navigationDestination(for: BulletinBoardPathType.self) { path in
-                pathModel.getNavigationDestination(view: path)
-            }
         }
         .onAppear{
             bulletinBoardUseCase.isClickComment = false
