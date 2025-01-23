@@ -28,7 +28,7 @@ struct QuestionListView: View {
     
     private func QuestionCountLabel() -> some View {
         HStack(alignment: .top) {
-            Text("\(store.questionList.count)개의 질문")
+            Text("\(store.totalCount)개의 질문")
                 .font(.pretendard(.medium, size: 14))
                 .foregroundStyle(.sub3)
             

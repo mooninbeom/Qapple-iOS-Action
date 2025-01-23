@@ -9,6 +9,8 @@ import Foundation
 
 enum QappleAPI {
     
+    typealias TotalCount = Int
+    
     struct PaginationInfo: Equatable {
         var threshold: String
         var hasNext: Bool

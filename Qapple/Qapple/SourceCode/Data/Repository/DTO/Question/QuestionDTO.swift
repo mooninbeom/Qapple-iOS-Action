@@ -8,7 +8,7 @@
 import Foundation
 
 struct QuestionsDTO: Decodable {
-    let total: Int
+    let total: QappleAPI.TotalCount
     let size: Int
     let content: [Content]
     let numberOfElements: Int
@@ -23,7 +23,7 @@ struct QuestionsDTO: Decodable {
         var isAnswered: Bool
     }
     
-    var toEntityWithThreshold: ([QuestionEntity], QappleAPI.PaginationInfo) {
+    var toEntityWithThreshold: ([QuestionEntity], QappleAPI.TotalCount, QappleAPI.PaginationInfo) {
         let questionList = self.content.map {
             QuestionEntity(
                 id: $0.questionId,
@@ -39,6 +39,6 @@ struct QuestionsDTO: Decodable {
             hasNext: self.hasNext
         )
         
-        return (questionList, paginationInfo)
+        return (questionList, total, paginationInfo)
     }
 }

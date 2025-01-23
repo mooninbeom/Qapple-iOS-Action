@@ -13,6 +13,7 @@ struct QuestionListFeature {
     @ObservableState
     struct State: Equatable {
         var questionList: [QuestionEntity] = []
+        var totalCount: QappleAPI.TotalCount = 0
         var paginationInfo = QappleAPI.PaginationInfo(threshold: "", hasNext: false)
     }
     
@@ -20,13 +21,13 @@ struct QuestionListFeature {
         case onAppear
         case refresh
         case pagination
-        case questionListResponse([QuestionEntity], QappleAPI.PaginationInfo)
+        case questionListResponse([QuestionEntity], QappleAPI.TotalCount, QappleAPI.PaginationInfo)
         case paginationResponse([QuestionEntity], QappleAPI.PaginationInfo)
         case questionCellTapped(QuestionEntity)
         case answerButtonTapped(QuestionEntity)
     }
     
-    @Dependency(\.qappleRepository.fetchQuestionList) var fetchQuestionList
+    @Dependency(\.questionRepository.fetchQuestionList) var fetchQuestionList
     
     var body: some ReducerOf<Self> {
         Reduce { state, action in
@@ -35,7 +36,7 @@ struct QuestionListFeature {
                 return .run { send in
                     do {
                         let response = try await fetchQuestionList(nil)
-                        await send(.questionListResponse(response.0, response.1))
+                        await send(.questionListResponse(response.0, response.1, response.2))
                     } catch {
                         print(error)
                     }
@@ -45,14 +46,15 @@ struct QuestionListFeature {
                 return .run { [threshold = state.paginationInfo.threshold] send in
                     do {
                         let response = try await fetchQuestionList(threshold)
-                        await send(.paginationResponse(response.0, response.1))
+                        await send(.paginationResponse(response.0, response.2))
                     } catch {
                         print(error)
                     }
                 }
                 
-            case let .questionListResponse(questionList, paginationInfo):
+            case let .questionListResponse(questionList, totalCount, paginationInfo):
                 state.questionList = questionList
+                state.totalCount = totalCount
                 state.paginationInfo = paginationInfo
                 return .none
                 
