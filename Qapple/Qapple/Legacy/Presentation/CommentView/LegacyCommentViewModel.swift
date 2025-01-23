@@ -7,7 +7,7 @@
 
 import SwiftUI
 
-final class CommentViewModel: ObservableObject {
+final class LegacyCommentViewModel: ObservableObject {
 
     @Published public var comments: [CommentResponse.Comment] = []
     @Published public var isLoading: Bool = false
@@ -112,7 +112,7 @@ final class CommentViewModel: ObservableObject {
 }
 
 
-extension CommentViewModel {
+extension LegacyCommentViewModel {
     enum Action {
         case upload(id: Int, request: CommentRequest.UploadComment)
         case delete(id: Int)
@@ -137,7 +137,7 @@ extension CommentViewModel {
     }
 }
 
-extension CommentViewModel {
+extension LegacyCommentViewModel {
     
     // 이름을 익명화 해주는 method
     private func anonymizeComment(_ comments: [CommentResponse.Comment]) -> [CommentResponse.Comment] {

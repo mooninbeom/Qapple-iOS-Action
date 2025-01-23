@@ -7,12 +7,12 @@
 
 import SwiftUI
 
-struct CommentView: View {
+struct LegacyCommentView: View {
     
     @EnvironmentObject private var pathModel: Router
     @EnvironmentObject private var bulletinBoardUseCase: BulletinBoardUseCase
     
-    @StateObject private var commentViewModel: CommentViewModel = .init()
+    @StateObject private var commentViewModel: LegacyCommentViewModel = .init()
     @State private var text: String = ""
     @State private var selectedPost: Post?
     
@@ -87,7 +87,7 @@ struct CommentView: View {
                         comment in
                         seperator
                         
-                        CommentCell(
+                        LegacyCommentCell(
                             comment: comment,
                             cellIndex: index,
                             commentViewModel: commentViewModel,
@@ -207,7 +207,7 @@ private struct HeaderView: View {
 }
 
 // MARK: View 업데이트 관련 메소드
-extension CommentView {
+extension LegacyCommentView {
     
     private func refreshComments() async {
         await commentViewModel.refreshComments(boardId: post.boardId)
