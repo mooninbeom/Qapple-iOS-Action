@@ -237,7 +237,7 @@ private struct HomeView: View {
             CustomTabBar(tab: $tab)
             
             TabView(selection: $tab) {
-                TodayQuestionView()
+                LegacyTodayQuestionView()
                     .tag(TodayQuestionTab.todayQuestion)
                 
                 TodayQuestionListView()

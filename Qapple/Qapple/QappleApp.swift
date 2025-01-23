@@ -16,7 +16,7 @@ struct QappleApp: App {
     
     var body: some Scene {
         WindowGroup {
-            MainView(authViewModel: authViewModel)
+              MainView(authViewModel: authViewModel)
         }
     }
 }

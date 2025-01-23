@@ -51,7 +51,7 @@ struct WrittenAnswerView: View {
                     ScrollView(.vertical, showsIndicators: false) {
                         LazyVStack(spacing: 0) {
                             ForEach(Array(viewModel.myAnswers.enumerated()), id: \.offset) { index, answer in
-                                AnswerCell(
+                                LegacyAnswerCell(
                                     answer: Answer(
                                         id: answer.answerId,
                                         writerId: answer.writerId,
