@@ -10,7 +10,7 @@ import Foundation
 extension QappleRepository {
     
     /// 모든 질문 조회
-    static func makeFetchQuestionList() -> (_ threshold: String?) async throws -> ([Question], QappleAPI.PaginationInfo) {
+    static func makeFetchQuestionList() -> (_ threshold: String?) async throws -> ([QuestionEntity], QappleAPI.PaginationInfo) {
         return { threshold in
             let url = try QappleAPI.Question.list(threshold: threshold, pageSize: 25).url()
             let response: BaseResponse<QuestionsDTO> = try await networkClient.get(url: url)
@@ -27,5 +27,3 @@ extension QappleRepository {
         }
     }
 }
-
-

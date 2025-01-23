@@ -23,17 +23,22 @@ struct QuestionsDTO: Decodable {
         var isAnswered: Bool
     }
     
-    var toEntityWithThreshold: ([Question], QappleAPI.PaginationInfo) {
+    var toEntityWithThreshold: ([QuestionEntity], QappleAPI.PaginationInfo) {
         let questionList = self.content.map {
-            Question(
+            QuestionEntity(
                 id: $0.questionId,
-                title: $0.content,
-                publishedDate: $0.livedAt,
+                content: $0.content,
+                publishedDate: $0.livedAt?.ISO8601ToDate ?? .now,
                 isAnswered: $0.isAnswered,
-                isLived: false // questionStatus
+                isLived: $0.questionStatus == "LIVE"
             )
         }
         
-        return (questionList, (threshold, hasNext))
+        let paginationInfo = QappleAPI.PaginationInfo(
+            threshold: self.threshold,
+            hasNext: self.hasNext
+        )
+        
+        return (questionList, paginationInfo)
     }
 }

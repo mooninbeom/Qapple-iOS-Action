@@ -5,6 +5,7 @@
 //  Created by Kyungsoo Lee on 2/9/24.
 //
 
+import ComposableArchitecture
 import SwiftUI
 
 @main
@@ -16,7 +17,10 @@ struct QappleApp: App {
     
     var body: some Scene {
         WindowGroup {
-              MainView(authViewModel: authViewModel)
+              // MainView(authViewModel: authViewModel)
+            QuestionListView(store: Store(initialState: QuestionListFeature.State(), reducer: {
+                QuestionListFeature()
+            }))
         }
     }
 }

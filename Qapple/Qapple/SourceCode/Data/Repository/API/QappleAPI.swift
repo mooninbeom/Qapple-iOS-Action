@@ -9,7 +9,10 @@ import Foundation
 
 enum QappleAPI {
     
-    typealias PaginationInfo = (threshold: String, hasNext: Bool)
+    struct PaginationInfo: Equatable {
+        var threshold: String
+        var hasNext: Bool
+    }
     
     private static let baseUrl = URL(string: basicURLString())
     

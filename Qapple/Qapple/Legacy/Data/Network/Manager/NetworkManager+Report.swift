@@ -31,7 +31,7 @@ extension NetworkManager {
         var request = URLRequest(url: url)
         request.httpMethod = "POST"
         request.setValue("application/json", forHTTPHeaderField: "Content-Type")
-        request.setValue("Bearer \(try SignInInfo.shared.token(.access))", forHTTPHeaderField: "Authorization")
+        request.setValue("Bearer \(try KeychainService.shared.token(.access))", forHTTPHeaderField: "Authorization")
         
         // URLSession 실행
         let (data, response) = try await URLSession.shared.upload(for: request, from: requestData)
@@ -76,7 +76,7 @@ extension NetworkManager {
         var request = URLRequest(url: url)
         request.httpMethod = "POST"
         request.setValue("application/json", forHTTPHeaderField: "Content-Type")
-        request.setValue("Bearer \(try SignInInfo.shared.token(.access))", forHTTPHeaderField: "Authorization")
+        request.setValue("Bearer \(try KeychainService.shared.token(.access))", forHTTPHeaderField: "Authorization")
         
         // URLSession 실행
         let (data, response) = try await URLSession.shared.upload(for: request, from: requestData)

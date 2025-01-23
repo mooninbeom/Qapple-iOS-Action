@@ -38,6 +38,12 @@ struct NotificationsDTO: Codable {
                 isReadStatus: false
             )
         }
-        return (qappleNotificationList, (threshold, hasNext))
+        
+        let paginationInfo = QappleAPI.PaginationInfo(
+            threshold: self.threshold,
+            hasNext: self.hasNext
+        )
+        
+        return (qappleNotificationList, paginationInfo)
     }
 }

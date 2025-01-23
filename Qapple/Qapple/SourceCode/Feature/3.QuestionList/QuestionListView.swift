@@ -62,7 +62,7 @@ private struct QuestionList: View {
                     .configurePagination(
                         store.questionList,
                         currentIndex: index,
-                        hasNext: store.haxNext,
+                        hasNext: store.paginationInfo.hasNext,
                         pagination: {
                             store.send(.pagination)
                         }
@@ -90,6 +90,7 @@ private struct QuestionCell: View {
             Text(question.content)
                 .foregroundStyle(.main)
                 .font(.pretendard(.bold, size: 17))
+                .multilineTextAlignment(.leading)
                 .lineSpacing(4.0)
                 .lineLimit(2)
                 .padding(.top, 6)
@@ -177,35 +178,7 @@ extension QuestionCell {
 // MARK: - Preview
 
 #Preview {
-    let questionList = [
-        QuestionEntity(
-            id: 0,
-            content: "테스트 질문 01",
-            publishedDate: .now,
-            isAnswered: false,
-            isLived: true
-        ),
-        QuestionEntity(
-            id: 1,
-            content: "테스트 질문 02",
-            publishedDate: .now,
-            isAnswered: false,
-            isLived: false
-        ),
-        QuestionEntity(
-            id: 2,
-            content: "테스트 질문 03",
-            publishedDate: .now,
-            isAnswered: true,
-            isLived: false
-        ),
-    ]
-    QuestionListView(
-        store: Store(
-            initialState: QuestionListFeature.State(
-                questionList: questionList
-            )
-        ) {
-            QuestionListFeature()
-        })
+    QuestionListView(store: Store(initialState: QuestionListFeature.State()) {
+        QuestionListFeature()
+    })
 }
