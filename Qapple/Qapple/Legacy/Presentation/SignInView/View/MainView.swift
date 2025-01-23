@@ -91,7 +91,7 @@ private struct MainTabView: View {
                         )
                     }
                 
-                BulletinBoardView()
+                LegacyBulletinBoardView()
                     .tag(TabType.bulletinBoard)
                     .tabItem {
                         TabItem(

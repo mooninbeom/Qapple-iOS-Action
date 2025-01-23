@@ -98,7 +98,7 @@ private struct SearchListView: View {
         ScrollView {
             LazyVStack(spacing: 0) {
                 ForEach(Array(searchPostList.enumerated()), id: \.offset) { index, post in
-                    BulletinBoardCell(
+                    LegacyBulletinBoardCell(
                         post: post,
                         seeMoreAction: {
                             selectedPost = post

@@ -9,7 +9,7 @@ import SwiftUI
 
 // MARK: - BulletinBoardCell
 
-struct BulletinBoardCell: View {
+struct LegacyBulletinBoardCell: View {
     
     let post: Post
     let seeMoreAction: () -> Void
@@ -322,7 +322,7 @@ private struct ReportHideView: View {
 
 #Preview {
     VStack {
-        BulletinBoardCell(
+        LegacyBulletinBoardCell(
             post: Post(
                 boardId: 1,
                 writerId: 2,
@@ -337,7 +337,7 @@ private struct ReportHideView: View {
             )
         ) {}
         
-        BulletinBoardCell(
+        LegacyBulletinBoardCell(
             post: Post(
                 boardId: 1,
                 writerId: 2,

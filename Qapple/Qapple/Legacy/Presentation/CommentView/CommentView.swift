@@ -26,7 +26,7 @@ struct CommentView: View {
         VStack(spacing: 0) {
             HeaderView()
             
-            BulletinBoardCell(
+            LegacyBulletinBoardCell(
                 post: self.post,
                 seeMoreAction: {
                     selectedPost = post

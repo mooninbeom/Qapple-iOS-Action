@@ -2,7 +2,7 @@
 //  BulletinBoardView.swift
 //  Qapple
 //
-//  Created by 김민준 on 8/10/24.
+//  Created by Simmons on 1/23/25.
 //
 
 import SwiftUI
@@ -66,9 +66,11 @@ private struct BoardView: View {
         VStack(spacing: 0) {
             NavigationBar()
             
-            AcademyPlanDayCounter(academyEvents: bulletinBoardUseCase.state.academyEvents)
-                .padding(.top, 8)
-                .padding(.horizontal, 16)
+            AcademyPlanDayCounter(
+                academyEvents: bulletinBoardUseCase.state.academyEvents
+            )
+            .padding(.top, 8)
+            .padding(.horizontal, 16)
             
             PostListView()
                 .padding(.top, 20)
@@ -195,14 +197,4 @@ private struct PostListView: View {
             Text("신고된 게시글은 열람할 수 없습니다.")
         }
     }
-}
-
-// MARK: - Preview
-
-#Preview {
-    NavigationStack {
-        BulletinBoardView()
-    }
-    .environmentObject(Router(pathType: .bulletinBoard))
-    .environmentObject(BulletinBoardUseCase())
 }
