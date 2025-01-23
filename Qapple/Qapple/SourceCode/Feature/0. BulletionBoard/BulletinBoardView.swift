@@ -19,7 +19,7 @@ struct BulletinBoardView: View {
     var body: some View {
         GeometryReader { proxy in
             ZStack {
-                BoardView()
+                BoardView(store: store)
                 
                 NewPostButton(
                     title: "게시글 작성",
@@ -43,14 +43,14 @@ struct BulletinBoardView: View {
             .background(Background.first)
         }
         .onAppear{
-            bulletinBoardUseCase.isClickComment = false
-            bulletinBoardUseCase.state.searchPosts.removeAll()
-            bulletinBoardUseCase.searchText = ""
-            bulletinBoardUseCase.effect(.fetchPost)
+            bulletinBoardUseCase.isClickComment = false // ?
+            bulletinBoardUseCase.state.searchPosts.removeAll() // 어떻게 처리할 지 고민
+            bulletinBoardUseCase.searchText = "" // 이것도
+            store.send(.getBulletinBoardList)
             
         }
         .onReceive(NotificationCenter.default.publisher(for: .updateViewNotification)) { _ in
-            bulletinBoardUseCase.refreshPostList()
+            store.send(.refreshBulletinBoardList)
         }
     }
 }
@@ -58,6 +58,8 @@ struct BulletinBoardView: View {
 // MARK: - BoardView
 
 private struct BoardView: View {
+    
+    @Bindable var store: StoreOf<BulletinBoardFeature>
     
     @EnvironmentObject private var bulletinBoardUseCase: BulletinBoardUseCase
     
@@ -71,7 +73,7 @@ private struct BoardView: View {
             .padding(.top, 8)
             .padding(.horizontal, 16)
             
-            PostListView()
+            PostListView(store: store)
                 .padding(.top, 20)
             
             Spacer()
@@ -137,6 +139,8 @@ private struct CustomTabBar: View {
 
 private struct PostListView: View {
     
+    @Bindable var store: StoreOf<BulletinBoardFeature>
+    
     @EnvironmentObject private var bulletinBoardUseCase: BulletinBoardUseCase
     
     @EnvironmentObject private var pathModel: Router
@@ -158,7 +162,7 @@ private struct PostListView: View {
                         if index == bulletinBoardUseCase.state.posts.count - 1
                             && bulletinBoardUseCase.state.hasNext {
                             print("게시판 페이지네이션")
-                            bulletinBoardUseCase.effect(.fetchPost)
+                            store.send(.getBulletinBoardList)
                         }
                     }
                     .onTapGesture {
@@ -178,9 +182,9 @@ private struct PostListView: View {
             }
         }
         .refreshable {
-            bulletinBoardUseCase.refreshPostList()
+            store.send(.refreshBulletinBoardList)
         }
-        .disabled(bulletinBoardUseCase.isLoading)
+        .disabled(store.isLoading)
         .sheet(item: $selectedPost) { post in
             BulletinBoardSeeMoreSheetView(
                 sheetType: post.isMine ? .mine : .others,
