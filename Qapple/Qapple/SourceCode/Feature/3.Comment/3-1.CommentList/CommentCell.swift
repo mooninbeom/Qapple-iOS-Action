@@ -196,7 +196,6 @@ struct CommentCell: View {
             }
         }
         .frame(width: 73)
-        .alert($store.scope(state: \.alert, action: \.alert))
     }
     
     private var reportBtn: some View {
@@ -230,7 +229,8 @@ struct CommentCell: View {
         isLiked: true,
         isMine: false,
         isReport: true,
-        createdAt: "2025-01-01T00:00:00Z")
+        createdAt: "2025-01-01T00:00:00Z"
+    )
     
     CommentCell(store: store, comment: comment, cellIndex: 1)
 }

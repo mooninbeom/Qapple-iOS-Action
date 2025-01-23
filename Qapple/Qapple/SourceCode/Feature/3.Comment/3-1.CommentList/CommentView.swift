@@ -46,6 +46,7 @@ struct CommentView: View {
             // TODO: 초기 데이터 fetch
             store.send(.commentViewAppeared)
         }
+        .alert($store.scope(state: \.alert, action: \.alert))
         // TODO: - Post ellipsis 버튼 대응
 //        .sheet(item: $selectedPost) { post in
 //            BulletinBoardSeeMoreSheetView(

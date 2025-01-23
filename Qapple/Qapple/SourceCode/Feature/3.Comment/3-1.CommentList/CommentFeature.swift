@@ -42,12 +42,14 @@ struct CommentFeature {
         case uploadButtonTapped
         case deleteButtonTapped(id: Int)
         case reportButtonTapped(id: Int)
+        case successActionLoading
         
         case refreshCommentList
         
         case commentTextChanged(text: String)
         
         case alert(PresentationAction<Alert>)
+        case networkErrorAlert
         
         @CasePathable
         enum Alert: Equatable {
@@ -61,23 +63,35 @@ struct CommentFeature {
     var body: some ReducerOf<Self> {
         Reduce { state, action in
             switch action {
+            // MARK: - 데이터 fetch 관련 액션
             case .commentViewAppeared, .refreshCommentList:
                 state.isLoading = true
                 
                 state.comments.removeAll()
                 state.threshold = nil
                 state.hasNext = false
-                return .run { [boardId = state.postWriterId] send in
+                return .run { [boardId = state.post.boardId] send in
                     do {
                         let result = try await commentRepository.fetchBoardCommentList(boardId, nil)
                         await send(.fetchCommentData(result.0, result.1.threshold, result.1.hasNext))
                     } catch {
-                        
+                        await send(.networkErrorAlert)
                     }
                 }
                 
             case .paginationCellAppeared:
-                return .none
+                state.isLoading = true
+                return .run { [
+                    boardId = state.post.boardId,
+                    threshold = state.threshold
+                ] send in
+                    do {
+                        let result = try await commentRepository.fetchBoardCommentList(boardId, threshold)
+                        await send(.fetchCommentData(result.0, result.1.threshold, result.1.hasNext))
+                    } catch {
+                        await send(.networkErrorAlert)
+                    }
+                }
                 
             case let .fetchCommentData(comments, threshold, hasNext):
                 state.comments.append(contentsOf: comments)
@@ -87,21 +101,46 @@ struct CommentFeature {
                 state.isLoading = false
                 return .none
                 
-            case .likeButtonTapped(id: _):
+            case .successActionLoading:
+                state.isLoading = false
                 return .none
-            case .uploadButtonTapped:
-                // 댓글 업로드(state.text 사용)
-                return .none
+                
+            // MARK: - 버튼 액션 관련(업로드, 좋아요, 삭제, 신고)
+            case let .likeButtonTapped(id: id):
+                state.isLoading = true
+                state.comments[state.comments.firstIndex{ $0.id == id }!].isLiked.toggle()
+                return .run { send in
+                    do {
+                        let _ = try await commentRepository.likeBoardComment(id)
+                        await send(.successActionLoading)
+                    } catch {
+                        await send(.networkErrorAlert)
+                    }
+                }
                 
             case let .commentTextChanged(text: text):
                 state.text = text
                 return .none
+            case .uploadButtonTapped:
+                // 댓글 업로드(state.text 사용)
+                state.isLoading = true
+                return .run { [
+                    text = state.text,
+                    boardId = state.post.boardId
+                ] send in
+                    do {
+                        let _ = try await commentRepository.postBoardComment(boardId, text)
+                        await send(.refreshCommentList)
+                        // TODO: - 댓글 업로드 후 액션 추가
+                    } catch {
+                        await send(.networkErrorAlert)
+                    }
+                }
             
             case .reportButtonTapped(id: _):
                 // TODO: CommentReportView로 navigating
                 return .none
                 
-            // Delete 버튼 alert
             case let .deleteButtonTapped(id: id):
                 state.alert = AlertState {
                     TextState("정말로 댓글을 삭제하시겠습니까?")
@@ -111,6 +150,9 @@ struct CommentFeature {
                 }
                 return .none
                 
+            // MARK: - Alert 관련 액션
+            // Delete 버튼 alert
+
             case let .alert(.presented(.deleteComment(id))):
                 // TODO: 댓글 삭제 구현
                 print("댓글 아이디: \(id) 삭제")
@@ -119,6 +161,24 @@ struct CommentFeature {
                     TextState("댓글이 삭제되었습니다")
                 } actions: {
                     ButtonState(label: { TextState("확인")})
+                }
+                return .run { send in
+                    do {
+                        let _ = try await commentRepository.deleteBoardComment(id)
+                        await send(.refreshCommentList)
+                    } catch {
+                        await send(.networkErrorAlert)
+                    }
+                }
+                
+            case .networkErrorAlert:
+                state.isLoading = false
+                state.alert = AlertState {
+                    TextState("알 수 없는 오류가 발생했습니다.")
+                } actions: {
+                    ButtonState(role: .cancel, label: { TextState("확인") })
+                } message: {
+                    TextState("잠시후 다시 시도해주세요.")
                 }
                 return .none
                 
@@ -199,4 +259,5 @@ private let samplePost = Post(
     createAt: .init(),
     isMine: false,
     isReported: false,
-    isLiked: true)
+    isLiked: true
+)
