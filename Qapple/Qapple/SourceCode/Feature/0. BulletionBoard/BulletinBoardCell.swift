@@ -11,26 +11,26 @@ import SwiftUI
 
 struct BulletinBoardCell: View {
     
-    let post: Post
+    let post: BulletinBoard
     let seeMoreAction: () -> Void
     
     var body: some View {
         if post.isMine {
-            NormalBoardCell(
-                post: post,
-                seeMoreAction: seeMoreAction
-            )
+//            NormalBoardCell(
+//                post: post,
+//                seeMoreAction: seeMoreAction
+//            )
         } else {
             if post.isReported {
-                ReportBoardCell(
-                    post: post,
-                    seeMoreAction: seeMoreAction
-                )
+//                ReportBoardCell(
+//                    post: post,
+//                    seeMoreAction: seeMoreAction
+//                )
             } else {
-                NormalBoardCell(
-                    post: post,
-                    seeMoreAction: seeMoreAction
-                )
+//                NormalBoardCell(
+//                    post: post,
+//                    seeMoreAction: seeMoreAction
+//                )
             }
         }
     }

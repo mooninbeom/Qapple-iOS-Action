@@ -7,7 +7,7 @@
 
 import Foundation
 
-struct AcademyEvent {
+struct AcademyEvent: Equatable {
     let title: String
     let startDate: Date
     let endDate: Date

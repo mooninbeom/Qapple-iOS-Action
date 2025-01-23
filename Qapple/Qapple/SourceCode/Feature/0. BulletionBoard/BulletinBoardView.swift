@@ -43,7 +43,7 @@ struct BulletinBoardView: View {
             .background(Background.first)
         }
         .onAppear{
-            bulletinBoardUseCase.isClickComment = false // ?
+//            bulletinBoardUseCase.isClickComment = false // ?
             bulletinBoardUseCase.state.searchPosts.removeAll() // 어떻게 처리할 지 고민
             bulletinBoardUseCase.searchText = "" // 이것도
             store.send(.getBulletinBoardList)
@@ -65,10 +65,10 @@ private struct BoardView: View {
     
     var body: some View {
         VStack(spacing: 0) {
-            NavigationBar()
+            CustomTabBar(store: store)
             
             AcademyPlanDayCounter(
-                academyEvents: bulletinBoardUseCase.state.academyEvents
+                academyEvents: store.academyEvents
             )
             .padding(.top, 8)
             .padding(.horizontal, 16)
@@ -84,16 +84,18 @@ private struct BoardView: View {
 
 // MARK: - NavigationBar
 
-private struct NavigationBar: View {
-    @EnvironmentObject private var pathModel: Router
-    
-    var body: some View {
-        CustomTabBar()
-    }
-}
+//private struct NavigationBar: View {
+//    @EnvironmentObject private var pathModel: Router
+//    
+//    var body: some View {
+//        CustomTabBar()
+//    }
+//}
 
 // MARK: - 커스텀 탭바
 private struct CustomTabBar: View {
+    
+    let store: StoreOf<BulletinBoardFeature>
     
     @EnvironmentObject var pathModel: Router
     
@@ -110,7 +112,7 @@ private struct CustomTabBar: View {
                     Spacer()
                     
                     Button {
-                        pathModel.pushView(screen: BulletinBoardPathType.alert)
+                        store.send(.notificationButtonTapped)
                     } label: {
                         Image(.noticeIcon)
                             .resizable()
@@ -120,7 +122,7 @@ private struct CustomTabBar: View {
                     }
                     
                     Button {
-                        pathModel.pushView(screen: BulletinBoardPathType.search)
+                        store.send(.searchButtonTapped)
                     } label: {
                         Image(.search)
                             .resizable()
@@ -145,37 +147,38 @@ private struct PostListView: View {
     
     @EnvironmentObject private var pathModel: Router
     
-    @State private var selectedPost: Post?
+    @State private var selectedPost: BulletinBoard?
     @State private var isReportedPostTappedAlert = false
     
     var body: some View {
         ScrollView {
             LazyVStack(spacing: 0) {
-                ForEach(Array(bulletinBoardUseCase.state.posts.enumerated()), id: \.offset) { index, post in
+                ForEach(Array(store.bulletinBoardList.enumerated()), id: \.offset) { index, board in
                     BulletinBoardCell(
-                        post: post,
+                        post: board,
                         seeMoreAction: {
-                            selectedPost = post
+                            selectedPost = board
                         }
                     )
                     .onAppear {
-                        if index == bulletinBoardUseCase.state.posts.count - 1
-                            && bulletinBoardUseCase.state.hasNext {
+                        if index == store.bulletinBoardList.count - 1
+                            && store.hasNext {
                             print("게시판 페이지네이션")
                             store.send(.getBulletinBoardList)
                         }
                     }
                     .onTapGesture {
-                        if !post.isReported {
-                            pathModel.pushView(screen: BulletinBoardPathType.comment(post: post))
-                            bulletinBoardUseCase.isClickComment = true
+                        if !board.isReported {
+//                            pathModel.pushView(screen: BulletinBoardPathType.comment(post: post))
+                            store.send(.boardButtonTapped)
+//                            bulletinBoardUseCase.isClickComment = true
                         } else {
                             HapticService.notification(type: .warning)
                             isReportedPostTappedAlert.toggle()
                         }
                     }
                     
-                    if index != bulletinBoardUseCase.state.posts.endIndex - 1 {
+                    if index != store.bulletinBoardList.endIndex - 1 {
                         QappleDivider()
                     }
                 }
@@ -185,15 +188,15 @@ private struct PostListView: View {
             store.send(.refreshBulletinBoardList)
         }
         .disabled(store.isLoading)
-        .sheet(item: $selectedPost) { post in
-            BulletinBoardSeeMoreSheetView(
-                sheetType: post.isMine ? .mine : .others,
-                post: post,
-                isComment: false
-            )
-            .presentationDetents([.height(84)])
-            .presentationDragIndicator(.visible)
-        }
+//        .sheet(item: $selectedPost) { post in
+//            BulletinBoardSeeMoreSheetView(
+//                sheetType: post.isMine ? .mine : .others,
+//                post: post,
+//                isComment: false
+//            )
+//            .presentationDetents([.height(84)])
+//            .presentationDragIndicator(.visible)
+//        }
         .alert("신고된 게시글", isPresented: $isReportedPostTappedAlert) {
             Button("확인", role: .none, action: {})
         } message: {

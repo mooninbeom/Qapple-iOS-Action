@@ -13,6 +13,7 @@ struct BulletinBoardFeature {
     @ObservableState
     struct State: Equatable {
         var bulletinBoardList: [BulletinBoard] = []
+        var academyEvents: [AcademyEvent] = [.macro, .epilogue]
         var isLoading: Bool = false
         var threshold: Int?
         var hasNext: Bool = false
@@ -24,7 +25,7 @@ struct BulletinBoardFeature {
         case fetchBulletinBoardList(([BulletinBoard], QappleAPI.PaginationInfo))
         case boardButtonTapped
         case likeBoardButtonTapped
-        case seeMoreButtonTapped
+        case ellipsisButtonTapped
         case searchButtonTapped
         case notificationButtonTapped
         case postBoardButtonTapped
@@ -60,18 +61,21 @@ struct BulletinBoardFeature {
                 return .none
                 
             case .boardButtonTapped:
+                // TODO: Navigation 처리
                 return .none
                 
             case .likeBoardButtonTapped:
                 return .none
                 
-            case .seeMoreButtonTapped:
+            case .ellipsisButtonTapped:
                 return .none
                 
             case .searchButtonTapped:
+                // TODO: Navigation 처리
                 return .none
                 
             case .notificationButtonTapped:
+                // TODO: Navigation 처리
                 return .none
                 
             case .postBoardButtonTapped:
