@@ -164,7 +164,7 @@ private struct PostListView: View {
                             store.send(.boardButtonTapped(board))
                         } else {
                             HapticService.notification(type: .warning)
-                            isReportedPostTappedAlert.toggle()
+                            store.send(.reportButtonTapped)
                         }
                     }
                     if index != store.bulletinBoardList.endIndex - 1 {
@@ -178,15 +178,10 @@ private struct PostListView: View {
             BulletinBoardEllipsisView(store: ellipsisStore)
                 .presentationDetents([.height(84)])
         }
+        .alert($store.scope(state: \.alert, action: \.alert))
         .refreshable {
             store.send(.refreshBulletinBoardList)
         }
         .disabled(store.isLoading)
-        
-//        .alert("신고된 게시글", isPresented: $isReportedPostTappedAlert) {
-//            Button("확인", role: .none, action: {})
-//        } message: {
-//            Text("신고된 게시글은 열람할 수 없습니다.")
-//        }
     }
 }

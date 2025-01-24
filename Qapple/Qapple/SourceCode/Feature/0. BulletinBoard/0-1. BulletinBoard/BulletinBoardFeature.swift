@@ -13,6 +13,7 @@ struct BulletinBoardFeature {
     @ObservableState
     struct State: Equatable {
         @Presents var sheet: Sheet.State?
+        @Presents var alert: AlertState<Action.Alert>?
         var bulletinBoardList: [BulletinBoard] = []
         var academyEvents: [AcademyEvent] = [.macro, .epilogue]
         var isLoading: Bool = false
@@ -22,17 +23,28 @@ struct BulletinBoardFeature {
     
     enum Action {
         case sheet(PresentationAction<Sheet.Action>)
+        case alert(PresentationAction<Alert>)
+        case delegate(Delegate)
         
         case getBulletinBoardList
         case refreshBulletinBoardList
         case fetchBulletinBoardList(([BulletinBoard], QappleAPI.PaginationInfo))
         
         case boardButtonTapped(BulletinBoard)
+        case reportButtonTapped
         case likeBoardButtonTapped
         case ellipsisButtonTapped(Int, Bool)
         case searchButtonTapped
         case notificationButtonTapped
         case postBoardButtonTapped
+        
+        enum Alert {
+            case confirmReport
+        }
+        
+        enum Delegate {
+            case confirmReport
+        }
     }
     
     @Dependency(\.bulletinBoardRepository) var bulletinBoardRepository
@@ -44,6 +56,17 @@ struct BulletinBoardFeature {
                 return .none
                 
             case .sheet:
+                return .none
+                
+            case .alert(.presented(.confirmReport)):
+                return .run { send in
+                    await send(.delegate(.confirmReport))
+                }
+                
+            case .alert:
+                return .none
+                
+            case .delegate:
                 return .none
                 
             case .getBulletinBoardList:
@@ -83,6 +106,10 @@ struct BulletinBoardFeature {
                 // TODO: Navigation 처리
                 return .none
                 
+            case .reportButtonTapped:
+                state.alert = .confirmReport
+                return .none
+                
             case .likeBoardButtonTapped:
                 return .none
                 
@@ -108,6 +135,7 @@ struct BulletinBoardFeature {
             }
         }
         .ifLet(\.$sheet, action: \.sheet)
+        .ifLet(\.$alert, action: \.alert)
     }
 }
 
@@ -121,3 +149,17 @@ extension BulletinBoardFeature {
 }
 
 extension BulletinBoardFeature.Sheet.State: Equatable {}
+
+// MARK: - BulletinBoardAlert
+
+extension AlertState where Action == BulletinBoardFeature.Action.Alert {
+    static let confirmReport = Self {
+        TextState("신고된 게시글")
+    } actions: {
+        ButtonState(role: .cancel) {
+            TextState("확인")
+        }
+    } message: {
+        TextState("신고된 게시글은 열람할 수 없습니다.")
+    }
+}
