@@ -21,9 +21,13 @@ struct CommentView: View {
             
             BulletinBoardCell(
                 board: store.post,
-                seeMoreAction: {
+                ellipsis: {
                     // TODO: Post Ellipsis 버튼 action
-                })
+                },
+                like: {
+                    // TODO: Post Like 버튼 action
+                }
+            )
             .frame(width: UIScreen.main.bounds.width)
             .disabled(store.isLoading)
             

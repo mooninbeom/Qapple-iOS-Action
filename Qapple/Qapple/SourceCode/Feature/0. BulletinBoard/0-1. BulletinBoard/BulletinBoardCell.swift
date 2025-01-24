@@ -13,23 +13,27 @@ import ComposableArchitecture
 struct BulletinBoardCell: View {
     
     let board: BulletinBoard
-    let seeMoreAction: () -> Void
+    let ellipsis: () -> Void
+    let like: () -> Void
     
     var body: some View {
         if board.isMine {
             NormalBoardCell(
                 board: board,
-                seeMoreAction: seeMoreAction
+                ellipsis: ellipsis,
+                like: like
             )
         } else {
             if board.isReported {
                 ReportBoardCell(
-                    board: board
+                    board: board,
+                    like: like
                 )
             } else {
                 NormalBoardCell(
                     board: board,
-                    seeMoreAction: seeMoreAction
+                    ellipsis: ellipsis,
+                    like: like
                 )
             }
         }
@@ -40,17 +44,21 @@ struct BulletinBoardCell: View {
 private struct NormalBoardCell: View {
     
     let board: BulletinBoard
-    let seeMoreAction: () -> Void
+    let ellipsis: () -> Void
+    let like: () -> Void
     
     var body: some View {
         VStack(alignment: .leading, spacing: 0) {
             HeaderView(
                 board: board,
-                seeMoreAction: seeMoreAction
+                ellipsis: ellipsis
             )
             .padding(.horizontal, 16)
             
-            ContentView(board: board)
+            ContentView(
+                board: board,
+                like: like
+            )
                 .padding(.horizontal, 16)
             
             Divider()
@@ -67,7 +75,7 @@ private struct NormalBoardCell: View {
 private struct HeaderView: View {
     
     let board: BulletinBoard
-    let seeMoreAction: () -> Void
+    let ellipsis: () -> Void
     
     private var nickname: String {
         if board.writerNickname == "알 수 없음" {
@@ -96,7 +104,7 @@ private struct HeaderView: View {
             Spacer()
             
             Button {
-                seeMoreAction()
+                ellipsis()
             } label: {
                 Image(systemName: "ellipsis")
                     .resizable()
@@ -113,6 +121,7 @@ private struct HeaderView: View {
 private struct ContentView: View {
     
     let board: BulletinBoard
+    let like: () -> Void
     
     var body: some View {
         HStack(spacing: 8) {
@@ -126,7 +135,10 @@ private struct ContentView: View {
                     .foregroundStyle(TextLabel.main)
                     .padding(.top, 2)
                 
-                RemoteView(board: board)
+                RemoteView(
+                    board: board,
+                    like: like
+                )
                     .padding(.top, 12)
                     .disabled(board.isReported)
             }
@@ -138,31 +150,14 @@ private struct ContentView: View {
 
 private struct RemoteView: View {
     
-    @EnvironmentObject private var bulletinBoardUseCase: BulletinBoardUseCase
-    
     let board: BulletinBoard
+    let like: () -> Void
     
     var body: some View {
         HStack {
-            LikeButton(
-                board: board,
-                tapAction: {
-                    if !board.isLiked { HapticService.impact(style: .light) }
-//                    bulletinBoardUseCase.effect(.likePost(postId: board.boardId))
-                }
-            )
-            
-            CommentButton(board: board)
-        }
-    }
-    
-    struct LikeButton: View {
-        let board: BulletinBoard
-        let tapAction: () -> Void
-        
-        var body: some View {
             Button {
-                tapAction()
+                if !board.isLiked { HapticService.impact(style: .light) }
+                like()
             } label: {
                 HStack(spacing: 4) {
                     Image(board.isLiked ? .heartActive : .heart)
@@ -172,32 +167,17 @@ private struct RemoteView: View {
                         .foregroundStyle(TextLabel.sub3)
                 }
             }
-        }
-    }
-    
-    struct CommentButton: View {
-        @EnvironmentObject private var pathModel: Router
-        @EnvironmentObject private var bulletinBoardUseCase: BulletinBoardUseCase
-        
-        let board: BulletinBoard
-        
-        var body: some View {
-            Button {
-//                pathModel.pushView(screen: BulletinBoardPathType.comment(board: board))
-                bulletinBoardUseCase.isClickComment = true
-            } label: {
-                HStack(spacing: 4) {
-                    Image(systemName: "text.bubble.fill")
-                        .resizable()
-                        .frame(width: 15, height: 14)
-                        .foregroundStyle(TextLabel.sub3)
-                    
-                    Text("\(board.commentCount)")
-                        .pretendard(.regular, 13)
-                        .foregroundStyle(TextLabel.sub3)
-                }
+            
+            HStack(spacing: 4) {
+                Image(systemName: "text.bubble.fill")
+                    .resizable()
+                    .frame(width: 15, height: 14)
+                    .foregroundStyle(TextLabel.sub3)
+                
+                Text("\(board.commentCount)")
+                    .pretendard(.regular, 13)
+                    .foregroundStyle(TextLabel.sub3)
             }
-//            .disabled(bulletinBoardUseCase.isClickComment)
         }
     }
 }
@@ -209,13 +189,18 @@ private struct ReportBoardCell: View {
     @State private var isReportContentShow = false
 
     let board: BulletinBoard
+    let like: () -> Void
 
     var body: some View {
         Group {
             if !isReportContentShow {
                 ReportHideView(isReportContentShow: $isReportContentShow)
             } else {
-                ReportShowView(isReportContentShow: $isReportContentShow, board: board)
+                ReportShowView(
+                    isReportContentShow: $isReportContentShow,
+                    board: board,
+                    like: like
+                )
             }
         }
         .opacity(0.5)
@@ -229,6 +214,7 @@ private struct ReportShowView: View {
     @Binding private(set) var isReportContentShow: Bool
     
     let board: BulletinBoard
+    let like: () -> Void
     
     private var nickname: String {
         if board.writerNickname == "알 수 없음" {
@@ -267,7 +253,10 @@ private struct ReportShowView: View {
             }
             .padding(.horizontal, 16)
 
-            ContentView(board: board)
+            ContentView(
+                board: board,
+                like: like
+            )
                 .padding(.horizontal, 16)
         }
         .padding(.top, 16)

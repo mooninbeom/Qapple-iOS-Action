@@ -11,12 +11,7 @@ import ComposableArchitecture
 // MARK: - BulletinBoardView
 
 struct BulletinBoardView: View {
-    @Bindable var store: StoreOf<BulletinBoardFeature> = Store(initialState: BulletinBoardFeature.State()) {
-        BulletinBoardFeature()
-    }
-    
-    @EnvironmentObject private var pathModel: Router
-    @EnvironmentObject private var bulletinBoardUseCase: BulletinBoardUseCase
+    @Bindable var store: StoreOf<BulletinBoardFeature>
     
     var body: some View {
         GeometryReader { proxy in
@@ -63,8 +58,6 @@ private struct BoardView: View {
     
     @Bindable var store: StoreOf<BulletinBoardFeature>
     
-    @EnvironmentObject private var bulletinBoardUseCase: BulletinBoardUseCase
-    
     var body: some View {
         VStack(spacing: 0) {
             CustomTabBar(store: store)
@@ -88,8 +81,6 @@ private struct BoardView: View {
 private struct CustomTabBar: View {
     
     let store: StoreOf<BulletinBoardFeature>
-    
-    @EnvironmentObject var pathModel: Router
     
     var body: some View {
         CustomNavigationBar(
@@ -135,21 +126,17 @@ private struct PostListView: View {
     
     @Bindable var store: StoreOf<BulletinBoardFeature>
     
-    @EnvironmentObject private var bulletinBoardUseCase: BulletinBoardUseCase
-    
-    @EnvironmentObject private var pathModel: Router
-    
-    @State private var selectedboard: BulletinBoard?
-    @State private var isReportedPostTappedAlert = false
-    
     var body: some View {
         ScrollView {
             LazyVStack(spacing: 0) {
                 ForEach(Array(store.bulletinBoardList.enumerated()), id: \.offset) { index, board in
                     BulletinBoardCell(
                         board: board,
-                        seeMoreAction: {
+                        ellipsis: {
                             store.send(.ellipsisButtonTapped(board.id, board.isMine))
+                        },
+                        like: {
+                            store.send(.likeBoardButtonTapped(board.id))
                         }
                     )
                     .onAppear {

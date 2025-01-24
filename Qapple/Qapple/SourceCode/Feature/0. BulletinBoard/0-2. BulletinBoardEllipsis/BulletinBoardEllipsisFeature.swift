@@ -80,6 +80,8 @@ struct BulletinBoardEllipsisFeature {
     }
 }
 
+// MARK: - BulletinBoardEllipsisAlert
+
 extension AlertState where Action == BulletinBoardEllipsisFeature.Action.Alert {
     static let confirmDelete = Self {
         TextState("게시글을 삭제할까요?")

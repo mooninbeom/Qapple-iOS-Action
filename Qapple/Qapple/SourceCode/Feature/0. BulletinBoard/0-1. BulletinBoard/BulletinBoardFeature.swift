@@ -32,11 +32,12 @@ struct BulletinBoardFeature {
         
         case boardButtonTapped(BulletinBoard)
         case reportButtonTapped
-        case likeBoardButtonTapped
+        case likeBoardButtonTapped(Int)
         case ellipsisButtonTapped(Int, Bool)
         case searchButtonTapped
         case notificationButtonTapped
         case postBoardButtonTapped
+        case StopLoading
         
         enum Alert {
             case confirmReport
@@ -95,11 +96,12 @@ struct BulletinBoardFeature {
                 }
                 
             case let .fetchBulletinBoardList((bulletinBoardList, paginationInfo)):
-                state.isLoading = false
                 state.bulletinBoardList.append(contentsOf: bulletinBoardList)
                 state.threshold = Int(paginationInfo.threshold)
                 state.hasNext = paginationInfo.hasNext
-                return .none
+                return .run { send in
+                    await send(.StopLoading)
+                }
                 
             case let .boardButtonTapped(board):
                 print("게시판 정보\(board)")
@@ -110,8 +112,20 @@ struct BulletinBoardFeature {
                 state.alert = .confirmReport
                 return .none
                 
-            case .likeBoardButtonTapped:
-                return .none
+            case let .likeBoardButtonTapped(boardId):
+                state.isLoading = true
+                if let index = state.bulletinBoardList.firstIndex(where: {$0.id == boardId}) {
+                    state.bulletinBoardList[index].isLiked.toggle()
+                    state.bulletinBoardList[index].heartCount += state.bulletinBoardList[index].isLiked ? 1 : -1
+                }
+                return .run { send in
+                    do {
+                        let _ = try await bulletinBoardRepository.likeBoard(boardId)
+                        await send(.StopLoading)
+                    } catch {
+                        print(error)
+                    }
+                }
                 
             case let .ellipsisButtonTapped(boardId, isMine):
                 state.sheet = .ellipsisButtonTap(
@@ -131,6 +145,10 @@ struct BulletinBoardFeature {
                 
             case .postBoardButtonTapped:
                 // TODO: Navigiation 처리
+                return .none
+                
+            case .StopLoading:
+                state.isLoading = false
                 return .none
             }
         }
