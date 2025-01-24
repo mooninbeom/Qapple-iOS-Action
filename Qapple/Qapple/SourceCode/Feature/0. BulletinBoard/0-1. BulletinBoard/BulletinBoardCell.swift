@@ -197,7 +197,7 @@ private struct RemoteView: View {
                         .foregroundStyle(TextLabel.sub3)
                 }
             }
-            .disabled(bulletinBoardUseCase.isClickComment)
+//            .disabled(bulletinBoardUseCase.isClickComment)
         }
     }
 }

@@ -45,9 +45,9 @@ struct BulletinBoardView: View {
             .background(Background.first)
         }
         .onAppear{
-//            bulletinBoardUseCase.isClickComment = false // ?
-            bulletinBoardUseCase.state.searchPosts.removeAll() // 어떻게 처리할 지 고민
-            bulletinBoardUseCase.searchText = "" // 이것도
+//            bulletinBoardUseCase.isClickComment = false
+//            bulletinBoardUseCase.state.searchPosts.removeAll() // 어떻게 처리할 지 고민
+//            bulletinBoardUseCase.searchText = ""
             store.send(.getBulletinBoardList)
             
         }
@@ -161,7 +161,7 @@ private struct PostListView: View {
                     }
                     .onTapGesture {
                         if !board.isReported {
-                            store.send(.boardButtonTapped)
+                            store.send(.boardButtonTapped(board))
                         } else {
                             HapticService.notification(type: .warning)
                             isReportedPostTappedAlert.toggle()

@@ -27,7 +27,7 @@ struct BulletinBoardFeature {
         case refreshBulletinBoardList
         case fetchBulletinBoardList(([BulletinBoard], QappleAPI.PaginationInfo))
         
-        case boardButtonTapped
+        case boardButtonTapped(BulletinBoard)
         case likeBoardButtonTapped
         case ellipsisButtonTapped(Int, Bool)
         case searchButtonTapped
@@ -51,16 +51,24 @@ struct BulletinBoardFeature {
                 let threshold = state.threshold
                 
                 return .run { send in
-                    let data = try await bulletinBoardRepository.fetchBulletinBoardList(threshold)
-                    await send(.fetchBulletinBoardList(data))
+                    do {
+                        let data = try await bulletinBoardRepository.fetchBulletinBoardList(threshold)
+                        await send(.fetchBulletinBoardList(data))
+                    } catch {
+                        print(error)
+                    }
                 }
                 
             case .refreshBulletinBoardList:
                 state.isLoading = true
                 state.bulletinBoardList = []
                 return .run { send in
-                    let data = try await bulletinBoardRepository.fetchBulletinBoardList(nil)
-                    await send(.fetchBulletinBoardList(data))
+                    do {
+                        let data = try await bulletinBoardRepository.fetchBulletinBoardList(nil)
+                        await send(.fetchBulletinBoardList(data))
+                    } catch {
+                        print(error)
+                    }
                 }
                 
             case let .fetchBulletinBoardList((bulletinBoardList, paginationInfo)):
@@ -70,7 +78,8 @@ struct BulletinBoardFeature {
                 state.hasNext = paginationInfo.hasNext
                 return .none
                 
-            case .boardButtonTapped:
+            case let .boardButtonTapped(board):
+                print("게시판 정보\(board)")
                 // TODO: Navigation 처리
                 return .none
                 
@@ -101,6 +110,8 @@ struct BulletinBoardFeature {
         .ifLet(\.$sheet, action: \.sheet)
     }
 }
+
+// MARK: - BulletinBoardSheet
 
 extension BulletinBoardFeature {
     @Reducer
