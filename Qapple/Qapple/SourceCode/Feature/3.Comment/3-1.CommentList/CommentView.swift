@@ -20,7 +20,7 @@ struct CommentView: View {
             HeaderView()
             
             BulletinBoardCell(
-                post: store.post,
+                board: store.post,
                 seeMoreAction: {
                     // TODO: Post Ellipsis 버튼 action
                 })

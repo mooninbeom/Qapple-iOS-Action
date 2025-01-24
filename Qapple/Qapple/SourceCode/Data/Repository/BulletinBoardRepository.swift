@@ -9,7 +9,6 @@ import Foundation
 import ComposableArchitecture
 
 struct BulletinBoardRepository {
-    static let networkClient = NetworkClient()
     
     var fetchBulletinBoardList: (_ threshold: Int?) async throws -> ([BulletinBoard], QappleAPI.PaginationInfo)
     var postBoard: (_ content: String) async throws -> PostBoardDTO

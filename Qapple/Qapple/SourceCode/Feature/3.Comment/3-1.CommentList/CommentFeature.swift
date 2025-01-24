@@ -15,7 +15,7 @@ import ComposableArchitecture
 struct CommentFeature {
     @ObservableState
     struct State: Equatable {
-        var post: Post = samplePost
+        var post: BulletinBoard = samplePost
         
         var text: String = ""
         
@@ -167,8 +167,8 @@ extension CommentFeature {
 
 
 
-private let samplePost = Post(
-    boardId: 1,
+private let samplePost = BulletinBoard(
+    id: 1,
     writerId: 1,
     writerNickname: "이호창",
     content: "특전사",
