@@ -81,7 +81,7 @@ private struct QuestionList: View {
 
 private struct QuestionCell: View {
     
-    let question: QuestionEntity
+    let question: Question
     let answerButtonTapped: () -> Void
     
     var body: some View {

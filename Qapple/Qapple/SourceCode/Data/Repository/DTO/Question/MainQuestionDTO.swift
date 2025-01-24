@@ -13,8 +13,8 @@ struct MainQuestionDTO: Codable {
     let content: String
     let isAnswered: Bool
     
-    var toEntity: QuestionEntity {
-        QuestionEntity(
+    var toEntity: Question {
+        Question(
             id: questionId,
             content: content,
             publishedDate: .now,

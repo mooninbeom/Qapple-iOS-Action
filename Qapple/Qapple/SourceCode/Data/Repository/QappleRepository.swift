@@ -41,8 +41,8 @@ struct QappleRepository {
     
     // MARK: - Question
     
-    var fetchQuestionList: (_ threshold: String?) async throws -> ([QuestionEntity], QappleAPI.TotalCount, QappleAPI.PaginationInfo)
-    var fetchMainQuestionList: () async throws -> QuestionEntity
+    var fetchQuestionList: (_ threshold: String?) async throws -> ([Question], QappleAPI.TotalCount, QappleAPI.PaginationInfo)
+    var fetchMainQuestionList: () async throws -> Question
     
     // MARK: - BoardComment
     

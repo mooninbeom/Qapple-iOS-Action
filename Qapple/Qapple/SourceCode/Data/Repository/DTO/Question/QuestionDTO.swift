@@ -8,7 +8,7 @@
 import Foundation
 
 struct QuestionsDTO: Decodable {
-    let total: QappleAPI.TotalCount
+    let total: Int
     let size: Int
     let content: [Content]
     let numberOfElements: Int
@@ -23,9 +23,9 @@ struct QuestionsDTO: Decodable {
         var isAnswered: Bool
     }
     
-    var toEntityWithThreshold: ([QuestionEntity], QappleAPI.TotalCount, QappleAPI.PaginationInfo) {
+    var toEntityWithInfo: ([Question], QappleAPI.TotalCount, QappleAPI.PaginationInfo) {
         let questionList = self.content.map {
-            QuestionEntity(
+            Question(
                 id: $0.questionId,
                 content: $0.content,
                 publishedDate: $0.livedAt?.ISO8601ToDate ?? .now,

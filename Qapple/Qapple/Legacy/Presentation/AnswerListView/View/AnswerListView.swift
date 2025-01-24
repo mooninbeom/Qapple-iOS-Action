@@ -173,7 +173,7 @@ private struct AnswerScrollView: View {
             LazyVStack(spacing: 0) {
                 ForEach(Array(viewModel.answerList.enumerated()), id: \.offset) { index, answer in
                     LegacyAnswerCell(
-                        answer: Answer(
+                        answer: LegacyAnswer(
                             id: answer.answerId,
                             writerId: answer.writerId,
                             learnerIndex: viewModel.learnerIndex(to: answer),

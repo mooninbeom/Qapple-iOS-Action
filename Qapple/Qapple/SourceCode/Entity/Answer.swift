@@ -7,9 +7,7 @@
 
 import Foundation
 
-/// 현재 Legacy 코드와의 충돌을 염두에 두어 Entity를 접미에 붙여 네이밍했습니다.
-/// 추후 Answer로 변경 예정입니다!
-struct AnswerEntity: Identifiable, Equatable {
+struct Answer: Identifiable, Equatable {
     
     /// 답변 ID
     let id: Int
