@@ -86,7 +86,7 @@ private struct QuestionButton: View {
                 .cornerRadius(32, corners: [.bottomLeft, .bottomRight])
             
             Button {
-                store.send(.questionButtonTapped)
+                store.send(.questionButtonTapped(store.todayQuestion))
             } label: {
                 Text(title)
                     .font(.pretendard(.semiBold, size: 17))
@@ -181,7 +181,7 @@ private struct AnswerPreviewList: View {
             
             if store.todayQuestion.isAnswered {
                 SeeAllButton {
-                    store.send(.seeAllAnswerButtonTapped)
+                    store.send(.seeAllAnswerButtonTapped(store.todayQuestion))
                 }
             }
         }

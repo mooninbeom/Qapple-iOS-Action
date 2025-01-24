@@ -25,8 +25,8 @@ struct TodayQuestionFeature {
         case refresh
         case mainQuestionResponse(Question)
         case answerListResponse([Answer])
-        case questionButtonTapped
-        case seeAllAnswerButtonTapped
+        case questionButtonTapped(Question)
+        case seeAllAnswerButtonTapped(Question)
         case seeMoreAnswerButtonTapped(Answer)
         case questionTimerTick
     }

@@ -7,7 +7,7 @@
 
 import SwiftUI
 
-struct AnswerListView: View {
+struct LegacyAnswerListView: View {
     
     @EnvironmentObject var pathModel: Router
     @StateObject var viewModel: AnswerListViewModel = .init()
@@ -217,7 +217,7 @@ private struct AnswerScrollView: View {
 }
 
 #Preview {
-    AnswerListView(
+    LegacyAnswerListView(
         questionId: 1,
         questionContent: "디폴트"
     )

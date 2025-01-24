@@ -25,7 +25,8 @@ struct RootView: View {
             .fixedTabBarBackground(color: .first)
         } destination: { store in
             switch store.case {
-            default: EmptyView()
+            case let .writeAnswer(store): WriteAnswerView(store: store)
+            case let .answerList(store): AnswerListView(store: store)
             }
         }
     }

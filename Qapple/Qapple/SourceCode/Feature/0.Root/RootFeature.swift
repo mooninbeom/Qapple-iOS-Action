@@ -27,6 +27,17 @@ struct RootFeature {
         }
         Reduce { state, action in
             switch action {
+            case let .questionTab(.todayQuestion(.questionButtonTapped(question))):
+                if question.isAnswered {
+                    state.path.append(.answerList(.init(question: question)))
+                } else {
+                    state.path.append(.writeAnswer(.init(question: question)))
+                }
+                return .none
+                
+            case let .questionTab(.todayQuestion(.seeAllAnswerButtonTapped(question))):
+                state.path.append(.answerList(.init(question: question)))
+                return .none
             default: return .none
             }
         }
@@ -40,6 +51,7 @@ extension RootFeature {
     
     @Reducer(state: .equatable)
     enum Path {
-        
+        case writeAnswer(WriteAnswerFeature)
+        case answerList(AnswerListFeature)
     }
 }
