@@ -11,7 +11,9 @@ import ComposableArchitecture
 // MARK: - BulletinBoardView
 
 struct BulletinBoardView: View {
-    @Binding var store: StoreOf<BulletinBoardFeature>
+    @Bindable var store: StoreOf<BulletinBoardFeature> = Store(initialState: BulletinBoardFeature.State()) {
+        BulletinBoardFeature()
+    }
     
     @EnvironmentObject private var pathModel: Router
     @EnvironmentObject private var bulletinBoardUseCase: BulletinBoardUseCase
@@ -82,16 +84,6 @@ private struct BoardView: View {
     }
 }
 
-// MARK: - NavigationBar
-
-//private struct NavigationBar: View {
-//    @EnvironmentObject private var pathModel: Router
-//    
-//    var body: some View {
-//        CustomTabBar()
-//    }
-//}
-
 // MARK: - 커스텀 탭바
 private struct CustomTabBar: View {
     
@@ -147,7 +139,7 @@ private struct PostListView: View {
     
     @EnvironmentObject private var pathModel: Router
     
-    @State private var selectedPost: BulletinBoard?
+    @State private var selectedboard: BulletinBoard?
     @State private var isReportedPostTappedAlert = false
     
     var body: some View {
@@ -155,9 +147,9 @@ private struct PostListView: View {
             LazyVStack(spacing: 0) {
                 ForEach(Array(store.bulletinBoardList.enumerated()), id: \.offset) { index, board in
                     BulletinBoardCell(
-                        post: board,
+                        board: board,
                         seeMoreAction: {
-                            selectedPost = board
+                            store.send(.ellipsisButtonTapped(board.id, board.isMine))
                         }
                     )
                     .onAppear {
@@ -169,38 +161,32 @@ private struct PostListView: View {
                     }
                     .onTapGesture {
                         if !board.isReported {
-//                            pathModel.pushView(screen: BulletinBoardPathType.comment(post: post))
                             store.send(.boardButtonTapped)
-//                            bulletinBoardUseCase.isClickComment = true
                         } else {
                             HapticService.notification(type: .warning)
                             isReportedPostTappedAlert.toggle()
                         }
                     }
-                    
                     if index != store.bulletinBoardList.endIndex - 1 {
                         QappleDivider()
                     }
                 }
             }
         }
+        .sheet(item: $store.scope(state: \.sheet?.ellipsisButtonTap, action: \.sheet.ellipsisButtonTap)
+        ) { ellipsisStore in
+            BulletinBoardEllipsisView(store: ellipsisStore)
+                .presentationDetents([.height(84)])
+        }
         .refreshable {
             store.send(.refreshBulletinBoardList)
         }
         .disabled(store.isLoading)
-//        .sheet(item: $selectedPost) { post in
-//            BulletinBoardSeeMoreSheetView(
-//                sheetType: post.isMine ? .mine : .others,
-//                post: post,
-//                isComment: false
-//            )
-//            .presentationDetents([.height(84)])
-//            .presentationDragIndicator(.visible)
+        
+//        .alert("신고된 게시글", isPresented: $isReportedPostTappedAlert) {
+//            Button("확인", role: .none, action: {})
+//        } message: {
+//            Text("신고된 게시글은 열람할 수 없습니다.")
 //        }
-        .alert("신고된 게시글", isPresented: $isReportedPostTappedAlert) {
-            Button("확인", role: .none, action: {})
-        } message: {
-            Text("신고된 게시글은 열람할 수 없습니다.")
-        }
     }
 }

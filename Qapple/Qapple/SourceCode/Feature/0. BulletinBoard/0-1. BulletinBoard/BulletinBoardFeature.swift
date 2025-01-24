@@ -12,6 +12,7 @@ import ComposableArchitecture
 struct BulletinBoardFeature {
     @ObservableState
     struct State: Equatable {
+        @Presents var sheet: Sheet.State?
         var bulletinBoardList: [BulletinBoard] = []
         var academyEvents: [AcademyEvent] = [.macro, .epilogue]
         var isLoading: Bool = false
@@ -20,12 +21,15 @@ struct BulletinBoardFeature {
     }
     
     enum Action {
+        case sheet(PresentationAction<Sheet.Action>)
+        
         case getBulletinBoardList
         case refreshBulletinBoardList
         case fetchBulletinBoardList(([BulletinBoard], QappleAPI.PaginationInfo))
+        
         case boardButtonTapped
         case likeBoardButtonTapped
-        case ellipsisButtonTapped
+        case ellipsisButtonTapped(Int, Bool)
         case searchButtonTapped
         case notificationButtonTapped
         case postBoardButtonTapped
@@ -36,6 +40,12 @@ struct BulletinBoardFeature {
     var body: some ReducerOf<Self> {
         Reduce { state, action in
             switch action {
+            case .sheet(.presented(.ellipsisButtonTap(.delegate(.confirmDelete)))):
+                return .none
+                
+            case .sheet:
+                return .none
+                
             case .getBulletinBoardList:
                 state.isLoading = true
                 let threshold = state.threshold
@@ -67,7 +77,12 @@ struct BulletinBoardFeature {
             case .likeBoardButtonTapped:
                 return .none
                 
-            case .ellipsisButtonTapped:
+            case let .ellipsisButtonTapped(boardId, isMine):
+                state.sheet = .ellipsisButtonTap(
+                    BulletinBoardEllipsisFeature.State(
+                        boardId: boardId, isMine: isMine
+                    )
+                )
                 return .none
                 
             case .searchButtonTapped:
@@ -83,6 +98,15 @@ struct BulletinBoardFeature {
                 return .none
             }
         }
+        .ifLet(\.$sheet, action: \.sheet)
     }
 }
 
+extension BulletinBoardFeature {
+    @Reducer
+    enum Sheet {
+        case ellipsisButtonTap(BulletinBoardEllipsisFeature)
+    }
+}
+
+extension BulletinBoardFeature.Sheet.State: Equatable {}
