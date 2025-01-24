@@ -52,7 +52,7 @@ struct WrittenAnswerView: View {
                         LazyVStack(spacing: 0) {
                             ForEach(Array(viewModel.myAnswers.enumerated()), id: \.offset) { index, answer in
                                 LegacyAnswerCell(
-                                    answer: Answer(
+                                    answer: LegacyAnswer(
                                         id: answer.answerId,
                                         writerId: answer.writerId,
                                         learnerIndex: 0,

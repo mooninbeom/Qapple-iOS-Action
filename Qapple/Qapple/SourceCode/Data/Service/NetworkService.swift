@@ -16,7 +16,7 @@ protocol HTTPMethod {
 }
 
 /// 네트워킹을 수행할 클라이언트 객체
-struct NetworkClient {
+struct NetworkService {
     
     /// SignIn 요청을 수행합니다.
     func signIn<T: Decodable, U: Encodable>(url: URL, body: U) async throws -> T {
@@ -93,7 +93,7 @@ struct NetworkClient {
 
 // MARK: - URLSession
 
-extension NetworkClient {
+extension NetworkService {
     
     /// URLSession을 통한 네트워킹을 수행합니다.
     ///
@@ -102,7 +102,7 @@ extension NetworkClient {
         do {
             var request = URLRequest(url: url)
             request.httpMethod = method
-            request.setValue(try SignInInfo.shared.token(.access),
+            request.setValue(try KeychainService.shared.token(.access),
                 forHTTPHeaderField: "Authorization"
             )
             
@@ -121,7 +121,7 @@ extension NetworkClient {
 
 // MARK: - Status Code
 
-extension NetworkClient {
+extension NetworkService {
     
     /// URLResponse의 StatusCode를 반환합니다.
     func statusCode(_ response: URLResponse) -> Int {
@@ -147,7 +147,7 @@ extension NetworkClient {
 
 // MARK: - Decoding
 
-extension NetworkClient {
+extension NetworkService {
     
     /// Data를 Decoding 후 반환합니다.
     ///

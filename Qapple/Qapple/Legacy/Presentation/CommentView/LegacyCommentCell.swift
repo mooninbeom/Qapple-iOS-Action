@@ -1,5 +1,5 @@
 //
-//  CommentCell.swift
+//  LegacyCommentCell.swift
 //  Qapple
 //
 //  Created by 문인범 on 8/8/24.
@@ -7,7 +7,7 @@
 
 import SwiftUI
 
-struct CommentCell: View {
+struct LegacyCommentCell: View {
     let comment: CommentResponse.Comment
     let cellIndex: Int
     
@@ -23,7 +23,7 @@ struct CommentCell: View {
     
     @EnvironmentObject private var pathModel: Router
     
-    @ObservedObject var commentViewModel: CommentViewModel
+    @ObservedObject var commentViewModel: LegacyCommentViewModel
     
     @Binding var post: Post
     
@@ -244,4 +244,3 @@ struct CommentCell: View {
         .frame(width: 73)
     }
 }
-

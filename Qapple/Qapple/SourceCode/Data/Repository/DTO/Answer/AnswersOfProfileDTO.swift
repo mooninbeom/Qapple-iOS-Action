@@ -39,6 +39,11 @@ struct AnswersOfProfileDTO: Codable {
             )
         }
         
-        return (answerListOfProfile, (threshold, hasNext))
+        let paginationInfo = QappleAPI.PaginationInfo(
+            threshold: self.threshold,
+            hasNext: self.hasNext
+        )
+        
+        return (answerListOfProfile, paginationInfo)
     }
 }

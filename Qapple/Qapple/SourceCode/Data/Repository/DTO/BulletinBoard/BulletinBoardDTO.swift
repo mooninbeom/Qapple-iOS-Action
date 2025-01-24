@@ -58,8 +58,12 @@ struct BulletinBoardDTO: Codable {
                 isLiked: $0.isLiked
             )
         }
-        return (bulletinBoardList, (threshold, hasNext))
+        
+        let paginationInfo = QappleAPI.PaginationInfo(
+            threshold: self.threshold,
+            hasNext: self.hasNext
+        )
+        
+        return (bulletinBoardList, paginationInfo)
     }
-    
-    
 }
