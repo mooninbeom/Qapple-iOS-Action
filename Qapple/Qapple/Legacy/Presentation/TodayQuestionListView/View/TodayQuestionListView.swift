@@ -67,7 +67,7 @@ struct TodayQuestionListView: View {
                     LazyVStack(spacing: 4) {
                         ForEach(Array(viewModel.questions.enumerated()), id: \.offset) { index, question in
                             VStack {
-                                QuestionCell(
+                                LegacyQuestionCell(
                                     question: question,
                                     questionNumber: viewModel.questions.count - index
                                 ) {

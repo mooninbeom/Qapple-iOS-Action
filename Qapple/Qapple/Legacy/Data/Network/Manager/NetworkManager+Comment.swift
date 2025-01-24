@@ -40,7 +40,7 @@ extension NetworkManager {
         
         var request = URLRequest(url: url)
         request.httpMethod = "GET"
-        request.setValue("Bearer \(try SignInInfo.shared.token(.access))", forHTTPHeaderField: "Authorization")
+        request.setValue("Bearer \(try KeychainService.shared.token(.access))", forHTTPHeaderField: "Authorization")
         
         do {
             let (data, response) = try await URLSession.shared.data(for: request)
@@ -71,7 +71,7 @@ extension NetworkManager {
         var accessToken = ""
         
         do {
-            accessToken = try SignInInfo.shared.token(.access)
+            accessToken = try KeychainService.shared.token(.access)
         } catch {
             print("액세스 토큰 반환 실패")
         }
@@ -111,7 +111,7 @@ extension NetworkManager {
         var accessToken = ""
         
         do {
-            accessToken = try SignInInfo.shared.token(.access)
+            accessToken = try KeychainService.shared.token(.access)
         } catch {
             print("액세스 토큰 반환 실패")
         }
@@ -147,7 +147,7 @@ extension NetworkManager {
         var accessToken = ""
         
         do {
-            accessToken = try SignInInfo.shared.token(.access)
+            accessToken = try KeychainService.shared.token(.access)
         } catch {
             print("액세스 토큰 반환 실패")
         }
@@ -183,7 +183,7 @@ extension NetworkManager {
         var accessToken = ""
         
         do {
-            accessToken = try SignInInfo.shared.token(.access)
+            accessToken = try KeychainService.shared.token(.access)
         } catch {
             print("액세스 토큰 반환 실패")
         }

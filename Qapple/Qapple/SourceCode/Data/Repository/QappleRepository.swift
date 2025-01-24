@@ -7,9 +7,10 @@
 
 import Foundation
 import ComposableArchitecture
+import DependenciesMacros
 
 struct QappleRepository {
-    static let networkClient = NetworkClient()
+    static let networkClient = NetworkService()
     
     // MARK: - Answer
     
@@ -40,8 +41,8 @@ struct QappleRepository {
     
     // MARK: - Question
     
-    var fetchQuestionList: (_ threshold: String?) async throws -> ([Question], QappleAPI.PaginationInfo)
-    var fetchMainQuestionList: () async throws -> QuestionOfMain
+    var fetchQuestionList: (_ threshold: String?) async throws -> ([QuestionEntity], QappleAPI.TotalCount, QappleAPI.PaginationInfo)
+    var fetchMainQuestionList: () async throws -> QuestionEntity
     
     // MARK: - BoardComment
     

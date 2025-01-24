@@ -13,7 +13,7 @@ extension Date {
     
     /// 전체 날짜 포맷 문자열을 반환합니다.
     /// ex) 03.03
-    var MonthDayDate: String {
+    var monthDayDate: String {
         let dateFormatter = DateFormatter()
         dateFormatter.dateFormat = "MM.dd"
         return dateFormatter.string(from: self)

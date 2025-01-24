@@ -15,7 +15,6 @@ extension QappleRepository {
             let url = try QappleAPI.Answer.listOfProfile(threshold: threshold, pageSize: 25).url()
             let response: BaseResponse<AnswersOfProfileDTO> = try await networkClient.get(url: url)
             return response.result.toEntityWithThreshold
-            
         }
     }
     
