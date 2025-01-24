@@ -64,7 +64,7 @@ private struct BoardView: View {
     
     var body: some View {
         VStack(spacing: 0) {
-            NavigationBar()
+            NaviBar()
             
             AcademyPlanDayCounter(academyEvents: bulletinBoardUseCase.state.academyEvents)
                 .padding(.top, 8)
@@ -81,7 +81,7 @@ private struct BoardView: View {
 
 // MARK: - NavigationBar
 
-private struct NavigationBar: View {
+private struct NaviBar: View {
     @EnvironmentObject private var pathModel: Router
     
     var body: some View {
@@ -95,9 +95,9 @@ private struct CustomTabBar: View {
     @EnvironmentObject var pathModel: Router
     
     var body: some View {
-        CustomNavigationBar(
+        NavigationBar(
             leadingView: {},
-            principalView: {
+            centerView: {
                 Text("게시판")
                     .font(Font.pretendard(.semiBold, size: 15))
                     .foregroundStyle(TextLabel.main)

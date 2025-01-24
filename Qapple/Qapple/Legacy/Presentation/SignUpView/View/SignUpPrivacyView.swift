@@ -15,11 +15,11 @@ struct SignUpPrivacyView: View {
         
         VStack(spacing: 0) {
             
-            CustomNavigationBar(
+            NavigationBar(
                 leadingView: { CustomNavigationBackButton(buttonType: .arrow)   {
                     pathModel.paths.removeLast()
                 }},
-                principalView: { Text("개인정보 처리방침")
+                centerView: { Text("개인정보 처리방침")
                     .font(Font.pretendard(.semiBold, size: 15))
                     .foregroundStyle(TextLabel.main) },
                 trailingView: { },

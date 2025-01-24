@@ -13,7 +13,25 @@ struct WriteAnswerView: View {
     let store: StoreOf<WriteAnswerFeature>
     
     var body: some View {
-        Text("WriteAnswerView")
+        VStack {
+            WriteAnswerNavigationBar(store: store)
+        }
+        .background(.first)
+    }
+}
+
+// MARK: - WriteAnswerNavigationBar
+
+private struct WriteAnswerNavigationBar: View {
+    
+    let store: StoreOf<WriteAnswerFeature>
+    
+    var body: some View {
+        NavigationBar(
+            leadingView: {
+                
+            }
+        )
     }
 }
 

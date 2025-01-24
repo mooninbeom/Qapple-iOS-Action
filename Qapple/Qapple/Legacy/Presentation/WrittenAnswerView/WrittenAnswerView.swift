@@ -17,13 +17,13 @@ struct WrittenAnswerView: View {
     var body: some View {
         ZStack {
             VStack(alignment: .leading, spacing: 0) {
-                CustomNavigationBar(
+                NavigationBar(
                     leadingView:{
                         CustomNavigationBackButton(buttonType: .arrow) {
                             pathModel.pop()
                         }
                     },
-                    principalView: {
+                    centerView: {
                         Text("내 답변")
                             .font(Font.pretendard(.semiBold, size: 15))
                             .foregroundStyle(TextLabel.main)

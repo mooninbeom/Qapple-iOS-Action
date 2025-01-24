@@ -14,9 +14,9 @@ struct CompleteAnswerView: View {
     
     var body: some View {
         VStack(spacing: 0) {
-            CustomNavigationBar(
+            NavigationBar(
                 leadingView: {},
-                principalView: {},
+                centerView: {},
                 trailingView: {},
                 backgroundColor: Background.first)
             

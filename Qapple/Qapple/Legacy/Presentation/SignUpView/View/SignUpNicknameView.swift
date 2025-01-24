@@ -38,15 +38,14 @@ struct SignUpNicknameView: View {
     var body: some View {
         ZStack {
             VStack(alignment: .leading) {
-                CustomNavigationBar(
+                NavigationBar(
                     leadingView: { CustomNavigationBackButton(buttonType: .arrow) {
                         pathModel.paths.removeLast()
                     } },
-                    principalView: { Text("회원가입")
+                    centerView: { Text("회원가입")
                             .font(Font.pretendard(.semiBold, size: 15))
                         .foregroundStyle(TextLabel.main) },
-                    trailingView: { },
-                    backgroundColor: Background.first
+                    trailingView: { }
                 )
                 
                 Spacer()

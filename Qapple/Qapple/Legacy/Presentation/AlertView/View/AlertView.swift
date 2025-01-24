@@ -20,13 +20,13 @@ struct AlertView: View {
                 .ignoresSafeArea()
             
             VStack {
-                CustomNavigationBar(
+                NavigationBar(
                     leadingView:{
                         CustomNavigationBackButton(buttonType: .arrow) {
                             pathModel.pop()
                         }
                     },
-                    principalView: {
+                    centerView: {
                         Text("알림")
                             .font(Font.pretendard(.semiBold, size: 15))
                             .foregroundStyle(TextLabel.main)

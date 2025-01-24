@@ -28,7 +28,7 @@ struct AnswerView: View {
                 .ignoresSafeArea()
             
             VStack {	
-                CustomNavigationBar(
+                NavigationBar(
                     leadingView: {
                         CustomNavigationBackButton(buttonType: .xmark) {
                             if self.viewModel.answer.isEmpty {
@@ -39,7 +39,7 @@ struct AnswerView: View {
                             }
                         }
                     },
-                    principalView: {},
+                    centerView: {},
                     trailingView: {
                         CustomNavigationTextButton(
                             title: "완료",

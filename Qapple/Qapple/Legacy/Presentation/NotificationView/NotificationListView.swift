@@ -44,11 +44,11 @@ private struct NotificationContentView: View {
     
     var body: some View {
         VStack(spacing: 0) {
-            CustomNavigationBar(
+            NavigationBar(
                 leadingView: { CustomNavigationBackButton(buttonType: .arrow) {
                     pathModel.pop()
                 }},
-                principalView: {
+                centerView: {
                     Text("알림")
                         .font(Font.pretendard(.semiBold, size: 17))
                         .foregroundStyle(TextLabel.main)

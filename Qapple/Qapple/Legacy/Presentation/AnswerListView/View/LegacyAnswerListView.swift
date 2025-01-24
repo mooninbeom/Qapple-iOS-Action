@@ -90,13 +90,13 @@ private struct CustomNavigationView: View {
     @EnvironmentObject var pathModel: Router
     
     var body: some View {
-        CustomNavigationBar(
+        NavigationBar(
             leadingView:{
                 CustomNavigationBackButton(buttonType: .arrow) {
                     pathModel.pop()
                 }
             },
-            principalView: {
+            centerView: {
                 Text("답변 리스트")
                     .font(Font.pretendard(.semiBold, size: 15))
                     .foregroundStyle(TextLabel.main)

@@ -19,14 +19,14 @@ struct SignUpEmailView: View {
     var body: some View {
         ZStack {
             VStack(alignment: .leading) {
-                CustomNavigationBar(
+                NavigationBar(
                     leadingView: { CustomNavigationBackButton(buttonType: .arrow) {
                         authViewModel.resetAllInfo()
                         authViewModel.isSignIn = false
                         authViewModel.isSignUp = false
                         pathModel.paths.removeLast()
                     }},
-                    principalView: { Text("회원가입")
+                    centerView: { Text("회원가입")
                             .font(Font.pretendard(.semiBold, size: 15))
                         .foregroundStyle(TextLabel.main) },
                     trailingView: { },

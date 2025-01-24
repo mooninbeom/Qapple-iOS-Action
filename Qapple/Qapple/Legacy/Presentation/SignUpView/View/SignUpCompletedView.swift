@@ -15,9 +15,9 @@ struct SignUpCompletedView: View {
     var body: some View {
         ZStack {
             VStack(spacing: 0) {
-                CustomNavigationBar(
+                NavigationBar(
                     leadingView: {},
-                    principalView: {},
+                    centerView: {},
                     trailingView: {},
                     backgroundColor: Background.first)
                 

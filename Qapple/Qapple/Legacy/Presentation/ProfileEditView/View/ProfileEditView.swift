@@ -43,13 +43,13 @@ struct ProfileEditView: View {
     var body: some View {
         ZStack {
             VStack(alignment: .leading, spacing: 0) {
-                CustomNavigationBar(
+                NavigationBar(
                     leadingView: {
                         CustomNavigationBackButton(buttonType: .arrow) {
                             pathModel.pop()
                         }
                     },
-                    principalView: {
+                    centerView: {
                         Text("프로필 수정")
                             .font(Font.pretendard(.semiBold, size: 15))
                             .foregroundStyle(TextLabel.main)
