@@ -22,8 +22,7 @@ struct CommentFeature {
         
         var comments: [BoardComment] = []
         
-        var postWriterId: Int = -1
-        
+        // MARK: 추후 자동 스크롤 연결 예정
         var scrollIndex: Int?
         var isLoading: Bool = false
         
@@ -80,6 +79,7 @@ struct CommentFeature {
                 }
                 
             case .paginationCellAppeared:
+                guard state.hasNext else { return .none }
                 state.isLoading = true
                 return .run { [
                     boardId = state.post.boardId,
@@ -108,7 +108,17 @@ struct CommentFeature {
             // MARK: - 버튼 액션 관련(업로드, 좋아요, 삭제, 신고)
             case let .likeButtonTapped(id: id):
                 state.isLoading = true
-                state.comments[state.comments.firstIndex{ $0.id == id }!].isLiked.toggle()
+                
+                let index = state.comments.firstIndex{ $0.id == id }!
+                let isLiked = state.comments[index].isLiked
+                state.comments[index].isLiked.toggle()
+                
+                if isLiked {
+                    state.comments[index].heartCount -= 1
+                } else {
+                    state.comments[index].heartCount += 1
+                }
+                
                 return .run { send in
                     do {
                         let _ = try await commentRepository.likeBoardComment(id)
@@ -122,7 +132,6 @@ struct CommentFeature {
                 state.text = text
                 return .none
             case .uploadButtonTapped:
-                // 댓글 업로드(state.text 사용)
                 state.isLoading = true
                 return .run { [
                     text = state.text,
@@ -151,8 +160,7 @@ struct CommentFeature {
                 return .none
                 
             // MARK: - Alert 관련 액션
-            // Delete 버튼 alert
-
+            /// Delete 버튼 alert
             case let .alert(.presented(.deleteComment(id))):
                 // TODO: 댓글 삭제 구현
                 print("댓글 아이디: \(id) 삭제")
@@ -171,6 +179,7 @@ struct CommentFeature {
                     }
                 }
                 
+            /// 네트워크 오류 대응 alert
             case .networkErrorAlert:
                 state.isLoading = false
                 state.alert = AlertState {

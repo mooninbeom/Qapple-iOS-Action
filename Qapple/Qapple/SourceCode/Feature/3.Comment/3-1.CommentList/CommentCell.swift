@@ -112,12 +112,12 @@ struct CommentCell: View {
             VStack(alignment: .leading, spacing: 5) {
                 HStack(spacing: 10) {
                     // 사용자 이름
-                    if self.comment.writeId == -1 {
+                    if self.comment.anonymityId == -1 {
                         Text("작성자")
                             .font(.pretendard(.semiBold, size: 14))
                             .foregroundStyle(.text)
                     } else {
-                        Text("러너 \(self.comment.writeId)")
+                        Text("러너 \(self.comment.anonymityId)")
                             .font(.pretendard(.semiBold, size: 14))
                             .foregroundStyle(.icon)
                     }
@@ -143,10 +143,8 @@ struct CommentCell: View {
                 // 댓글 좋아요 버튼
                 Button {
                     if !comment.isReport {
-                        Task {
-                            if !comment.isLiked { HapticService.impact(style: .light) }
-                            store.send(.likeButtonTapped(id: comment.id))
-                        }
+                        HapticService.impact(style: .light)
+                        store.send(.likeButtonTapped(id: comment.id))
                     } else {
                         self.isReportedComment.toggle()
                     }
@@ -228,8 +226,9 @@ struct CommentCell: View {
         heartCount: 20,
         isLiked: true,
         isMine: false,
-        isReport: true,
-        createdAt: "2025-01-01T00:00:00Z"
+        isReport: false,
+        createdAt: "2025-01-01T00:00:00Z",
+        anonymityId: 2
     )
     
     CommentCell(store: store, comment: comment, cellIndex: 1)

@@ -43,7 +43,6 @@ struct CommentView: View {
         }
         .navigationBarBackButtonHidden()
         .task {
-            // TODO: 초기 데이터 fetch
             store.send(.commentViewAppeared)
         }
         .alert($store.scope(state: \.alert, action: \.alert))

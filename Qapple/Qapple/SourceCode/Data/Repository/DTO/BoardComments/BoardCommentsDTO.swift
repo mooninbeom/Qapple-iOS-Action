@@ -36,7 +36,8 @@ struct BoardCommentsDTO: Codable {
                 isLiked: $0.isLiked,
                 isMine: $0.isMine,
                 isReport: $0.isReport,
-                createdAt: $0.CreatedAt
+                createdAt: $0.CreatedAt,
+                anonymityId: -2
             )
         }
         

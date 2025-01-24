@@ -16,4 +16,6 @@ struct BoardComment: Identifiable, Equatable {
     let isMine: Bool
     var isReport: Bool
     let createdAt: String
+    
+    var anonymityId: Int
 }
