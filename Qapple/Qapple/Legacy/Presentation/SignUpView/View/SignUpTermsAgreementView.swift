@@ -178,7 +178,7 @@ struct SignUpTermsAgreementView: View {
                 
                 Spacer()
                 
-                ActionButton("다음", isActive: $isAllChecked, action: {
+                LegacyActionButton("다음", isActive: $isAllChecked, action: {
                     HapticService.notification(type: .success)
                     pathModel.paths.append(.signUpCompleted)
                 })

@@ -198,7 +198,7 @@ private struct Footer: View {
                     .foregroundStyle(BrandPink.text)
             }
             .sheet(isPresented: $isAnonymitySheetPresented) {
-                AnonymityNoticeView(isAnonymitySheetPresented: $isAnonymitySheetPresented)
+                LegacyAnonymityNoticeView(isAnonymitySheetPresented: $isAnonymitySheetPresented)
                     .presentationDetents([.height(560)])
             }
             

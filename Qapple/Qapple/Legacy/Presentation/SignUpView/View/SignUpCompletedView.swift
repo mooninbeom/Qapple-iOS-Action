@@ -42,7 +42,7 @@ struct SignUpCompletedView: View {
                 
                 Spacer()
                 
-                ActionButton("시작하기", isActive: .constant(true)) {
+                LegacyActionButton("시작하기", isActive: .constant(true)) {
                     Task {
                         await authViewModel.requestSignUp()
                         pathModel.paths.removeAll()

@@ -153,7 +153,7 @@ struct SignUpNicknameView: View {
                     
                     Spacer()
                     
-                    ActionButton("다음", isActive: $authViewModel.isNicknameCanUse, action: {
+                    LegacyActionButton("다음", isActive: $authViewModel.isNicknameCanUse, action: {
                         pathModel.paths.append(.agreement)
                     })
                     .padding(.bottom, 16)

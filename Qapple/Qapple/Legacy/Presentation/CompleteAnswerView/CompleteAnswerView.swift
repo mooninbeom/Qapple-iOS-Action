@@ -41,7 +41,7 @@ struct CompleteAnswerView: View {
             
             Spacer()
             
-            ActionButton("확인", isActive: .constant(true)) {
+            LegacyActionButton("확인", isActive: .constant(true)) {
                 pathModel.popToRoot()
                 if pathModel.searchPathType == .questionList {
                     pathModel.pushView(

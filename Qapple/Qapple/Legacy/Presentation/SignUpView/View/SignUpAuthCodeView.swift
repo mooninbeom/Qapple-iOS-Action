@@ -180,7 +180,7 @@ struct SignUpAuthCodeView: View {
                     
                     Spacer()
                     
-                    ActionButton("다음", isActive: $authViewModel.isCertifyCodeVerified, action: {
+                    LegacyActionButton("다음", isActive: $authViewModel.isCertifyCodeVerified, action: {
                         pathModel.paths.append(.inputNickName)
                     })
                     .padding(.bottom, 16)

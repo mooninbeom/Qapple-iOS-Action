@@ -32,13 +32,18 @@ struct NavigationButton: View {
                 
             case .back:
                 Image(.customBackButtonIcon)
+                    .resizable()
+                    .frame(width: 24, height: 24)
                 
             case .xmark:
                 Image(.xmark)
+                    .resizable()
+                    .frame(width: 24, height: 24)
                 
             case let .systemImage(string, color):
                 Image(systemName: string)
                     .foregroundStyle(color)
+                    .frame(width: 24, height: 24)
                 
             case let .image(imageResource):
                 Image(imageResource)
@@ -46,7 +51,6 @@ struct NavigationButton: View {
                     .frame(width: 24, height: 24)
             }
         }
-        .frame(width: 24, height: 24)
     }
 }
 
