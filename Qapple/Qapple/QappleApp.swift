@@ -13,14 +13,13 @@ struct QappleApp: App {
     
     @UIApplicationDelegateAdaptor private var appDelegate: AppDelegate
     
-    @StateObject private var authViewModel: AuthViewModel = .init()
+    static let store = Store(initialState: RootFeature.State()) {
+        RootFeature()
+    }
     
     var body: some Scene {
         WindowGroup {
-              // MainView(authViewModel: authViewModel)
-            QuestionListView(store: Store(initialState: QuestionListFeature.State(), reducer: {
-                QuestionListFeature()
-            }))
+            RootView(store: QappleApp.store)
         }
     }
 }

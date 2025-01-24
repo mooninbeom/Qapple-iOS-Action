@@ -9,8 +9,8 @@ import ComposableArchitecture
 import Foundation
 
 struct QuestionRepository {
-    var fetchQuestionList: (_ threshold: String?) async throws -> ([QuestionEntity], QappleAPI.TotalCount, QappleAPI.PaginationInfo)
-    var fetchMainQuestion: () async throws -> QuestionEntity
+    var fetchQuestionList: (_ threshold: String?) async throws -> ([Question], QappleAPI.TotalCount, QappleAPI.PaginationInfo)
+    var fetchMainQuestion: () async throws -> Question
 }
 
 // MARK: - QuestionRepository
@@ -37,7 +37,7 @@ extension QuestionRepository: DependencyKey {
             (stubQuestionList, 25, QappleAPI.PaginationInfo(threshold: "", hasNext: false))
         },
         fetchMainQuestion: {
-            QuestionEntity(
+            Question(
                 id: 0,
                 content: "프리뷰용 테스트 질문입니다.",
                 publishedDate: .now,
@@ -61,11 +61,11 @@ extension DependencyValues {
 
 extension QuestionRepository {
     
-    private static var stubQuestionList: [QuestionEntity] {
-        var questionList: [QuestionEntity] = []
+    private static var stubQuestionList: [Question] {
+        var questionList: [Question] = []
         for i in 0..<25 {
             questionList.append(
-                QuestionEntity(
+                Question(
                     id: i,
                     content: "테스트 질문 \(i)",
                     publishedDate: .init(timeIntervalSinceNow: TimeInterval(i*(-10000))),

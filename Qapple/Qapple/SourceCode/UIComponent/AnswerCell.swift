@@ -14,7 +14,7 @@ struct AnswerCell: View {
         case written
     }
     
-    let answer: AnswerEntity
+    let answer: Answer
     let state: State
     let seeMoreAction: () -> Void
     
@@ -54,7 +54,7 @@ struct AnswerCell: View {
 
 private struct NormalCell: View {
     
-    let answer: AnswerEntity
+    let answer: Answer
     let author: String
     let seeMoreAction: () -> Void
     
@@ -123,7 +123,7 @@ private struct ReportedCell: View {
     
     @State private var isReportContentShow = false
     
-    let answer: AnswerEntity
+    let answer: Answer
     let author: String
     
     var body: some View {
@@ -235,7 +235,7 @@ private struct ReportedCell: View {
 
 #Preview {
     let answers = [
-        AnswerEntity(
+        Answer(
             id: 0,
             content: "일반 답변",
             authorNickname: "시몬스",
@@ -244,7 +244,7 @@ private struct ReportedCell: View {
             isMine: false,
             isResignMember: false
         ),
-        AnswerEntity(
+        Answer(
             id: 1,
             content: "내 답변",
             authorNickname: "한톨",
@@ -253,7 +253,7 @@ private struct ReportedCell: View {
             isMine: true,
             isResignMember: false
         ),
-        AnswerEntity(
+        Answer(
             id: 2,
             content: "탈퇴한 답변",
             authorNickname: "무니",
@@ -262,7 +262,7 @@ private struct ReportedCell: View {
             isMine: false,
             isResignMember: true
         ),
-        AnswerEntity(
+        Answer(
             id: 3,
             content: "신고된 답변",
             authorNickname: "리버",

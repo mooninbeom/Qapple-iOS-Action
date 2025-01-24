@@ -11,12 +11,12 @@ import SwiftUI
 
 struct LegacyAnswerCell: View {
     
-    let answer: Answer
+    let answer: LegacyAnswer
     let isWrittenAnswerCell: Bool
     let seeMoreAction: () -> Void
     
     init(
-        answer: Answer,
+        answer: LegacyAnswer,
         isWrittenAnswerCell: Bool = false,
         seeMoreAction: @escaping () -> Void
     ) {
@@ -55,7 +55,7 @@ struct LegacyAnswerCell: View {
 
 private struct NormalAnswerCell: View {
     
-    let answer: Answer
+    let answer: LegacyAnswer
     let isWrittenAnswerCell: Bool
     let seeMoreAction: () -> Void
     
@@ -80,7 +80,7 @@ private struct NormalAnswerCell: View {
 
 private struct HeaderView: View {
     
-    let answer: Answer
+    let answer: LegacyAnswer
     let isWrittenAnswerCell: Bool
     let seeMoreAction: () -> Void
     
@@ -125,7 +125,7 @@ private struct HeaderView: View {
 
 private struct ContentView: View {
     
-    let answer: Answer
+    let answer: LegacyAnswer
     
     var body: some View {
         HStack(spacing: 8) {
@@ -148,7 +148,7 @@ private struct ReportAnswerCell: View {
     
     @State private var isReportContentShow = false
     
-    let answer: Answer
+    let answer: LegacyAnswer
     let seeMoreAction: () -> Void
     
     var body: some View {
@@ -210,7 +210,7 @@ private struct ReportHideView: View {
 private struct ReportShowView: View {
     @Binding private(set) var isReportContentShow: Bool
     
-    let answer: Answer
+    let answer: LegacyAnswer
     
     private var learnerName: String {
         if answer.nickname == "알 수 없음" {
@@ -265,7 +265,7 @@ private struct ReportShowView: View {
         
         VStack {
             LegacyAnswerCell(
-                answer: Answer(
+                answer: LegacyAnswer(
                     id: 0,
                     writerId: 0,
                     learnerIndex: 0,
@@ -278,7 +278,7 @@ private struct ReportShowView: View {
             ) {}
             
             LegacyAnswerCell(
-                answer: Answer(
+                answer: LegacyAnswer(
                     id: 0,
                     writerId: 0,
                     learnerIndex: 0,

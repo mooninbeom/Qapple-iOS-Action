@@ -27,9 +27,9 @@ struct AnswersOfQuestionDTO: Codable {
         let writeAt: String
     }
     
-    var toEntity: [AnswerEntity] {
+    var toEntity: [Answer] {
         self.content.map {
-            AnswerEntity(
+            Answer(
                 id: $0.answerId,
                 content: $0.content,
                 authorNickname: $0.nickname,
@@ -41,9 +41,9 @@ struct AnswersOfQuestionDTO: Codable {
         }
     }
     
-    var toEntityWithInfo: ([AnswerEntity], QappleAPI.TotalCount, QappleAPI.PaginationInfo) {
+    var toEntityWithInfo: ([Answer], QappleAPI.TotalCount, QappleAPI.PaginationInfo) {
         let answerList = self.content.map {
-            AnswerEntity(
+            Answer(
                 id: $0.answerId,
                 content: $0.content,
                 authorNickname: $0.nickname,

@@ -13,7 +13,7 @@ struct QuestionListFeature {
     @ObservableState
     struct State: Equatable {
         @Presents var alert: AlertState<Action.Alert>?
-        var questionList: [QuestionEntity] = []
+        var questionList: [Question] = []
         var totalCount: QappleAPI.TotalCount = 0
         var paginationInfo = QappleAPI.PaginationInfo(threshold: "", hasNext: false)
     }
@@ -22,10 +22,10 @@ struct QuestionListFeature {
         case onAppear
         case refresh
         case pagination
-        case questionListResponse([QuestionEntity], QappleAPI.TotalCount, QappleAPI.PaginationInfo)
-        case paginationResponse([QuestionEntity], QappleAPI.PaginationInfo)
-        case questionCellTapped(QuestionEntity)
-        case answerButtonTapped(QuestionEntity)
+        case questionListResponse([Question], QappleAPI.TotalCount, QappleAPI.PaginationInfo)
+        case paginationResponse([Question], QappleAPI.PaginationInfo)
+        case questionCellTapped(Question)
+        case answerButtonTapped(Question)
         case alert(PresentationAction<Alert>)
         
         enum Alert: Equatable {

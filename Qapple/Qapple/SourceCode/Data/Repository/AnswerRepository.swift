@@ -9,9 +9,9 @@ import ComposableArchitecture
 import Foundation
 
 struct AnswerRepository {
-    var fetchAnswerPreviewList: (_ questionId: Int) async throws -> [AnswerEntity]
+    var fetchAnswerPreviewList: (_ questionId: Int) async throws -> [Answer]
     var fetchAnswerListOfQuestion: (_ questionId: Int, _ threshold: Int?) async throws -> (
-        [AnswerEntity],
+        [Answer],
         QappleAPI.TotalCount,
         QappleAPI.PaginationInfo
     )
@@ -69,11 +69,11 @@ extension DependencyValues {
 
 extension AnswerRepository {
     
-    private static var stubAnswerList: [AnswerEntity] {
-        var answerList: [AnswerEntity] = []
+    private static var stubAnswerList: [Answer] {
+        var answerList: [Answer] = []
         for i in 0..<25 {
             answerList.append(
-                AnswerEntity(
+                Answer(
                     id: i,
                     content: "테스트 답변 \(i)",
                     authorNickname: "\(i)번째 러너",

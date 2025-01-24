@@ -1,5 +1,5 @@
 //
-//  Answer.swift
+//  LegacyAnswer.swift
 //  Qapple
 //
 //  Created by 김민준 on 8/20/24.
@@ -7,7 +7,7 @@
 
 import Foundation
 
-struct Answer: Identifiable {
+struct LegacyAnswer: Identifiable {
     let id: Int
     let writerId: Int
     let learnerIndex: Int

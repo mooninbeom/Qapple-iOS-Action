@@ -14,8 +14,8 @@ struct TodayQuestionFeature {
     @ObservableState
     struct State: Equatable {
         var questionState: QuestionState = .creating
-        var todayQuestion: QuestionEntity = .initialState
-        var answerPreviewList: [AnswerEntity] = []
+        var todayQuestion: Question = .initialState
+        var answerPreviewList: [Answer] = []
         var timeRemainingForQuestion: TimeInterval = 0
     }
     
@@ -23,11 +23,11 @@ struct TodayQuestionFeature {
         case onAppear
         case onDisappear
         case refresh
-        case mainQuestionResponse(QuestionEntity)
-        case answerListResponse([AnswerEntity])
+        case mainQuestionResponse(Question)
+        case answerListResponse([Answer])
         case questionButtonTapped
         case seeAllAnswerButtonTapped
-        case seeMoreAnswerButtonTapped(AnswerEntity)
+        case seeMoreAnswerButtonTapped(Answer)
         case questionTimerTick
     }
     

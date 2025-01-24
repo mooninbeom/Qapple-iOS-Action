@@ -1,0 +1,16 @@
+//
+//  LegacyQuestion.swift
+//  Qapple
+//
+//  Created by Simmons on 1/21/25.
+//
+
+import Foundation
+
+struct LegacyQuestion: Identifiable, Equatable {
+    let id: Int
+    let title: String
+    let publishedDate: String?
+    var isAnswered: Bool
+    var isLived: Bool
+}

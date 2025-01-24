@@ -24,7 +24,9 @@ struct RootView: View {
             .tint(.button)
             .fixedTabBarBackground(color: .first)
         } destination: { store in
-            EmptyView()
+            switch store.case {
+            default: EmptyView()
+            }
         }
     }
 }
