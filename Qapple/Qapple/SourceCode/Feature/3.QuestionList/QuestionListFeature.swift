@@ -12,10 +12,10 @@ struct QuestionListFeature {
     
     @ObservableState
     struct State: Equatable {
-        @Presents var alert: AlertState<Action.Alert>?
         var questionList: [Question] = []
         var totalCount: QappleAPI.TotalCount = 0
         var paginationInfo = QappleAPI.PaginationInfo(threshold: "", hasNext: false)
+        @Presents var alert: AlertState<Action.Alert>?
     }
     
     enum Action {
@@ -29,7 +29,7 @@ struct QuestionListFeature {
         case alert(PresentationAction<Alert>)
         
         enum Alert: Equatable {
-            case confirmButtonTapped
+            
         }
     }
     

@@ -15,6 +15,7 @@ struct AnswerRepository {
         QappleAPI.TotalCount,
         QappleAPI.PaginationInfo
     )
+    var postAnswer: (_ questionId: Int, _ answer: String) async throws -> Void
 }
 
 // MARK: - DependencyKey
@@ -43,6 +44,12 @@ extension AnswerRepository: DependencyKey {
             
             let response: BaseResponse<AnswersOfQuestionDTO> = try await networkService.get(url: url)
             return response.result.toEntityWithInfo
+        },
+        postAnswer: { questionId, answer in
+            let url = try QappleAPI.Answer.post(questionId: questionId).url()
+            let requestBody = PostAnswerRequest(answer: answer)
+            let response: BaseResponse<PostAnswerDTO> = try await networkService.post(url: url, body: requestBody)
+            return ()
         }
     )
     
@@ -52,7 +59,8 @@ extension AnswerRepository: DependencyKey {
         },
         fetchAnswerListOfQuestion: { _, _ in
             (stubAnswerList, 25, .init(threshold: "", hasNext: false))
-        }
+        },
+        postAnswer: { _, _ in }
     )
 }
 

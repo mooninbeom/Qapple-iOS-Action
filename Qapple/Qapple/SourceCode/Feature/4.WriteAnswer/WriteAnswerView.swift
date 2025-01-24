@@ -39,6 +39,7 @@ struct WriteAnswerView: View {
         .onTapGesture {
             isTextFieldFocused.toggle()
         }
+        .alert($store.scope(state: \.alert, action: \.alert))
         .sheet(item: $store.scope(
             state: \.sheet?.anonymityNotice,
             action: \.sheet.anonymityNotice

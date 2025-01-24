@@ -12,13 +12,13 @@ struct RootFeature {
     
     @ObservableState
     struct State: Equatable {
-        var path = StackState<Path.State>()
         var questionTab = QuestionTabFeature.State()
+        var path = StackState<Path.State>()
     }
     
     enum Action {
-        case path(StackActionOf<Path>)
         case questionTab(QuestionTabFeature.Action)
+        case path(StackActionOf<Path>)
     }
     
     var body: some ReducerOf<Self> {
@@ -38,6 +38,17 @@ struct RootFeature {
             case let .questionTab(.todayQuestion(.seeAllAnswerButtonTapped(question))):
                 state.path.append(.answerList(.init(question: question)))
                 return .none
+                
+            case let .path(stackAction):
+                switch stackAction {
+                case let .element(id: _, action: .writeAnswer(.postAnswerResponse(question))):
+                    state.path.append(.answerList(.init(question: question)))
+                    return .none
+                    
+                default:
+                    return .none
+                }
+                
             default: return .none
             }
         }
