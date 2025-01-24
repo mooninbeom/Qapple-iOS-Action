@@ -29,13 +29,18 @@ struct CommentFeature {
         var threshold: Int?
         var hasNext: Bool = false
         
+        // 익명화 관련 프로퍼티
+        var anonymousArray: [Int:Int] = [:]
+        var anonymousIndex: Int = 0
+        
         @Presents var alert: AlertState<Action.Alert>?
     }
     
     enum Action: Equatable {
         case commentViewAppeared
         case paginationCellAppeared
-        case fetchCommentData([BoardComment], String, Bool)
+        case fetchCommentData([BoardComment])
+        case anonymizeComments([BoardComment], String, Bool)
         
         case likeButtonTapped(id: Int)
         case uploadButtonTapped
@@ -72,7 +77,7 @@ struct CommentFeature {
                 return .run { [boardId = state.post.boardId] send in
                     do {
                         let result = try await commentRepository.fetchBoardCommentList(boardId, nil)
-                        await send(.fetchCommentData(result.0, result.1.threshold, result.1.hasNext))
+                        await send(.anonymizeComments(result.0, result.1.threshold, result.1.hasNext))
                     } catch {
                         await send(.networkErrorAlert)
                     }
@@ -87,17 +92,14 @@ struct CommentFeature {
                 ] send in
                     do {
                         let result = try await commentRepository.fetchBoardCommentList(boardId, threshold)
-                        await send(.fetchCommentData(result.0, result.1.threshold, result.1.hasNext))
+                        await send(.anonymizeComments(result.0, result.1.threshold, result.1.hasNext))
                     } catch {
                         await send(.networkErrorAlert)
                     }
                 }
                 
-            case let .fetchCommentData(comments, threshold, hasNext):
+            case let .fetchCommentData(comments):
                 state.comments.append(contentsOf: comments)
-                state.threshold = Int(threshold)
-                state.hasNext = hasNext
-                
                 state.isLoading = false
                 return .none
                 
@@ -193,6 +195,61 @@ struct CommentFeature {
                 
             case .alert:
                 return .none
+                
+            // MARK: 여러가지 메소드들
+            /// BoardComment 익명화 메소드
+            case let .anonymizeComments(comments, threshold, hasNext):
+                state.threshold = Int(threshold)
+                state.hasNext = hasNext
+                
+                let writerId = state.post.writerId
+                let result = comments.map { comment in
+                    // 한번이라도 나온 writer인지 여부 판단
+                    let isContainName = state.anonymousArray.values.contains {
+                        $0 == comment.writeId
+                    }
+                    
+                    if !isContainName { // 처음 나오는 writer일 경우
+                        state.anonymousIndex += 1
+                        
+                        if comment.writeId == writerId {
+                            state.anonymousArray.updateValue(comment.writeId, forKey: -1)
+                        } else {
+                            state.anonymousArray.updateValue(comment.writeId, forKey: state.anonymousIndex)
+                        }
+                        
+                        return BoardComment(
+                            id: comment.id,
+                            writeId: comment.writeId,
+                            content: comment.content,
+                            heartCount: comment.heartCount,
+                            isLiked: comment.isLiked,
+                            isMine: comment.isMine,
+                            isReport: comment.isReport,
+                            createdAt: comment.createdAt,
+                            anonymityId: (comment.writeId == writerId) ? -1 : state.anonymousIndex
+                        )
+                    } else { // 한번 이상 나온 writer일 경우
+                        // 해당 value의 key 값을 찾아 name의 index로 제공
+                        let currentIndex = state.anonymousArray
+                            .filter { $0.value == comment.writeId }
+                            .first!.key
+                        
+                        return BoardComment(
+                            id: comment.id,
+                            writeId: currentIndex,
+                            content: comment.content,
+                            heartCount: comment.heartCount,
+                            isLiked: comment.isLiked,
+                            isMine: comment.isMine,
+                            isReport: comment.isReport,
+                            createdAt: comment.createdAt,
+                            anonymityId: currentIndex
+                        )
+                    }
+                }
+                
+                return .send(.fetchCommentData(result))
             }
         }
         .ifLet(\.$alert, action: \.alert)
