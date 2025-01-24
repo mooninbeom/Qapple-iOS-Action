@@ -1,5 +1,5 @@
 //
-//  SignInInfo.swift
+//  KeychainService.swift
 //  Capple
 //
 //  Created by 김민준 on 3/17/24.
@@ -7,7 +7,7 @@
 
 import Foundation
 
-final class SignInInfo {
+final class KeychainService {
     
     /// 키체인 에러 열거형
     enum KeyChainError: Error {
@@ -23,7 +23,7 @@ final class SignInInfo {
         case userID = "userID"
     }
     
-    static let shared = SignInInfo()
+    static let shared = KeychainService()
     private init() {}
     
     private var userIDValue = ""
@@ -32,6 +32,9 @@ final class SignInInfo {
     
     /// 키체인에서 액세스 토큰을 반환합니다.
     func token(_ type: KeychainType) throws -> String {
+        
+        let testToken = ""
+        return "Bearer \(testToken)"
         
         // 1. 키체인에서 검색할 query
         let searchQuery: [CFString: Any] = [
@@ -130,7 +133,7 @@ final class SignInInfo {
 
 // MARK: - User ID
 
-extension SignInInfo {
+extension KeychainService {
     
     /// 키체인에서 UserID를 반환합니다.
     func userID() throws -> String {

@@ -31,6 +31,9 @@ struct TodayQuestionView: View {
         .refreshable {
             store.send(.refresh)
         }
+        .onDisappear {
+            store.send(.onDisappear)
+        }
     }
 }
 
@@ -203,7 +206,7 @@ private struct AnswerPreviewList: View {
 // MARK: - Preview
 
 #Preview {
-    let question = QuestionEntity(
+    let question = Question(
         id: 0,
         content: "테스트 질문입니다.",
         publishedDate: .now,
@@ -215,7 +218,7 @@ private struct AnswerPreviewList: View {
             questionState: .creating,
             todayQuestion: question,
             answerPreviewList: [
-                AnswerEntity(
+                Answer(
                     id: 0,
                     content: "테스트 답변 01",
                     authorNickname: "테스트 러너 1",
@@ -224,7 +227,7 @@ private struct AnswerPreviewList: View {
                     isMine: false,
                     isResignMember: false
                 ),
-                AnswerEntity(
+                Answer(
                     id: 1,
                     content: "테스트 답변 02",
                     authorNickname: "테스트 러너 2",
@@ -233,7 +236,7 @@ private struct AnswerPreviewList: View {
                     isMine: false,
                     isResignMember: false
                 ),
-                AnswerEntity(
+                Answer(
                     id: 2,
                     content: "테스트 답변 03",
                     authorNickname: "테스트 러너 3",

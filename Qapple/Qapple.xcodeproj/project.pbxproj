@@ -10,7 +10,7 @@
 		420D72052C71D5BB00B56439 /* FirebaseAuth in Frameworks */ = {isa = PBXBuildFile; productRef = 420D72042C71D5BB00B56439 /* FirebaseAuth */; };
 		420D720D2C71D8AC00B56439 /* FirebaseMessaging in Frameworks */ = {isa = PBXBuildFile; productRef = 420D720C2C71D8AC00B56439 /* FirebaseMessaging */; };
 		420D720F2C71DB7F00B56439 /* FirebaseAnalytics in Frameworks */ = {isa = PBXBuildFile; productRef = 420D720E2C71DB7F00B56439 /* FirebaseAnalytics */; };
-		820BDBA52D3E711700178F7E /* ComposableArchitecture in Frameworks */ = {isa = PBXBuildFile; productRef = 820BDBA42D3E711700178F7E /* ComposableArchitecture */; };
+		829A879C2D423D4200808E43 /* ComposableArchitecture in Frameworks */ = {isa = PBXBuildFile; productRef = 829A879B2D423D4200808E43 /* ComposableArchitecture */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -38,7 +38,7 @@
 			files = (
 				420D720D2C71D8AC00B56439 /* FirebaseMessaging in Frameworks */,
 				420D720F2C71DB7F00B56439 /* FirebaseAnalytics in Frameworks */,
-				820BDBA52D3E711700178F7E /* ComposableArchitecture in Frameworks */,
+				829A879C2D423D4200808E43 /* ComposableArchitecture in Frameworks */,
 				420D72052C71D5BB00B56439 /* FirebaseAuth in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -85,7 +85,7 @@
 				420D72042C71D5BB00B56439 /* FirebaseAuth */,
 				420D720C2C71D8AC00B56439 /* FirebaseMessaging */,
 				420D720E2C71DB7F00B56439 /* FirebaseAnalytics */,
-				820BDBA42D3E711700178F7E /* ComposableArchitecture */,
+				829A879B2D423D4200808E43 /* ComposableArchitecture */,
 			);
 			productName = Capple;
 			productReference = F3EA66C82B7643EE002417CE /* Qapple.app */;
@@ -98,7 +98,7 @@
 			isa = PBXProject;
 			attributes = {
 				BuildIndependentTargetsInParallel = 1;
-				LastSwiftUpdateCheck = 1510;
+				LastSwiftUpdateCheck = 1600;
 				LastUpgradeCheck = 1600;
 				TargetAttributes = {
 					F3EA66C72B7643EE002417CE = {
@@ -117,7 +117,7 @@
 			mainGroup = F3EA66BF2B7643EE002417CE;
 			packageReferences = (
 				420D72022C71D56400B56439 /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */,
-				820BDBA32D3E711700178F7E /* XCRemoteSwiftPackageReference "swift-composable-architecture" */,
+				829A879A2D423D4200808E43 /* XCRemoteSwiftPackageReference "swift-composable-architecture" */,
 			);
 			productRefGroup = F3EA66C92B7643EE002417CE /* Products */;
 			projectDirPath = "";
@@ -203,6 +203,7 @@
 				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
 				GCC_WARN_UNUSED_FUNCTION = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
+				"INFOPLIST_FILE[sdk=*]" = "";
 				IPHONEOS_DEPLOYMENT_TARGET = 17.2;
 				LOCALIZATION_PREFERS_STRING_CATALOGS = YES;
 				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
@@ -305,7 +306,7 @@
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator";
 				SUPPORTS_MACCATALYST = NO;
-				SUPPORTS_MAC_DESIGNED_FOR_IPHONE_IPAD = NO;
+				SUPPORTS_MAC_DESIGNED_FOR_IPHONE_IPAD = YES;
 				SUPPORTS_XR_DESIGNED_FOR_IPHONE_IPAD = NO;
 				SWIFT_EMIT_LOC_STRINGS = YES;
 				SWIFT_VERSION = 5.0;
@@ -346,7 +347,7 @@
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator";
 				SUPPORTS_MACCATALYST = NO;
-				SUPPORTS_MAC_DESIGNED_FOR_IPHONE_IPAD = NO;
+				SUPPORTS_MAC_DESIGNED_FOR_IPHONE_IPAD = YES;
 				SUPPORTS_XR_DESIGNED_FOR_IPHONE_IPAD = NO;
 				SWIFT_EMIT_LOC_STRINGS = YES;
 				SWIFT_VERSION = 5.0;
@@ -386,7 +387,7 @@
 				minimumVersion = 11.0.0;
 			};
 		};
-		820BDBA32D3E711700178F7E /* XCRemoteSwiftPackageReference "swift-composable-architecture" */ = {
+		829A879A2D423D4200808E43 /* XCRemoteSwiftPackageReference "swift-composable-architecture" */ = {
 			isa = XCRemoteSwiftPackageReference;
 			repositoryURL = "https://github.com/pointfreeco/swift-composable-architecture.git";
 			requirement = {
@@ -412,9 +413,9 @@
 			package = 420D72022C71D56400B56439 /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */;
 			productName = FirebaseAnalytics;
 		};
-		820BDBA42D3E711700178F7E /* ComposableArchitecture */ = {
+		829A879B2D423D4200808E43 /* ComposableArchitecture */ = {
 			isa = XCSwiftPackageProductDependency;
-			package = 820BDBA32D3E711700178F7E /* XCRemoteSwiftPackageReference "swift-composable-architecture" */;
+			package = 829A879A2D423D4200808E43 /* XCRemoteSwiftPackageReference "swift-composable-architecture" */;
 			productName = ComposableArchitecture;
 		};
 /* End XCSwiftPackageProductDependency section */

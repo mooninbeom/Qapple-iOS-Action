@@ -95,31 +95,31 @@ extension CommentRepository: DependencyKey {
     static let liveValue: CommentRepository = Self(
         fetchBoardCommentList: { boardId, threshold in
             let url = try QappleAPI.BoardComment.list(boardId: boardId, threshold: threshold, pageSize: 25).url()
-            let response: BaseResponse<BoardCommentsDTO> = try await NetworkClient.shared.get(url: url)
+            let response: BaseResponse<BoardCommentsDTO> = try await NetworkService.shared.get(url: url)
             return response.result.toEntityWithThreshold
         },
         deleteBoardComment: { boardCommentId in
             let url = try QappleAPI.BoardComment.delete(commentId: boardCommentId).url()
-            let response: BaseResponse<DeleteBoardCommentsDTO> = try await NetworkClient.shared.delete(url: url)
+            let response: BaseResponse<DeleteBoardCommentsDTO> = try await NetworkService.shared.delete(url: url)
             return response.result
         },
         postBoardComment: { boardId, content in
             let url = try QappleAPI.BoardComment.post(boardId: boardId).url()
             let requestBody: PostBoardCommentsRequest = PostBoardCommentsRequest(comment: content)
-            let response: BaseResponse<PostBoardCommentsDTO> = try await NetworkClient.shared.post(url: url, body: requestBody)
+            let response: BaseResponse<PostBoardCommentsDTO> = try await NetworkService.shared.post(url: url, body: requestBody)
             return response.result
         },
         likeBoardComment: { boardCommentId in
             let url = try QappleAPI.BoardComment.like(commentId: boardCommentId).url()
             let requestBody: LikeBoardCommentsRequest = LikeBoardCommentsRequest(commentId: boardCommentId)
-            let response: BaseResponse<LikeBoardCommentsDTO> = try await NetworkClient.shared.fetch(url: url, body: requestBody)
+            let response: BaseResponse<LikeBoardCommentsDTO> = try await NetworkService.shared.fetch(url: url, body: requestBody)
             return response.result
         }
     )
     
     static let previewValue: CommentRepository = Self(
         fetchBoardCommentList: { _, _ in
-            (testComments, ("", false))
+            (testComments, .init(threshold: "", hasNext: false))
         },
         deleteBoardComment: { _ in
                 .init(boardCommentId: 0)

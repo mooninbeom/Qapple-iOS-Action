@@ -1,7 +1,7 @@
 import SwiftUI
 import Foundation
 
-struct QuestionCell: View {
+struct LegacyQuestionCell: View {
     
     @EnvironmentObject var pathModel: Router
     
@@ -180,7 +180,7 @@ private struct AnswerButtonView: View {
         Color.Background.first.ignoresSafeArea()
         
         VStack {
-            QuestionCell(
+            LegacyQuestionCell(
                 question: .init(
                     questionId: 13,
                     questionStatus: "LIVE",
@@ -191,7 +191,7 @@ private struct AnswerButtonView: View {
                 questionNumber: 0
             ) {}
             
-            QuestionCell(
+            LegacyQuestionCell(
                 question: .init(
                     questionId: 13,
                     questionStatus: "PENDING",

@@ -13,11 +13,13 @@ struct MainQuestionDTO: Codable {
     let content: String
     let isAnswered: Bool
     
-    var toEntity: QuestionOfMain {
-        return QuestionOfMain(
+    var toEntity: Question {
+        Question(
             id: questionId,
-            title: content,
-            isAnswered: isAnswered
+            content: content,
+            publishedDate: .now,
+            isAnswered: isAnswered,
+            isLived: questionStatus == "LIVE"
         )
     }
 }

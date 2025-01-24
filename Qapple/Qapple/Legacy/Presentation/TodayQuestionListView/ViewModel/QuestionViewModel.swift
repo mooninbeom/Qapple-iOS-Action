@@ -81,7 +81,7 @@ final class QuestionViewModel: ObservableObject {
         // 토큰 추가
         var request = URLRequest(url: url)
         request.httpMethod = "GET"
-        request.setValue("Bearer \(try SignInInfo.shared.token(.access))", forHTTPHeaderField: "Authorization")
+        request.setValue("Bearer \(try KeychainService.shared.token(.access))", forHTTPHeaderField: "Authorization")
         
         // 네트워크 통신
         

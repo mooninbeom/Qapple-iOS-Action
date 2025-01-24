@@ -41,6 +41,11 @@ struct BoardCommentsDTO: Codable {
             )
         }
         
-        return (boardCommentList, (threshold, hasNext))
+        let paginationInfo = QappleAPI.PaginationInfo(
+            threshold: self.threshold,
+            hasNext: self.hasNext
+        )
+        
+        return (boardCommentList, paginationInfo)
     }
 }
