@@ -13,7 +13,7 @@ extension QappleRepository {
     static func makeFetchBulletinBoardList() -> (_ threshold: Int?) async throws -> ([BulletinBoard], QappleAPI.PaginationInfo) {
         return { threshold in
             let url = try QappleAPI.Board.list(threshold: threshold, pageSize: 25).url()
-            let response: BaseResponse<BulletinBoardDTO> = try await networkClient.get(url: url)
+            let response: BaseResponse<BulletinBoardDTO> = try await NetworkService.shared.get(url: url)
             return response.result.toEntityWithThreshold
         }
     }
@@ -23,7 +23,7 @@ extension QappleRepository {
         return { content in
             let url = try QappleAPI.Board.post.url()
             let requestBody: PostBoardRequest = PostBoardRequest(content: content, boardType: "FREEBOARD")
-            let response: BaseResponse<PostBoardDTO> = try await networkClient.post(url: url, body: requestBody)
+            let response: BaseResponse<PostBoardDTO> = try await NetworkService.shared.post(url: url, body: requestBody)
             return response.result
         }
     }
@@ -32,7 +32,7 @@ extension QappleRepository {
     static func makeFetchSingleBoard() -> (_ boardId: Int) async throws -> BulletinBoard {
         return { boardId in
             let url = try QappleAPI.Board.single(boardId: boardId).url()
-            let response: BaseResponse<BulletinBoardDTO.Content> = try await networkClient.get(url: url)
+            let response: BaseResponse<BulletinBoardDTO.Content> = try await NetworkService.shared.get(url: url)
             return response.result.toEntity
         }
     }
@@ -41,7 +41,7 @@ extension QappleRepository {
     static func makeDeleteBoard() -> (_ boardId: Int) async throws -> DeleteBoardDTO {
         return { boardId in
             let url = try QappleAPI.Board.delete(boardId: boardId).url()
-            let response: BaseResponse<DeleteBoardDTO> = try await networkClient.delete(url: url)
+            let response: BaseResponse<DeleteBoardDTO> = try await NetworkService.shared.delete(url: url)
             return response.result
         }
     }
@@ -51,7 +51,7 @@ extension QappleRepository {
         return { boardId in
             let url = try QappleAPI.Board.like(boardId: boardId).url()
             let requestBody: LikeBoardRequest = LikeBoardRequest(boardId: boardId)
-            let response: BaseResponse<LikeBoardDTO> = try await networkClient.post(url: url, body: requestBody)
+            let response: BaseResponse<LikeBoardDTO> = try await NetworkService.shared.post(url: url, body: requestBody)
             return response.result
         }
     }
@@ -60,7 +60,7 @@ extension QappleRepository {
     static func makeSearchBoard() -> (_ keyword: String?, _ threshold: Int?) async throws -> ([BulletinBoard], QappleAPI.PaginationInfo) {
         return { keyword, threshold in
             let url = try QappleAPI.Board.search(keyword: keyword, threshold: threshold, pageSize: 25).url()
-            let response: BaseResponse<SearchBoardDTO> = try await networkClient.get(url: url)
+            let response: BaseResponse<SearchBoardDTO> = try await NetworkService.shared.get(url: url)
             return response.result.toEntityWithThreshold
         }
     }

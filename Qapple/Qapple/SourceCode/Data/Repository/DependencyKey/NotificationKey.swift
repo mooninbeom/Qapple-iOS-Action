@@ -13,7 +13,7 @@ extension QappleRepository {
     static func makeFetchNotificationList() -> (_ threshold: Int?) async throws -> ([QappleNotification], QappleAPI.PaginationInfo) {
         return { threshold in
             let url = try QappleAPI.Notification.list(threshold: threshold, pageSize: 25).url()
-            let response: BaseResponse<NotificationsDTO> = try await networkClient.get(url: url)
+            let response: BaseResponse<NotificationsDTO> = try await NetworkService.shared.get(url: url)
             return response.result.toEntityWithThreshold
         }
     }

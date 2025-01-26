@@ -17,6 +17,10 @@ protocol HTTPMethod {
 
 /// 네트워킹을 수행할 클라이언트 객체
 struct NetworkService {
+    /// NetworkClient 싱글톤 객체
+    static let shared = NetworkService()
+    
+    private init() {}
     
     /// SignIn 요청을 수행합니다.
     func signIn<T: Decodable, U: Encodable>(url: URL, body: U) async throws -> T {

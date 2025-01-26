@@ -10,7 +10,7 @@ import ComposableArchitecture
 import DependenciesMacros
 
 struct QappleRepository {
-    static let networkClient = NetworkService()
+    let networkClient = NetworkService.shared
     
     // MARK: - Answer
     
