@@ -9,7 +9,7 @@ import SwiftUI
 
 // MARK: - BulletinBoardView
 
-struct BulletinBoardView: View {
+struct LegacyBulletinBoardView: View {
     
     @EnvironmentObject private var pathModel: Router
     @EnvironmentObject private var bulletinBoardUseCase: BulletinBoardUseCase
@@ -147,7 +147,7 @@ private struct PostListView: View {
         ScrollView {
             LazyVStack(spacing: 0) {
                 ForEach(Array(bulletinBoardUseCase.state.posts.enumerated()), id: \.offset) { index, post in
-                    BulletinBoardCell(
+                    LegacyBulletinBoardCell(
                         post: post,
                         seeMoreAction: {
                             selectedPost = post
@@ -201,7 +201,7 @@ private struct PostListView: View {
 
 #Preview {
     NavigationStack {
-        BulletinBoardView()
+        LegacyBulletinBoardView()
     }
     .environmentObject(Router(pathType: .bulletinBoard))
     .environmentObject(BulletinBoardUseCase())
