@@ -13,7 +13,7 @@ extension QappleRepository {
     static func makeFetchQuestionList() -> (_ threshold: String?) async throws -> ([Question], QappleAPI.TotalCount, QappleAPI.PaginationInfo) {
         return { threshold in
             let url = try QappleAPI.Question.list(threshold: threshold, pageSize: 25).url()
-            let response: BaseResponse<QuestionsDTO> = try await networkClient.get(url: url)
+            let response: BaseResponse<QuestionsDTO> = try await NetworkService.shared.get(url: url)
             return response.result.toEntityWithInfo
         }
     }
@@ -22,7 +22,7 @@ extension QappleRepository {
     static func makeFetchMainQuestionList() -> () async throws -> Question {
         return {
             let url = try QappleAPI.Question.listOfMain.url()
-            let response: BaseResponse<MainQuestionDTO> = try await networkClient.get(url: url)
+            let response: BaseResponse<MainQuestionDTO> = try await NetworkService.shared.get(url: url)
             return response.result.toEntity
         }
     }

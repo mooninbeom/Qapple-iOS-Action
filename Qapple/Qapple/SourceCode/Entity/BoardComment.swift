@@ -11,9 +11,11 @@ struct BoardComment: Identifiable, Equatable {
     let id: Int
     let writeId: Int
     let content: String
-    let heartCount: Int
-    let isLiked: Bool
+    var heartCount: Int
+    var isLiked: Bool
     let isMine: Bool
-    let isReport: Bool
+    var isReport: Bool
     let createdAt: String
+    
+    var anonymityId: Int
 }

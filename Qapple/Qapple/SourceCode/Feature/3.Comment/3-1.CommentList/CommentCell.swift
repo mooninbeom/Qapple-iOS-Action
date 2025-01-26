@@ -13,7 +13,7 @@ struct CommentCell: View {
     @Bindable var store: StoreOf<CommentFeature>
     
     // TODO: 추후 property 정리 필요
-    let comment: CommentEntity
+    let comment: BoardComment
     let cellIndex: Int
     
     let screenWidth: CGFloat = UIScreen.main.bounds.width
@@ -112,12 +112,12 @@ struct CommentCell: View {
             VStack(alignment: .leading, spacing: 5) {
                 HStack(spacing: 10) {
                     // 사용자 이름
-                    if self.comment.writerId == -1 {
+                    if self.comment.anonymityId == -1 {
                         Text("작성자")
                             .font(.pretendard(.semiBold, size: 14))
                             .foregroundStyle(.text)
                     } else {
-                        Text("러너 \(self.comment.writerId)")
+                        Text("러너 \(self.comment.anonymityId)")
                             .font(.pretendard(.semiBold, size: 14))
                             .foregroundStyle(.icon)
                     }
@@ -143,10 +143,8 @@ struct CommentCell: View {
                 // 댓글 좋아요 버튼
                 Button {
                     if !comment.isReport {
-                        Task {
-                            if !comment.isLiked { HapticService.impact(style: .light) }
-                            store.send(.likeButtonTapped(id: comment.id))
-                        }
+                        HapticService.impact(style: .light)
+                        store.send(.likeButtonTapped(id: comment.id))
                     } else {
                         self.isReportedComment.toggle()
                     }
@@ -196,7 +194,6 @@ struct CommentCell: View {
             }
         }
         .frame(width: 73)
-        .alert($store.scope(state: \.alert, action: \.alert))
     }
     
     private var reportBtn: some View {
@@ -222,15 +219,17 @@ struct CommentCell: View {
         CommentFeature()
     }
     
-    let comment = CommentEntity(
+    let comment = BoardComment(
         id: 4,
-        writerId: 5,
+        writeId: 5,
         content: "테스트입니다",
-        createdAt: "2025-01-01T00:00:00Z",
         heartCount: 20,
-        isLiked: false,
-        isMine: true,
-        isReport: false)
+        isLiked: true,
+        isMine: false,
+        isReport: false,
+        createdAt: "2025-01-01T00:00:00Z",
+        anonymityId: 2
+    )
     
     CommentCell(store: store, comment: comment, cellIndex: 1)
 }

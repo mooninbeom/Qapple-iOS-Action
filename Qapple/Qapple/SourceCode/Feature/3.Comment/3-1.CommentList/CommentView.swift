@@ -9,6 +9,7 @@ import SwiftUI
 import ComposableArchitecture
 
 struct CommentView: View {
+    //TODO: 추후 외부 주입으로 수정
     @Bindable var store: StoreOf<CommentFeature> = .init(initialState: CommentFeature.State()) {
         CommentFeature()
     }
@@ -42,9 +43,9 @@ struct CommentView: View {
         }
         .navigationBarBackButtonHidden()
         .task {
-            // TODO: 초기 데이터 fetch
             store.send(.commentViewAppeared)
         }
+        .alert($store.scope(state: \.alert, action: \.alert))
         // TODO: - Post ellipsis 버튼 대응
 //        .sheet(item: $selectedPost) { post in
 //            BulletinBoardSeeMoreSheetView(
@@ -171,4 +172,13 @@ private struct AddCommentView: View {
         .frame(minHeight: 50)
         .padding(.horizontal, 16)
     }
+}
+
+
+#Preview {
+    // TODO: - 추후 usecase 제거 시 수정
+    let usecase = BulletinBoardUseCase()
+    
+    CommentView()
+        .environmentObject(usecase)
 }
