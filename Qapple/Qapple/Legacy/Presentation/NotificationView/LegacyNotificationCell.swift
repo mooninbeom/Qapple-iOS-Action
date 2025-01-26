@@ -7,7 +7,7 @@
 
 import SwiftUI
 
-struct NotificationCell: View {
+struct LegacyNotificationCell: View {
     let notification: QappleNoti
     let seeMoreAction: () -> Void
     
@@ -81,7 +81,7 @@ struct PressableButtonStyle: ButtonStyle {
 }
 
 #Preview {
-    NotificationCell(
+    LegacyNotificationCell(
         notification: .init(
             questionId: "",
             boardId: "0",

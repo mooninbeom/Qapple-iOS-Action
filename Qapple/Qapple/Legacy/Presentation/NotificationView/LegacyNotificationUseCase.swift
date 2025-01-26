@@ -7,7 +7,7 @@
 
 import Foundation
 
-final class NotificationUseCase: ObservableObject {
+final class LegacyNotificationUseCase: ObservableObject {
     
     @Published var state: State
     
@@ -22,7 +22,7 @@ final class NotificationUseCase: ObservableObject {
 
 // MARK: - State
 
-extension NotificationUseCase {
+extension LegacyNotificationUseCase {
     
     struct State {
         var notificationList: [QappleNoti] = []
@@ -34,7 +34,7 @@ extension NotificationUseCase {
 
 // MARK: - UseCase Method
 
-extension NotificationUseCase {
+extension LegacyNotificationUseCase {
     
     @MainActor
     func fetchNotificationList() {
