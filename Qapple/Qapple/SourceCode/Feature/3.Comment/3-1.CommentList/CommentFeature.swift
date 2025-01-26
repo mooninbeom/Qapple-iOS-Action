@@ -73,7 +73,7 @@ struct CommentFeature {
                 state.comments.removeAll()
                 state.threshold = nil
                 state.hasNext = false
-                return .run { [boardId = state.post.boardId] send in
+                return .run { [boardId = state.post.id] send in
                     do {
                         let result = try await commentRepository.fetchBoardCommentList(boardId, nil)
                         await send(.anonymizeComments(result.0, result.1.threshold, result.1.hasNext))
@@ -86,7 +86,7 @@ struct CommentFeature {
                 guard state.hasNext else { return .none }
                 state.isLoading = true
                 return .run { [
-                    boardId = state.post.boardId,
+                    boardId = state.post.id,
                     threshold = state.threshold
                 ] send in
                     do {
@@ -136,7 +136,7 @@ struct CommentFeature {
                 state.isLoading = true
                 return .run { [
                     text = state.text,
-                    boardId = state.post.boardId
+                    boardId = state.post.id
                 ] send in
                     do {
                         let _ = try await commentRepository.postBoardComment(boardId, text)
