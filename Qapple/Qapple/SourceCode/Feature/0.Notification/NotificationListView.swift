@@ -13,10 +13,11 @@ import ComposableArchitecture
  Notification 뷰(푸쉬 알림 뷰)
  */
 struct NotificationListView: View {
-    let store: StoreOf<NotificationFeature> = .init(
+    @Bindable var store: StoreOf<NotificationFeature> = .init(
         initialState: NotificationFeature.State()
     ) {
         NotificationFeature()
+            ._printChanges()
     }
     
     var body: some View {
@@ -32,6 +33,11 @@ struct NotificationListView: View {
             }
         }
         .navigationBarBackButtonHidden()
+        .onAppear {
+            store.send(.onAppear)
+        }
+        .alert($store.scope(state: \.alert, action: \.alert))
+        
     }
 }
 
@@ -61,6 +67,9 @@ private struct NotificationContentView: View {
                             // TODO: 탭 액션 제공 (신고된 글인지 여부, 답변된 질문인지 여부)
                             store.send(.notificationCellTapped(index))
                         }
+                        .onAppear {
+                            store.send(.onPagenationCellAppear(index))
+                        }
                         Separator()
                     }
                     
@@ -78,4 +87,9 @@ private struct NotificationContentView: View {
             // TODO: 단일 post 불러오기
         }
     }
+}
+
+
+#Preview {
+    NotificationListView()
 }
