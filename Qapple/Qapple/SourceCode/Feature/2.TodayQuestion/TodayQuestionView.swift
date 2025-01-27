@@ -193,7 +193,8 @@ private struct AnswerPreviewList: View {
                 index, answer in
                 AnswerCell(
                     answer: answer,
-                    state: .normal(index: index),
+                    index: index,
+                    state: .normal,
                     seeMoreAction: {
                         store.send(.seeMoreAnswerButtonTapped(answer))
                     }

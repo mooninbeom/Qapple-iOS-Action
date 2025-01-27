@@ -26,7 +26,7 @@ enum QappleAPI {
         
         case listOfProfile(threshold: Int?, pageSize: Int32 = 25)
         case delete(answerId: Int)
-        case listOfQuestion(questionId: Int, threshold: Int?, pageSize: Int32 = 25)
+        case listOfQuestion(questionId: Int, threshold: String?, pageSize: Int32 = 25)
         case post(questionId: Int)
         
         var rawValue: RawValue {

@@ -10,7 +10,7 @@ import Foundation
 
 struct AnswerRepository {
     var fetchAnswerPreviewList: (_ questionId: Int) async throws -> [Answer]
-    var fetchAnswerListOfQuestion: (_ questionId: Int, _ threshold: Int?) async throws -> (
+    var fetchAnswerListOfQuestion: (_ questionId: Int, _ threshold: String?) async throws -> (
         [Answer],
         QappleAPI.TotalCount,
         QappleAPI.PaginationInfo
@@ -37,7 +37,7 @@ extension AnswerRepository: DependencyKey {
         },
         fetchAnswerListOfQuestion: { questionId, threshold in
             let url = try QappleAPI.Answer.listOfQuestion(
-                questionId: Int(questionId),
+                questionId: questionId,
                 threshold: threshold,
                 pageSize: 25
             ).url()

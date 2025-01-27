@@ -10,25 +10,28 @@ import SwiftUI
 struct AnswerCell: View {
     
     enum State {
-        case normal(index: Int)
+        case normal
         case written
     }
     
     let answer: Answer
+    let index: Int
     let state: State
     let seeMoreAction: () -> Void
     
     var body: some View {
         switch state {
-        case let .normal(index):
+        case .normal:
             if answer.isReported {
                 ReportedCell(
                     answer: answer,
+                    index: index,
                     author: author(index: index)
                 )
             } else {
                 NormalCell(
                     answer: answer,
+                    index: index,
                     author: author(index: index),
                     seeMoreAction: seeMoreAction
                 )
@@ -37,6 +40,7 @@ struct AnswerCell: View {
         case .written:
             NormalCell(
                 answer: answer,
+                index: index,
                 author: answer.authorNickname,
                 seeMoreAction: seeMoreAction
             )
@@ -55,12 +59,15 @@ struct AnswerCell: View {
 private struct NormalCell: View {
     
     let answer: Answer
+    let index: Int
     let author: String
     let seeMoreAction: () -> Void
     
     var body: some View {
         VStack(alignment: .leading, spacing: 0) {
-            Divider()
+            if index > 0 {
+                Divider()
+            }
             
             Header()
                 .padding(.top, 18)
@@ -124,6 +131,7 @@ private struct ReportedCell: View {
     @State private var isReportContentShow = false
     
     let answer: Answer
+    let index: Int
     let author: String
     
     var body: some View {
@@ -139,7 +147,9 @@ private struct ReportedCell: View {
     
     private func ReportHideView() -> some View {
         VStack(alignment: .leading, spacing: 0) {
-            Divider()
+            if index > 0 {
+                Divider()
+            }
             
             HStack(alignment: .top) {
                 Text("신고 되어 내용을 검토 중인 답변이에요")
@@ -276,11 +286,11 @@ private struct ReportedCell: View {
         Color.first.ignoresSafeArea()
         
         VStack(alignment: .leading, spacing: 0) {
-            AnswerCell(answer: answers[0], state: .normal(index: 0)) {}
-            AnswerCell(answer: answers[1], state: .normal(index: 1)) {}
-            AnswerCell(answer: answers[2], state: .normal(index: 2)) {}
-            AnswerCell(answer: answers[3], state: .normal(index: 3)) {}
-            AnswerCell(answer: answers[1], state: .written) {}
+            AnswerCell(answer: answers[0], index: 0, state: .normal) {}
+            AnswerCell(answer: answers[1], index: 1, state: .normal) {}
+            AnswerCell(answer: answers[2], index: 2, state: .normal) {}
+            AnswerCell(answer: answers[3], index: 3, state: .normal) {}
+            AnswerCell(answer: answers[1], index: 4, state: .written) {}
         }
     }
 }
