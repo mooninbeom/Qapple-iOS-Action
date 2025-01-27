@@ -19,7 +19,7 @@ struct SignUpEmailView: View {
     var body: some View {
         ZStack {
             VStack(alignment: .leading) {
-                NavigationBar(
+                LegacyNavigationBar(
                     leadingView: { CustomNavigationBackButton(buttonType: .arrow) {
                         authViewModel.resetAllInfo()
                         authViewModel.isSignIn = false

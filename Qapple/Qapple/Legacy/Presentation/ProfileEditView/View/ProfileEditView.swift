@@ -43,7 +43,7 @@ struct ProfileEditView: View {
     var body: some View {
         ZStack {
             VStack(alignment: .leading, spacing: 0) {
-                NavigationBar(
+                LegacyNavigationBar(
                     leadingView: {
                         CustomNavigationBackButton(buttonType: .arrow) {
                             pathModel.pop()

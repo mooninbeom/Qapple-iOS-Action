@@ -54,7 +54,7 @@ private struct CustomTabBar: View {
     @EnvironmentObject var pathModel: Router
     
     var body: some View {
-        NavigationBar(
+        LegacyNavigationBar(
             leadingView: {
                 HStack(spacing: 12) {
                     

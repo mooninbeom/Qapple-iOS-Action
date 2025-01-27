@@ -28,7 +28,7 @@ struct AnswerView: View {
                 .ignoresSafeArea()
             
             VStack {	
-                NavigationBar(
+                LegacyNavigationBar(
                     leadingView: {
                         CustomNavigationBackButton(buttonType: .xmark) {
                             if self.viewModel.answer.isEmpty {

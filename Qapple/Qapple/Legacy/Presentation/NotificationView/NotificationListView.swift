@@ -44,7 +44,7 @@ private struct NotificationContentView: View {
     
     var body: some View {
         VStack(spacing: 0) {
-            NavigationBar(
+            LegacyNavigationBar(
                 leadingView: { CustomNavigationBackButton(buttonType: .arrow) {
                     pathModel.pop()
                 }},

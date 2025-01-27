@@ -13,7 +13,28 @@ struct AnswerListView: View {
     let store: StoreOf<AnswerListFeature>
     
     var body: some View {
-        Text("AnswerListView")
+        VStack {
+            AnswerListNavigationBar(store: store)
+        }
+        .background(.first)
+    }
+}
+
+// MARK: - AnswerListNavigationBar
+
+private struct AnswerListNavigationBar: View {
+    
+    let store: StoreOf<AnswerListFeature>
+    
+    var body: some View {
+        NavigationBar(
+            title: "답변 리스트",
+            leadingView: {
+                NavigationButton(buttonType: .back) {
+                    store.send(.backButtonTapped)
+                }
+            }
+        )
     }
 }
 

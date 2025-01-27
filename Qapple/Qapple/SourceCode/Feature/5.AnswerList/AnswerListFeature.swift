@@ -17,12 +17,15 @@ struct AnswerListFeature {
     }
     
     enum Action {
-        
+        case backButtonTapped
     }
     
     var body: some ReducerOf<Self> {
         Reduce { state, action in
-            return .none
+            switch action {
+            case .backButtonTapped:
+                return .none
+            }
         }
     }
 }

@@ -63,7 +63,7 @@ private struct NaviBar: View {
     @EnvironmentObject private var viewModel: MyPageViewModel
     
     var body: some View {
-        NavigationBar(
+        LegacyNavigationBar(
             leadingView: {},
             centerView: {
                 Text("프로필")

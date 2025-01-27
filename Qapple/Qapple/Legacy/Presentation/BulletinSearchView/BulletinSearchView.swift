@@ -63,7 +63,7 @@ private struct NaviBar: View {
     @Environment(\.dismiss) private var dismiss
     
     var body: some View {
-        NavigationBar(
+        LegacyNavigationBar(
             leadingView: {
                 CustomNavigationBackButton(buttonType: .arrow) {
                     dismiss()

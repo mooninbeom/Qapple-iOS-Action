@@ -38,7 +38,7 @@ struct SignUpNicknameView: View {
     var body: some View {
         ZStack {
             VStack(alignment: .leading) {
-                NavigationBar(
+                LegacyNavigationBar(
                     leadingView: { CustomNavigationBackButton(buttonType: .arrow) {
                         pathModel.paths.removeLast()
                     } },

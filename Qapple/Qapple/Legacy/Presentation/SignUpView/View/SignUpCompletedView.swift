@@ -15,7 +15,7 @@ struct SignUpCompletedView: View {
     var body: some View {
         ZStack {
             VStack(spacing: 0) {
-                NavigationBar(
+                LegacyNavigationBar(
                     leadingView: {},
                     centerView: {},
                     trailingView: {},

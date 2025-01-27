@@ -14,7 +14,7 @@ struct CompleteAnswerView: View {
     
     var body: some View {
         VStack(spacing: 0) {
-            NavigationBar(
+            LegacyNavigationBar(
                 leadingView: {},
                 centerView: {},
                 trailingView: {},

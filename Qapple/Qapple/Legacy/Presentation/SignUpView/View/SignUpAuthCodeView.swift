@@ -29,7 +29,7 @@ struct SignUpAuthCodeView: View {
     var body: some View {
         ZStack {
             VStack(alignment: .leading) {
-                NavigationBar(
+                LegacyNavigationBar(
                     leadingView: { CustomNavigationBackButton(buttonType: .arrow) {
                         authViewModel.resetAuthCodeInfo()
                         pathModel.paths.removeLast()

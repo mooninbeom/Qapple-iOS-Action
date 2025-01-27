@@ -7,26 +7,22 @@
 
 import SwiftUI
 
-struct NavigationBar<Leading: View, Center: View, Trailing: View>: View {
-    
-    let title: String?
-    let backgroundColor: Color
+struct LegacyNavigationBar<Leading: View, Center: View, Trailing: View>: View {
     let leadingView: Leading
     let centerView: Center
     let trailingView: Trailing
+    var backgroundColor: Color
     
     init(
-        title: String? = nil,
-        backgroundColor: Color = .clear,
         @ViewBuilder leadingView: (() -> Leading) = { EmptyView() },
         @ViewBuilder centerView: (() -> Center) = { EmptyView() },
-        @ViewBuilder trailingView: (() -> Trailing) = { EmptyView() }
+        @ViewBuilder trailingView: (() -> Trailing) = { EmptyView() },
+        backgroundColor: Color = .first
     ) {
-        self.title = title
-        self.backgroundColor = backgroundColor
         self.leadingView = leadingView()
         self.centerView = centerView()
         self.trailingView = trailingView()
+        self.backgroundColor = backgroundColor
     }
     
     var body: some View {
@@ -36,14 +32,7 @@ struct NavigationBar<Leading: View, Center: View, Trailing: View>: View {
                 Spacer()
                 trailingView
             }
-            
-            if let title = title {
-                Text(title)
-                    .font(.pretendard(.semiBold, size: 17))
-                    .foregroundStyle(.wh)
-            } else {
-                centerView
-            }
+            centerView
         }
         .padding(.horizontal, 16)
         .frame(height: 48)

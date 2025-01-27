@@ -20,7 +20,7 @@ struct AlertView: View {
                 .ignoresSafeArea()
             
             VStack {
-                NavigationBar(
+                LegacyNavigationBar(
                     leadingView:{
                         CustomNavigationBackButton(buttonType: .arrow) {
                             pathModel.pop()

@@ -189,7 +189,7 @@ private struct HeaderView: View {
     @EnvironmentObject private var pathModel: Router
     
     var body: some View {
-        NavigationBar(
+        LegacyNavigationBar(
             leadingView: {
                 CustomNavigationBackButton(buttonType: .arrow) {
                     pathModel.pop()

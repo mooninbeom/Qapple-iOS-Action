@@ -15,7 +15,7 @@ struct SignUpPrivacyView: View {
         
         VStack(spacing: 0) {
             
-            NavigationBar(
+            LegacyNavigationBar(
                 leadingView: { CustomNavigationBackButton(buttonType: .arrow)   {
                     pathModel.paths.removeLast()
                 }},

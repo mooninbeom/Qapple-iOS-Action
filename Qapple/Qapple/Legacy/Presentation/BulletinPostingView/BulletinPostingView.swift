@@ -64,7 +64,7 @@ private struct NaviBar: View {
     @Binding private(set) var isBackAlertPresented: Bool
 
     var body: some View {
-        NavigationBar(
+        LegacyNavigationBar(
             leadingView: {
                 Button("취소") {
                     if postingUseCase._state.content.isEmpty {
