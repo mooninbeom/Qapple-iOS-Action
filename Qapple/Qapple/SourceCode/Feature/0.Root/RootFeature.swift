@@ -52,7 +52,15 @@ struct RootFeature {
             case let .path(stackAction):
                 switch stackAction {
                 case let .element(id: _, action: .writeAnswer(.postAnswerResponse(question))):
+                    state.path.append(.completeAnswer(.init(question: question)))
+                    return .none
+                    
+                case let .element(id: _, action: .completeAnswer(.confirmButtonTapped(question))):
                     state.path.append(.answerList(.init(question: question)))
+                    return .none
+                    
+                case .element(id: _, action: .answerList(.backButtonTapped)):
+                    state.path.removeAll()
                     return .none
                     
                 default:
@@ -73,6 +81,7 @@ extension RootFeature {
     @Reducer(state: .equatable)
     enum Path {
         case writeAnswer(WriteAnswerFeature)
+        case completeAnswer(CompleteAnswerFeature)
         case answerList(AnswerListFeature)
     }
 }

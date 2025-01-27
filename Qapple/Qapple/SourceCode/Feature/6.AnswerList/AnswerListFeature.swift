@@ -36,7 +36,6 @@ struct AnswerListFeature {
     }
     
     @Dependency(\.answerRepository.fetchAnswerListOfQuestion) var fetchAnswerListOfQuestion
-    @Dependency(\.dismiss) var dismiss
     
     var body: some ReducerOf<Self> {
         Reduce {
@@ -86,9 +85,7 @@ struct AnswerListFeature {
                 return .none
                 
             case .backButtonTapped:
-                return .run { send in
-                    await dismiss()
-                }
+                return .none
             }
         }
     }

@@ -7,7 +7,7 @@
 
 import SwiftUI
 
-struct CompleteAnswerView: View {
+struct LegacyCompleteAnswerView: View {
     
     @EnvironmentObject var pathModel: Router
     @ObservedObject var viewModel: AnswerViewModel
@@ -69,6 +69,6 @@ struct CompleteAnswerView: View {
 }
 
 #Preview {
-    CompleteAnswerView(viewModel: .init())
+    LegacyCompleteAnswerView(viewModel: .init())
         .environmentObject(Router(pathType: .questionList))
 }

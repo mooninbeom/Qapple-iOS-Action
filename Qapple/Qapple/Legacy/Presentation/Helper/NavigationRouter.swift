@@ -64,7 +64,7 @@ final class Router: ObservableObject, NavigationRouter {
                     questionContent: questionContent
                 )
             case .completeAnswer:
-                CompleteAnswerView(viewModel: answerViewModel!)
+                LegacyCompleteAnswerView(viewModel: answerViewModel!)
             case .notifications:
                 NotificationListView()
             case .todayAnswer(questionId: let questionId, questionContent: let questionContent):
@@ -101,7 +101,7 @@ final class Router: ObservableObject, NavigationRouter {
                     questionContent: questionContent
                 )
             case .completeAnswer:
-                CompleteAnswerView(viewModel: answerViewModel!)
+                LegacyCompleteAnswerView(viewModel: answerViewModel!)
             case .todayAnswer(questionId: let questionId, questionContent: let questionContent):
                 LegacyAnswerListView(questionId: questionId, questionContent: questionContent)
             }

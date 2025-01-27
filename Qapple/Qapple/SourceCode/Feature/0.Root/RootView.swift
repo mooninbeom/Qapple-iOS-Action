@@ -26,6 +26,7 @@ struct RootView: View {
         } destination: { store in
             switch store.case {
             case let .writeAnswer(store): WriteAnswerView(store: store)
+            case let .completeAnswer(store): CompleteAnswerView(store: store)
             case let .answerList(store): AnswerListView(store: store)
             }
         }
