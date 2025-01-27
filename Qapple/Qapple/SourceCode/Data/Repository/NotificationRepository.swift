@@ -15,6 +15,7 @@ import ComposableArchitecture
 struct NotificationRepository {
     var fetchNotificationList: (_ threshold: Int?) async throws -> ([QappleNotification], QappleAPI.PaginationInfo)
     var fetchSingleBoard: (_ boardId: Int) async throws -> BulletinBoard
+    var isAnsweredQuestion: (_ questionId: Int) async throws -> Bool
     
     private static let dummyNoti: [QappleNotification] = {
         var result = [QappleNotification]()
@@ -59,6 +60,12 @@ extension NotificationRepository: DependencyKey {
             let url = try QappleAPI.Board.single(boardId: boardId).url()
             let response: BaseResponse<BulletinBoardDTO.Content> = try await NetworkService.shared.get(url: url)
             return response.result.toEntity
+        },
+        isAnsweredQuestion: { questionId in
+            let url = try QappleAPI.Answer.listOfProfile(threshold: nil, pageSize: 100).url()
+            let response: BaseResponse<AnswersOfProfileDTO> = try await NetworkService.shared.get(url: url)
+            let result = response.result.content.contains{ $0.questionId == questionId }
+            return result
         }
     )
     
@@ -68,6 +75,9 @@ extension NotificationRepository: DependencyKey {
         },
         fetchSingleBoard: { _ in
             NotificationRepository.dummyBoard
+        },
+        isAnsweredQuestion: { _ in
+            false
         }
     )
 }

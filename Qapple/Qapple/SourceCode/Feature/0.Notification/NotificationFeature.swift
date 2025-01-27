@@ -31,6 +31,7 @@ struct NotificationFeature {
         case reportedNotificationCellTapped
         
         case fetchNotifications([QappleNotification], QappleAPI.PaginationInfo)
+        case evaluateQuestion(Bool)
         
         case alert(PresentationAction<Alert>)
         
@@ -45,6 +46,7 @@ struct NotificationFeature {
             case .onAppear, .onRefresh:
                 state.isLoading = true
                 
+                state.notifications.removeAll()
                 state.threshold = nil
                 state.hasNext = false
                 return .run { send in
@@ -70,7 +72,28 @@ struct NotificationFeature {
                 return .none
                 
             case let .notificationCellTapped(index):
-                return .send(.reportedNotificationCellTapped)
+                return .run { [noti = state.notifications[index] ] send in
+                    // 게시판 관련 알림일때
+                    if let boardId = Int(noti.boardId) {
+                        let result = try await notificationRepository.fetchSingleBoard(boardId)
+                        
+                        // 신고된 게시물일 경우
+                        if result.isReported { await send(.reportedNotificationCellTapped) }
+                        else {
+                            // TODO: 게시판으로 네비게이팅
+                        }
+                    // 질문 관련 알림일때
+                    } else if let questionId = Int(noti.id) {
+                        // MARK: 현재 해당 질문의 답변 여부 파악을 위해 전체 질문을 뽑아서 찾음, 개선안 필요할듯
+                        let result = try await notificationRepository.isAnsweredQuestion(questionId)
+                        await send(.evaluateQuestion(result))
+                    }
+                }
+                
+            case let .evaluateQuestion(isAnswered):
+                // TODO: 답변 여부에 따른 네비게이팅 필요
+                return .none
+                
                 
             case .reportedNotificationCellTapped:
                 state.alert = AlertState {

@@ -17,7 +17,6 @@ struct NotificationListView: View {
         initialState: NotificationFeature.State()
     ) {
         NotificationFeature()
-            ._printChanges()
     }
     
     var body: some View {
@@ -64,12 +63,12 @@ private struct NotificationContentView: View {
                 LazyVStack(spacing: 0) {
                     ForEach(enumerated(store.notifications), id: \.offset) { index, notification in
                         NotificationCell(notification: notification) {
-                            // TODO: 탭 액션 제공 (신고된 글인지 여부, 답변된 질문인지 여부)
                             store.send(.notificationCellTapped(index))
                         }
                         .onAppear {
                             store.send(.onPagenationCellAppear(index))
                         }
+                        
                         Separator()
                     }
                     
@@ -82,9 +81,6 @@ private struct NotificationContentView: View {
             .refreshable {
                 store.send(.onRefresh)
             }
-        }
-        .onAppear {
-            // TODO: 단일 post 불러오기
         }
     }
 }
