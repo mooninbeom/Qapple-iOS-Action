@@ -39,6 +39,16 @@ struct RootFeature {
                 state.path.append(.answerList(.init(question: question)))
                 return .none
                 
+            case let .questionTab(.questionList(.questionCellTapped(question))):
+                if question.isAnswered {
+                    state.path.append(.answerList(.init(question: question)))
+                }
+                return .none
+                
+            case let .questionTab(.questionList(.answerButtonTapped(question))):
+                state.path.append(.writeAnswer(.init(question: question)))
+                return .none
+                
             case let .path(stackAction):
                 switch stackAction {
                 case let .element(id: _, action: .writeAnswer(.postAnswerResponse(question))):
