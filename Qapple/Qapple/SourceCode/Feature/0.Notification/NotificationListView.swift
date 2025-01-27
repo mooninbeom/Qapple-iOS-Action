@@ -13,21 +13,24 @@ import ComposableArchitecture
  Notification 뷰(푸쉬 알림 뷰)
  */
 struct NotificationListView: View {
-    @StateObject private var notificationUseCase = LegacyNotificationUseCase()
+    let store: StoreOf<NotificationFeature> = .init(
+        initialState: NotificationFeature.State()
+    ) {
+        NotificationFeature()
+    }
     
     var body: some View {
         ZStack {
             Color(Background.first).ignoresSafeArea()
             
-            NotificationContentView()
+            NotificationContentView(store: store)
             
-            if notificationUseCase.state.isLoading {
+            if store.isLoading {
                 ProgressView()
                     .progressViewStyle(.circular)
                     .tint(.primary)
             }
         }
-        .environmentObject(notificationUseCase)
         .navigationBarBackButtonHidden()
     }
 }
@@ -35,20 +38,13 @@ struct NotificationListView: View {
 
 // MARK: - NotificationContentView
 private struct NotificationContentView: View {
-    
-    @EnvironmentObject private var pathModel: Router
-    @EnvironmentObject private var notificationUseCase: LegacyNotificationUseCase
-    @EnvironmentObject private var bulletinBoardUseCase: BulletinBoardUseCase
-    
-    @StateObject var viewModel: QuestionViewModel = .init()
-    
-    @State private var isReportedPostTappedAlert = false // 신고된 게시글 알림
+    let store: StoreOf<NotificationFeature>
     
     var body: some View {
         VStack(spacing: 0) {
             CustomNavigationBar(
                 leadingView: { CustomNavigationBackButton(buttonType: .arrow) {
-                    pathModel.pop()
+                    // TODO: Navigation 적용
                 }},
                 principalView: {
                     Text("알림")
@@ -60,57 +56,11 @@ private struct NotificationContentView: View {
             
             ScrollView {
                 LazyVStack(spacing: 0) {
-                    ForEach(Array(notificationUseCase.state.notificationList.enumerated()), id: \.offset) { index, notification in
-                        
-                        LegacyNotificationCell(notification: notification) {
-                            if let boardId = Int(notification.boardId) {
-                                // 게시글 댓글로 이동
-                                Task {
-                                    if let post = bulletinBoardUseCase.state.posts.first(where: { $0.boardId == boardId }) {
-                                        if post.isReported {
-                                            // 신고된 게시글이면 알림 표시
-                                            isReportedPostTappedAlert.toggle()
-                                        } else {
-                                            if pathModel.searchPathType == .questionList {
-                                                pathModel.pushView(screen: QuestionListPathType.comment(post: post))
-                                            } else if pathModel.searchPathType == .bulletinBoard {
-                                                pathModel.pushView(screen: BulletinBoardPathType.comment(post: post))
-                                            }
-                                        }
-                                    }
-                                }
-                            } else {
-                                if let questionId = Int(notification.questionId) {
-                                    Task {
-                                        if let question = viewModel.questions.first(where: { $0.questionId == questionId }) {
-                                            if question.isAnswered {
-                                                // 답변된 경우 answerListView로 이동
-                                                if pathModel.searchPathType == .questionList {
-                                                    pathModel.pushView(screen: QuestionListPathType.todayAnswer(questionId: question.questionId, questionContent: question.content))
-                                                } else if pathModel.searchPathType == .bulletinBoard {
-                                                    pathModel.pushView(screen: BulletinBoardPathType.todayAnswer(questionId: question.questionId, questionContent: question.content))
-                                                }
-                                            } else {
-                                                // 답변되지 않은 경우 answerView로 이동
-                                                if pathModel.searchPathType == .questionList {
-                                                    pathModel.pushView(screen: QuestionListPathType.answer(questionId: question.questionId, questionContent: question.content))
-                                                } else if pathModel.searchPathType == .bulletinBoard {
-                                                    pathModel.pushView(screen: BulletinBoardPathType.answer(questionId: question.questionId, questionContent: question.content))
-                                                }
-                                            }
-                                        }
-                                    }
-                                }
-                            }
+                    ForEach(enumerated(store.notifications), id: \.offset) { index, notification in
+                        NotificationCell(notification: notification) {
+                            // TODO: 탭 액션 제공 (신고된 글인지 여부, 답변된 질문인지 여부)
+                            store.send(.notificationCellTapped(index))
                         }
-                        .onAppear {
-                            if index == notificationUseCase.state.notificationList.count - 1
-                                && notificationUseCase.state.hasNext {
-                                print("Notification 페이지네이션")
-                                notificationUseCase.fetchNotificationList()
-                            }
-                        }
-                        
                         Separator()
                     }
                     
@@ -121,19 +71,11 @@ private struct NotificationContentView: View {
                 }
             }
             .refreshable {
-                notificationUseCase.refreshNotificationList()
-            }
-            .alert("신고된 게시글", isPresented: $isReportedPostTappedAlert) {
-                Button("확인", role: .none, action: {})
-            } message: {
-                Text("신고된 게시글은 열람할 수 없습니다.")
+                store.send(.onRefresh)
             }
         }
         .onAppear {
-            bulletinBoardUseCase.effect(.fetchPost)
-            Task {
-                await viewModel.refreshGetQuestions()
-            }
+            // TODO: 단일 post 불러오기
         }
     }
 }

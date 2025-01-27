@@ -8,7 +8,7 @@
 import SwiftUI
 
 struct LegacyNotificationCell: View {
-    let notification: QappleNoti
+    let notification: LegacyQappleNoti
     let seeMoreAction: () -> Void
     
     var body: some View {
@@ -29,7 +29,7 @@ struct LegacyNotificationCell: View {
 
 private struct TitleView: View {
     
-    let notification: QappleNoti
+    let notification: LegacyQappleNoti
     
     var body: some View {
         HStack(spacing: 8) {
@@ -52,7 +52,7 @@ private struct TitleView: View {
 
 private struct ContentView: View {
     
-    let notification: QappleNoti
+    let notification: LegacyQappleNoti
     
     var body: some View {
         VStack(alignment: .leading, spacing: 4) {

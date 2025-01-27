@@ -7,7 +7,7 @@
 
 import Foundation
 
-struct QappleNoti: Identifiable {
+struct LegacyQappleNoti: Identifiable {
     let id = UUID()
     let questionId: String
     let boardId: String

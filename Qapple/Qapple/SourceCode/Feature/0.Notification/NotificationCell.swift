@@ -10,7 +10,7 @@ import ComposableArchitecture
 
 
 struct NotificationCell: View {
-    let notification: QappleNoti
+    let notification: QappleNotification
     let seeMoreAction: () -> Void
     
     var body: some View {
@@ -32,7 +32,7 @@ struct NotificationCell: View {
 
 private struct TitleView: View {
     
-    let notification: QappleNoti
+    let notification: QappleNotification
     
     var body: some View {
         HStack(spacing: 8) {
@@ -56,7 +56,7 @@ private struct TitleView: View {
 
 private struct ContentView: View {
     
-    let notification: QappleNoti
+    let notification: QappleNotification
     
     var body: some View {
         VStack(alignment: .leading, spacing: 4) {
