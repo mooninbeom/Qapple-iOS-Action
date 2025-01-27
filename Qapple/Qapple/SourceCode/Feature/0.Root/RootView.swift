@@ -30,6 +30,10 @@ struct RootView: View {
             .fixedTabBarBackground(color: .first)
         } destination: { store in
             switch store.case {
+            case let .bulletinBoardView(store):
+                BulletinBoardView(store: store)
+            case let .commentView(store):
+                CommentView(store: store)
             default: EmptyView()
             }
         }
