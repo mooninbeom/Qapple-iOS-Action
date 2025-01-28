@@ -7,7 +7,7 @@
 
 import SwiftUI
 
-struct CommentReportView: View {
+struct LegacyCommentReportView: View {
     
     @EnvironmentObject var pathModel: Router
     @State private var isReportAlertPresented = false
@@ -107,7 +107,7 @@ struct CommentReportView: View {
     }
 }
 
-extension CommentReportView {
+extension LegacyCommentReportView {
     
     @MainActor
     private func reportComment() async {
