@@ -17,9 +17,14 @@ struct QappleApp: App {
         RootFeature()
     }
     
+    static let store1 = Store(initialState: BulletinBoardPostFeature.State()) {
+        BulletinBoardPostFeature()
+    }
+    
     var body: some Scene {
         WindowGroup {
-            RootView(store: QappleApp.store)
+//            RootView(store: QappleApp.store)
+            BulletinBoardPostView(store: QappleApp.store1)
         }
     }
 }

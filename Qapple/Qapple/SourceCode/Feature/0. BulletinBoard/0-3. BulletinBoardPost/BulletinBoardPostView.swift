@@ -23,11 +23,11 @@ struct BulletinBoardPostView: View {
     var body: some View {
         ZStack{
             VStack(spacing: 0) {
-                NavigationBar(isBackAlertPresented: $isBackAlertPresented)
+                NavigationBar(store: store, isBackAlertPresented: $isBackAlertPresented)
                 Spacer()
-                WritingView(isTextFieldFocused: $isTextFieldFocused)
+                WritingView(store: store, isTextFieldFocused: $isTextFieldFocused)
                 Spacer()
-                Footer()
+                Footer(store: store)
             }
             if store.isLoading {
                 ProgressView()
@@ -42,7 +42,7 @@ struct BulletinBoardPostView: View {
         .onTapGesture {
             isTextFieldFocused.toggle()
         }
-        .disabled(postingUseCase.isLoading)
+        .disabled(store.isLoading)
         .alert("정말 그만두시겠어요?", isPresented: $isBackAlertPresented) {
             HStack {
                 Button("취소", role: .cancel) {}
@@ -59,6 +59,8 @@ struct BulletinBoardPostView: View {
 // MARK: - NavigationBar
 
 private struct NavigationBar: View {
+    
+    @Bindable var store: StoreOf<BulletinBoardPostFeature>
 
     @EnvironmentObject private var pathModel: Router
     @EnvironmentObject private var bulletinBoardUseCase: BulletinBoardUseCase
@@ -70,7 +72,7 @@ private struct NavigationBar: View {
         CustomNavigationBar(
             leadingView: {
                 Button("취소") {
-                    if postingUseCase._state.content.isEmpty {
+                    if store.content.isEmpty {
                         pathModel.pop()
                     } else {
                         isBackAlertPresented.toggle()
@@ -85,7 +87,7 @@ private struct NavigationBar: View {
             },
             trailingView: {
                 Button("올리기") {
-                    if !postingUseCase._state.content.isEmpty {
+                    if store.content != "" {
                         Task {
                             HapticService.notification(type: .success)
                             try await postingUseCase.effect(.uploadPost)
@@ -95,8 +97,8 @@ private struct NavigationBar: View {
                         }
                     }
                 }
-                .foregroundStyle(postingUseCase._state.content.isEmpty ? .disable : BrandPink.button)
-                .disabled(postingUseCase._state.content.isEmpty)
+                .foregroundStyle(store.content.isEmpty ? .disable : BrandPink.button)
+                .disabled(store.content.isEmpty)
             },
             backgroundColor: .clear
         )
@@ -106,6 +108,8 @@ private struct NavigationBar: View {
 // MARK: - WritingView
 
 private struct WritingView: View {
+    
+    @Bindable var store: StoreOf<BulletinBoardPostFeature>
 
     @EnvironmentObject private var postingUseCase: BulletinPostingUseCase
 
@@ -113,11 +117,11 @@ private struct WritingView: View {
 
     var body: some View {
         ZStack {
-            if postingUseCase._state.content.isEmpty {
+            if store.content == "" {
                 Placeholder()
             }
 
-            PostTextField(isTextFieldFocused: isTextFieldFocused)
+            PostTextField(store: store, isTextFieldFocused: isTextFieldFocused)
         }
         .multilineTextAlignment(.center)
     }
@@ -144,16 +148,15 @@ private struct Placeholder: View {
 // MARK: - PostTextField
 
 private struct PostTextField: View {
-
-    @EnvironmentObject private var postingUseCase: BulletinPostingUseCase
-
-    @State private var fontSize: CGFloat = 48
+    
+    @Bindable var store: StoreOf<BulletinBoardPostFeature>
+    @State var fontSize: CGFloat = 48
 
     var isTextFieldFocused: FocusState<Bool>.Binding
 
     var body: some View {
         TextField(
-            text: $postingUseCase._state.content,
+            text: $store.content.sending(\.setContent),
             axis: .vertical
         ) {
             Color.clear
@@ -163,29 +166,16 @@ private struct PostTextField: View {
         .focused(isTextFieldFocused)
         .padding(.horizontal, 24)
         .autocorrectionDisabled()
-        .onChange(of: postingUseCase._state.content) { oldText, newText in
-
-            // 글자 수 제한 로직
-            if newText.count > postingUseCase.textCountLimit {
-                postingUseCase._state.content = oldText
-            }
-
-            // 폰트 크기 변경 로직
-            switch newText.count {
-            case 0..<20: fontSize = 48
-            case 20..<32: fontSize = 40
-            case 32..<60: fontSize = 32
-            case 60...100: fontSize = 24
-            case 100...: fontSize = 17
-            default: break
-            }
-        }
+        .onChange(of: store.content){ _ in
+            fontSize = store.fontSize}
     }
 }
 
 // MARK: - Footer
 
 private struct Footer: View {
+    
+    @Bindable var store: StoreOf<BulletinBoardPostFeature>
 
     @EnvironmentObject private var postingUseCase: BulletinPostingUseCase
 
@@ -207,7 +197,7 @@ private struct Footer: View {
             
             Spacer()
 
-            Text("\(postingUseCase._state.content.count)/\(postingUseCase.textCountLimit)")
+            Text("\(store.content.count)/\(store.textCountLimit)")
                 .font(.pretendard(.medium, size: 14))
                 .foregroundStyle(TextLabel.sub3)
         }
