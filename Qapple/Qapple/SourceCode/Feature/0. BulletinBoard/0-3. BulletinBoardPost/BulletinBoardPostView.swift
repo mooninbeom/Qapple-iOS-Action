@@ -43,16 +43,7 @@ struct BulletinBoardPostView: View {
             isTextFieldFocused.toggle()
         }
         .disabled(store.isLoading)
-        .alert("정말 그만두시겠어요?", isPresented: $isBackAlertPresented) {
-            HStack {
-                Button("취소", role: .cancel) {}
-                Button("그만두기", role: .none) {
-                    pathModel.pop()
-                }
-            }
-        } message: {
-            Text("지금까지 작성한 답변이 사라져요")
-        }
+        .alert($store.scope(state: \.alert, action: \.alert))
     }
 }
 
@@ -72,11 +63,7 @@ private struct NavigationBar: View {
         CustomNavigationBar(
             leadingView: {
                 Button("취소") {
-                    if store.content.isEmpty {
-                        pathModel.pop()
-                    } else {
-                        isBackAlertPresented.toggle()
-                    }
+                    store.send(.cancelButtonTapped)
                 }
                 .foregroundStyle(GrayScale.icon)
             },
