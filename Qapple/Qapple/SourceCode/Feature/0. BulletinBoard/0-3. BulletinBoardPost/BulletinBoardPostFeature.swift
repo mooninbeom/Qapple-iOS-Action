@@ -25,6 +25,8 @@ struct BulletinBoardPostFeature {
         
         case cancelButtonTapped
         case setContent(String)
+        case postBoardButtonTapped
+        case stopLoading
         
         enum Alert {
             case confirmCancel
@@ -34,6 +36,8 @@ struct BulletinBoardPostFeature {
             case confirmCancel
         }
     }
+    
+    @Dependency(\.bulletinBoardRepository) var bulletinBoardRepository
     
     var body: some ReducerOf<Self> {
         Reduce { state, action in
@@ -75,6 +79,22 @@ struct BulletinBoardPostFeature {
                 default: break
                 }
                 
+                return .none
+            case .postBoardButtonTapped:
+                state.isLoading = true
+                let content = state.content
+                return .run { send in
+                    do {
+                        let _ = try await bulletinBoardRepository.postBoard(content)
+                        // TODO: board reset 필요하면 넣기
+                        await send(.stopLoading)
+                        // TODO: Navigation 처리
+                    } catch {
+                        print(error)
+                    }
+                }
+            case .stopLoading:
+                state.isLoading = false
                 return .none
             }
         }

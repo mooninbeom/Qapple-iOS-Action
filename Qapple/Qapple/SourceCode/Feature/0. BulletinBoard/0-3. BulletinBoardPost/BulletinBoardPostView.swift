@@ -74,14 +74,9 @@ private struct NavigationBar: View {
             },
             trailingView: {
                 Button("올리기") {
-                    if store.content != "" {
-                        Task {
-                            HapticService.notification(type: .success)
-                            try await postingUseCase.effect(.uploadPost)
-                            bulletinBoardUseCase.reset()
-                            pathModel.pop()
-                            postingUseCase.isLoading = false
-                        }
+                    if !store.content.isEmpty {
+                        HapticService.notification(type: .success)
+                        store.send(.postBoardButtonTapped)
                     }
                 }
                 .foregroundStyle(store.content.isEmpty ? .disable : BrandPink.button)
@@ -104,7 +99,7 @@ private struct WritingView: View {
 
     var body: some View {
         ZStack {
-            if store.content == "" {
+            if store.content.isEmpty {
                 Placeholder()
             }
 
