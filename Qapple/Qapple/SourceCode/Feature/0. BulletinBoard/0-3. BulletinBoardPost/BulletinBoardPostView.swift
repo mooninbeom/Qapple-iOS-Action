@@ -166,14 +166,15 @@ private struct Footer: View {
     var body: some View {
         HStack {
             Button {
-                isAnonymitySheetPresented.toggle()
+                store.send(.anonymityButtonTapped)
             } label: {
                 Text("익명이 보장되나요?")
                     .font(.pretendard(.semiBold, size: 12))
                     .foregroundStyle(BrandPink.text)
             }
-            .sheet(isPresented: $isAnonymitySheetPresented) {
-                AnonymityNoticeView(isAnonymitySheetPresented: $isAnonymitySheetPresented)
+            .sheet(item: $store.scope(state: \.sheet?.anonymityButtonTap, action: \.sheet.anonymityButtonTap)
+            ) { anonymityStore in
+                AnonymityView(store: anonymityStore)
                     .presentationDetents([.height(560)])
             }
             

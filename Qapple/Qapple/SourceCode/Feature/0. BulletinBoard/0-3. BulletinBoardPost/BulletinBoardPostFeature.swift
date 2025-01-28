@@ -12,6 +12,7 @@ import ComposableArchitecture
 struct BulletinBoardPostFeature {
     @ObservableState
     struct State: Equatable {
+        @Presents var sheet: Sheet.State?
         @Presents var alert: AlertState<Action.Alert>?
         var isLoading = false
         var content: String = ""
@@ -20,12 +21,14 @@ struct BulletinBoardPostFeature {
     }
     
     enum Action {
+        case sheet(PresentationAction<Sheet.Action>)
         case alert(PresentationAction<Alert>)
         case delegate(Delegate)
         
         case cancelButtonTapped
         case setContent(String)
         case postBoardButtonTapped
+        case anonymityButtonTapped
         case stopLoading
         
         enum Alert {
@@ -42,6 +45,12 @@ struct BulletinBoardPostFeature {
     var body: some ReducerOf<Self> {
         Reduce { state, action in
             switch action {
+            case .sheet(.presented(.anonymityButtonTap(.confirmButtonTapped))):
+                return .none
+                
+            case .sheet:
+                return .none
+                
             case .alert(.presented(.confirmCancel)):
                 return .run { send in
                     await send(.delegate(.confirmCancel))
@@ -93,14 +102,30 @@ struct BulletinBoardPostFeature {
                         print(error)
                     }
                 }
+            case .anonymityButtonTapped:
+                state.sheet = .anonymityButtonTap(AnonymityFeature.State())
+                return .none
+                
             case .stopLoading:
                 state.isLoading = false
                 return .none
             }
         }
+        .ifLet(\.$sheet, action: \.sheet)
         .ifLet(\.$alert, action: \.alert)
     }
 }
+
+// MARK: - BulletinBoardSheet
+
+extension BulletinBoardPostFeature {
+    @Reducer
+    enum Sheet {
+        case anonymityButtonTap(AnonymityFeature)
+    }
+}
+
+extension BulletinBoardPostFeature.Sheet.State: Equatable {}
 
 // MARK: - BulletinBoardPostAlert
 
