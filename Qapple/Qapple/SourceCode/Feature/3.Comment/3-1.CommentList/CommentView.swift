@@ -72,18 +72,14 @@ struct CommentView: View {
  */
 private struct HeaderView: View {
     var body: some View {
-        CustomNavigationBar(
+        NavigationBar(
+            title: "댓글",
             leadingView: {
-                CustomNavigationBackButton(buttonType: .arrow) {
+                NavigationButton(buttonType: .back) {
                     // TODO: 네비게이션 수정 필요
                 }
-            },
-            principalView: {
-                Text("댓글")
-                    .font(.pretendard(.semiBold, size: 17))
-            },
-            trailingView: {},
-            backgroundColor: Color.Background.first)
+            }
+        )
     }
 }
 

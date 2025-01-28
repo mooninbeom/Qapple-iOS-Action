@@ -34,19 +34,13 @@ struct CommentReportView: View {
                 .ignoresSafeArea()
             
             VStack {
-                CustomNavigationBar(
-                    leadingView:{
-                        CustomNavigationBackButton(buttonType: .arrow)  {
+                NavigationBar(
+                    title: "신고하기",
+                    leadingView: {
+                        NavigationButton(buttonType: .back) {
                             // TODO: 네비게이션 수정 필요
                         }
-                    },
-                    principalView: {
-                        Text("신고하기")
-                            .font(Font.pretendard(.semiBold, size: 15))
-                            .foregroundStyle(TextLabel.main)
-                    },
-                    trailingView: {},
-                    backgroundColor: .clear
+                    }
                 )
                 
                 VStack(alignment: .leading) {
