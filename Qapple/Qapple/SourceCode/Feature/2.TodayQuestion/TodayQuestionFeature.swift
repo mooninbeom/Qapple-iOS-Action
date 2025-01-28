@@ -17,6 +17,7 @@ struct TodayQuestionFeature {
         var todayQuestion: Question = .initialState
         var answerPreviewList: [Answer] = []
         var timeRemainingForQuestion: TimeInterval = 0
+        var isLoading = true
         @Presents var sheet: Sheet.State?
     }
     
@@ -31,6 +32,7 @@ struct TodayQuestionFeature {
         case seeMoreAnswerButtonTapped(Answer)
         case questionTimerTick
         case cancelQuestionTimer
+        case toggleLoading(Bool)
         case sheet(PresentationAction<Sheet.Action>)
     }
     
@@ -47,6 +49,7 @@ struct TodayQuestionFeature {
             switch action {
             case .onAppear, .refresh:
                 return .run { send in
+                    await send(.toggleLoading(true), animation: .bouncy)
                     do {
                         let mainQuestion = try await fetchMainQuestion()
                         let answerList = try await answerRepository.fetchAnswerPreviewList(mainQuestion.id)
@@ -56,10 +59,12 @@ struct TodayQuestionFeature {
                     } catch {
                         print(error)
                     }
+                    await send(.toggleLoading(false), animation: .bouncy)
                 }
                 
             case .onDisappear:
                 return .run { send in
+                    await send(.toggleLoading(false), animation: .bouncy)
                     await send(.cancelQuestionTimer)
                 }
                 
@@ -108,12 +113,14 @@ struct TodayQuestionFeature {
             case let .sheet(.presented(.seeMore(.alert(.presented(.confirmDeletion(sheetData)))))):
                 guard case let .answer(answer) = sheetData else { return .none }
                 return .run { send in
+                    await send(.toggleLoading(true), animation: .bouncy)
                     do {
                         try await answerRepository.deleteAnswer(answer.id)
                         await send(.sheet(.presented(.seeMore(.completionDeletion))))
                     } catch {
                         print(error)
                     }
+                    await send(.toggleLoading(false), animation: .bouncy)
                 }
                 
             case .sheet(.presented(.seeMore(.alert(.presented(.confirmCompletion))))):
@@ -121,6 +128,10 @@ struct TodayQuestionFeature {
                 return .run { send in
                     await send(.refresh)
                 }
+                
+            case let .toggleLoading(bool):
+                state.isLoading = bool
+                return .none
                 
             case .sheet:
                 return .none

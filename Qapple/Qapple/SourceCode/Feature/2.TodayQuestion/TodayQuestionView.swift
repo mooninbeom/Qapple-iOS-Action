@@ -34,6 +34,7 @@ struct TodayQuestionView: View {
         .onDisappear {
             store.send(.onDisappear)
         }
+        .loadingIndicator(isLoading: store.isLoading)
         .sheet(item: $store.scope(
             state: \.sheet,
             action: \.sheet)
@@ -53,26 +54,29 @@ private struct HeaderView: View {
     
     var body: some View {
         VStack(spacing: 0) {
-            Image(store.questionState.graphicImage)
-                .resizable()
-                .scaledToFill()
-                .frame(width: 120, height: 120)
-            
-            Text(store.questionState.mainTitle)
-                .font(.pretendard(.bold, size: 23))
-                .foregroundStyle(.wh)
-                .tracking(-1)
-                .padding(.top, 16)
-            
-            if store.questionState == .creating {
-                Text(store.timeRemainingForQuestion.timerFormat)
-                    .font(.pretendard(.bold, size: 38))
-                    .foregroundStyle(LinearGradient.timerGradient)
-                    .frame(height: 27)
-                    .padding(.top, 12)
-                    .monospacedDigit()
-                    .kerning(-2)
+            Group {
+                Image(store.questionState.graphicImage)
+                    .resizable()
+                    .scaledToFill()
+                    .frame(width: 120, height: 120)
+                
+                Text(store.questionState.mainTitle)
+                    .font(.pretendard(.bold, size: 23))
+                    .foregroundStyle(.wh)
+                    .tracking(-1)
+                    .padding(.top, 16)
+                
+                if store.questionState == .creating {
+                    Text(store.timeRemainingForQuestion.timerFormat)
+                        .font(.pretendard(.bold, size: 38))
+                        .foregroundStyle(LinearGradient.timerGradient)
+                        .frame(height: 27)
+                        .padding(.top, 12)
+                        .monospacedDigit()
+                        .kerning(-2)
+                }
             }
+            .opacity(store.isLoading ? 0 : 1)
         }
         .frame(maxWidth: .infinity)
         .frame(height: store.questionState == .creating ? 270 : 230)
@@ -104,6 +108,7 @@ private struct QuestionButton: View {
                     .background(backgroundColor)
                     .clipShape(RoundedRectangle(cornerRadius: 20))
             }
+            .opacity(store.isLoading ? 0 : 1)
         }
         .frame(maxWidth: .infinity)
         .background(.first)
@@ -162,6 +167,7 @@ private struct AnswerPreviewList: View {
                 }
             }
             .frame(maxWidth: .infinity)
+            .opacity(store.isLoading ? 0 : 1)
         }
     }
     

@@ -63,6 +63,10 @@ struct RootFeature {
                     state.path.removeAll()
                     return .none
                     
+                case .element(id: _, action: .answerList(.onDisappear)):
+                    state.path.removeAll()
+                    return .none
+                    
                 default:
                     return .none
                 }

@@ -15,6 +15,7 @@ struct QuestionListFeature {
         var questionList: [Question] = []
         var totalCount: QappleAPI.TotalCount = 0
         var paginationInfo = QappleAPI.PaginationInfo(threshold: "", hasNext: false)
+        var isLoading = false
         @Presents var alert: AlertState<Action.Alert>?
     }
     
@@ -26,6 +27,7 @@ struct QuestionListFeature {
         case paginationResponse([Question], QappleAPI.PaginationInfo)
         case questionCellTapped(Question)
         case answerButtonTapped(Question)
+        case toggleLoading(Bool)
         case alert(PresentationAction<Alert>)
         
         enum Alert: Equatable {}
@@ -38,22 +40,26 @@ struct QuestionListFeature {
             switch action {
             case .onAppear, .refresh:
                 return .run { send in
+                    await send(.toggleLoading(true), animation: .bouncy)
                     do {
                         let response = try await fetchQuestionList(nil)
                         await send(.questionListResponse(response.0, response.1, response.2))
                     } catch {
                         print(error)
                     }
+                    await send(.toggleLoading(false), animation: .bouncy)
                 }
                 
             case .pagination:
                 return .run { [threshold = state.paginationInfo.threshold] send in
+                    await send(.toggleLoading(true), animation: .bouncy)
                     do {
                         let response = try await fetchQuestionList(threshold)
                         await send(.paginationResponse(response.0, response.2))
                     } catch {
                         print(error)
                     }
+                    await send(.toggleLoading(false), animation: .bouncy)
                 }
                 
             case let .questionListResponse(questionList, totalCount, paginationInfo):
@@ -75,6 +81,10 @@ struct QuestionListFeature {
                 
             case let .answerButtonTapped(question):
                 print(question)
+                return .none
+                
+            case let .toggleLoading(bool):
+                state.isLoading = bool
                 return .none
                 
             case .alert:

@@ -39,6 +39,7 @@ struct WriteAnswerView: View {
         .onTapGesture {
             isTextFieldFocused.toggle()
         }
+        .loadingIndicator(isLoading: store.isLoading)
         .alert($store.scope(state: \.alert, action: \.alert))
         .sheet(item: $store.scope(
             state: \.sheet?.anonymityNotice,
@@ -74,7 +75,7 @@ private struct WriteAnswerNavigationBar: View {
                 NavigationButton(buttonType: .text("완료", completeButtonColor)) {
                     store.send(.completeButtonTapped)
                 }
-                .disabled(store.answerText.isEmpty)
+                .disabled(store.answerText.isEmpty || store.isLoading)
             }
         )
     }

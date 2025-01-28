@@ -17,6 +17,7 @@ struct WriteAnswerFeature {
         let textLimit = 250
         var answerText: String = ""
         var answerTextFontSize: CGFloat = 48
+        var isLoading = false
         @Presents var sheet: Sheet.State?
         @Presents var alert: AlertState<Action.Alert>?
     }
@@ -27,6 +28,7 @@ struct WriteAnswerFeature {
         case dismissButtonTapped
         case completeButtonTapped
         case postAnswerResponse(Question)
+        case toggleLoading(Bool)
         case sheet(PresentationAction<Sheet.Action>)
         case alert(PresentationAction<Alert>)
         
@@ -65,12 +67,14 @@ struct WriteAnswerFeature {
             case .completeButtonTapped:
                 guard !state.answerText.isEmpty else { return .none }
                 return .run { [state = state] send in
+                    await send(.toggleLoading(true), animation: .bouncy)
                     do {
                         try await postAnswer(state.question.id, state.answerText)
                         await send(.postAnswerResponse(state.question))
                     } catch {
                         print(error)
                     }
+                    await send(.toggleLoading(false), animation: .bouncy)
                 }
                 
             case .alert(.presented(.stopAnswering)):
@@ -79,6 +83,10 @@ struct WriteAnswerFeature {
                 }
                 
             case .postAnswerResponse:
+                return .none
+                
+            case let .toggleLoading(bool):
+                state.isLoading = bool
                 return .none
                 
             case .sheet, .alert:

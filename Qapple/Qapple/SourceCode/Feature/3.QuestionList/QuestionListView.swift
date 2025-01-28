@@ -24,6 +24,7 @@ struct QuestionListView: View {
         .onAppear {
             store.send(.onAppear)
         }
+        .loadingIndicator(isLoading: store.isLoading)
         .alert($store.scope(state: \.alert, action: \.alert))
     }
     

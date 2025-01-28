@@ -12,19 +12,22 @@ struct LoadingIndicatorModifier: ViewModifier {
     let isLoading: Bool
     
     func body(content: Content) -> some View {
-        if isLoading {
-            content.overlay {
-                LoadingIndicator()
+        content
+            .overlay {
+                if isLoading {
+                    ProgressView()
+                        .scaleEffect(1.5)
+                        .progressViewStyle(.circular)
+                        .tint(.primary)
+                }
             }
-        } else {
-            content
-        }
     }
 }
 
 extension View {
     
     /// 로딩 인디케이터를 추가합니다.
+    @ViewBuilder
     func loadingIndicator(isLoading: Bool) -> some View {
         modifier(LoadingIndicatorModifier(isLoading: isLoading))
     }

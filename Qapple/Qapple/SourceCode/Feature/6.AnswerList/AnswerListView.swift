@@ -35,6 +35,7 @@ struct AnswerListView: View {
         .refreshable {
             store.send(.refresh)
         }
+        .loadingIndicator(isLoading: store.isLoading)
         .sheet(item: $store.scope(
             state: \.sheet,
             action: \.sheet)

@@ -35,7 +35,6 @@ struct QuestionTabView: View {
             }
         }
         .tabViewStyle(PageTabViewStyle(indexDisplayMode: .never))
-        .loadingIndicator(isLoading: true)
     }
 }
 
