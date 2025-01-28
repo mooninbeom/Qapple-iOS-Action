@@ -22,8 +22,8 @@ struct WriteAnswerFeature {
         @Presents var alert: AlertState<Action.Alert>?
     }
     
-    enum Action {
-        case typeAnswerText(String)
+    enum Action: BindableAction {
+        case typeAnswerText
         case anonymityNoticeButtonTapped
         case dismissButtonTapped
         case completeButtonTapped
@@ -31,6 +31,7 @@ struct WriteAnswerFeature {
         case toggleLoading(Bool)
         case sheet(PresentationAction<Sheet.Action>)
         case alert(PresentationAction<Alert>)
+        case binding(BindingAction<State>)
         
         enum Alert: Equatable {
             case stopAnswering
@@ -41,12 +42,13 @@ struct WriteAnswerFeature {
     @Dependency(\.dismiss) var dismiss
     
     var body: some ReducerOf<Self> {
+        BindingReducer()
         Reduce { state, action in
             switch action {
-            case let .typeAnswerText(text):
-                if text.count <= state.textLimit {
-                    state.answerText = text
-                    state.answerTextFontSize = adaptiveFontSize(from: text)
+            case .typeAnswerText:
+                state.answerTextFontSize = adaptiveFontSize(from: state.answerText)
+                if state.answerText.count > state.textLimit {
+                    state.answerText = String(state.answerText.prefix(state.textLimit))
                 }
                 return .none
                 
@@ -89,7 +91,12 @@ struct WriteAnswerFeature {
                 state.isLoading = bool
                 return .none
                 
-            case .sheet, .alert:
+            case .binding(\.answerText):
+                return .run { send in
+                    await send(.typeAnswerText)
+                }
+                
+            case .sheet, .alert, .binding:
                 return .none
             }
         }

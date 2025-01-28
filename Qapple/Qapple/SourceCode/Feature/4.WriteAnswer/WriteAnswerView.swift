@@ -99,8 +99,7 @@ private struct AnswerTextField: View {
                 Placeholder()
             }
             
-            // TODO: 분명 폰트 사이즈의 값은 넘어오는데 화면에는 업데이트 되지 않는 버그가 있습니다!
-            TextField(text: $store.answerText.sending(\.typeAnswerText), axis: .vertical) {}
+            TextField(text: $store.answerText, axis: .vertical) {}
                 .foregroundStyle(.wh)
                 .font(.pretendard(.semiBold, size: store.answerTextFontSize))
                 .focused($isTextFieldFocused)

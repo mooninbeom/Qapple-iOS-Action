@@ -33,7 +33,7 @@ final class KeychainService {
     /// 키체인에서 액세스 토큰을 반환합니다.
     func token(_ type: KeychainType) throws -> String {
         
-        let testToken = "eyJhbGciOiJIUzUxMiJ9.eyJ0b2tlblR5cGUiOiJhY2Nlc3MiLCJtZW1iZXJJZCI6MTA1LCJyb2xlIjoiQUNBREVNSUVSIiwiaWF0IjoxNzM3OTc5MDU5LCJleHAiOjE3Mzg4NDMwNTl9.mDBML1DvtENBumacYl2s_0UC0nR8vMp7srWM4Pz_MbDJXJeVEXbtM347UZ0t0QJt-7fYCdiNriCxQWhvR5Hvww"
+        let testToken = ""
         return "Bearer \(testToken)"
         
         // 1. 키체인에서 검색할 query
