@@ -22,8 +22,7 @@ struct AnswerRepository {
 // MARK: - DependencyKey
 
 extension AnswerRepository: DependencyKey {
-    
-    private static let networkService = NetworkService()
+    private static let networkService = NetworkService.shared
     
     static let liveValue = Self(
         fetchAnswerPreviewList: { questionId in

@@ -13,17 +13,22 @@ struct RootFeature {
     @ObservableState
     struct State: Equatable {
         var questionTab = QuestionTabFeature.State()
+        var bulletinBoardTab = BulletinBoardFeature.State()
         var path = StackState<Path.State>()
     }
     
     enum Action {
         case questionTab(QuestionTabFeature.Action)
+        case bulletinBoardTab(BulletinBoardFeature.Action)
         case path(StackActionOf<Path>)
     }
     
     var body: some ReducerOf<Self> {
         Scope(state: \.questionTab, action: \.questionTab) {
             QuestionTabFeature()
+        }
+        Scope(state: \.bulletinBoardTab, action: \.bulletinBoardTab) {
+            BulletinBoardFeature()
         }
         Reduce { state, action in
             switch action {
@@ -47,6 +52,10 @@ struct RootFeature {
                 
             case let .questionTab(.questionList(.answerButtonTapped(question))):
                 state.path.append(.writeAnswer(.init(question: question)))
+                return .none
+                
+            case let .bulletinBoardTab(.boardButtonTapped(board)):
+                state.path.append(.commentView(.init(post: board)))
                 return .none
                 
             case let .path(stackAction):
@@ -87,5 +96,7 @@ extension RootFeature {
         case writeAnswer(WriteAnswerFeature)
         case completeAnswer(CompleteAnswerFeature)
         case answerList(AnswerListFeature)
+        case bulletinBoardView(BulletinBoardFeature)
+        case commentView(CommentFeature)
     }
 }

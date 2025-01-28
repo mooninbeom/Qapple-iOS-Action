@@ -13,7 +13,7 @@ extension QappleRepository {
     static func makeRefreshToken() -> () async throws -> RefreshToken {
         return {
             let url = try QappleAPI.Token.refresh.url()
-            let response: BaseResponse<RefreshTokenDTO> = try await networkClient.get(url: url)
+            let response: BaseResponse<RefreshTokenDTO> = try await NetworkService.shared.get(url: url)
             return response.result.toEntity
         }
     }

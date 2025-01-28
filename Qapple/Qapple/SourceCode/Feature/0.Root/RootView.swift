@@ -20,6 +20,12 @@ struct RootView: View {
                         Image(systemName: "questionmark.bubble.fill")
                         Text("오늘의 질문")
                     }
+                
+                BulletinBoardView(store: store.scope(state: \.bulletinBoardTab, action: \.bulletinBoardTab))
+                    .tabItem {
+                        Image(systemName: "list.clipboard.fill")
+                        Text("게시판")
+                    }
             }
             .tint(.button)
             .fixedTabBarBackground(color: .first)
@@ -28,6 +34,8 @@ struct RootView: View {
             case let .writeAnswer(store): WriteAnswerView(store: store)
             case let .completeAnswer(store): CompleteAnswerView(store: store)
             case let .answerList(store): AnswerListView(store: store)
+            case let .bulletinBoardView(store): BulletinBoardView(store: store)
+            case let .commentView(store): CommentView(store: store)
             }
         }
     }

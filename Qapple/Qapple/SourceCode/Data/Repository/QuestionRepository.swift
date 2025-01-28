@@ -17,17 +17,15 @@ struct QuestionRepository {
 
 extension QuestionRepository: DependencyKey {
     
-    private static let networkService = NetworkService()
-    
     static let liveValue = Self(
         fetchQuestionList: { threshold in
             let url = try QappleAPI.Question.list(threshold: threshold, pageSize: 25).url()
-            let response: BaseResponse<QuestionsDTO> = try await networkService.get(url: url)
+            let response: BaseResponse<QuestionsDTO> = try await NetworkService.shared.get(url: url)
             return response.result.toEntityWithInfo
         },
         fetchMainQuestion: {
             let url = try QappleAPI.Question.listOfMain.url()
-            let response: BaseResponse<MainQuestionDTO> = try await networkService.get(url: url)
+            let response: BaseResponse<MainQuestionDTO> = try await NetworkService.shared.get(url: url)
             return response.result.toEntity
         }
     )

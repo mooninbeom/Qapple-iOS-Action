@@ -9,7 +9,7 @@ import Foundation
 import ComposableArchitecture
 
 struct QappleRepository {
-    static let networkClient = NetworkService()
+    let networkClient = NetworkService.shared
     
     // MARK: - Answer
     
