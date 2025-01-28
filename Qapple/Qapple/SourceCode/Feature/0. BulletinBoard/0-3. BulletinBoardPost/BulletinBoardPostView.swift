@@ -12,18 +12,12 @@ struct BulletinBoardPostView: View {
     
     @Bindable var store: StoreOf<BulletinBoardPostFeature>
 
-    @EnvironmentObject private var pathModel: Router
-    
-    @StateObject private var postingUseCase = BulletinPostingUseCase()
-
-    @State private var isBackAlertPresented = false
-
     @FocusState private var isTextFieldFocused: Bool
 
     var body: some View {
         ZStack{
             VStack(spacing: 0) {
-                NavigationBar(store: store, isBackAlertPresented: $isBackAlertPresented)
+                NavigationBar(store: store)
                 Spacer()
                 WritingView(store: store, isTextFieldFocused: $isTextFieldFocused)
                 Spacer()
@@ -37,7 +31,6 @@ struct BulletinBoardPostView: View {
         }
         .background(Background.first)
         .navigationBarBackButtonHidden()
-        .environmentObject(postingUseCase)
         .popGestureDisabled()
         .onTapGesture {
             isTextFieldFocused.toggle()
@@ -51,13 +44,7 @@ struct BulletinBoardPostView: View {
 
 private struct NavigationBar: View {
     
-    @Bindable var store: StoreOf<BulletinBoardPostFeature>
-
-    @EnvironmentObject private var pathModel: Router
-    @EnvironmentObject private var bulletinBoardUseCase: BulletinBoardUseCase
-    @EnvironmentObject private var postingUseCase: BulletinPostingUseCase
-
-    @Binding private(set) var isBackAlertPresented: Bool
+    let store: StoreOf<BulletinBoardPostFeature>
 
     var body: some View {
         CustomNavigationBar(
@@ -92,8 +79,6 @@ private struct NavigationBar: View {
 private struct WritingView: View {
     
     @Bindable var store: StoreOf<BulletinBoardPostFeature>
-
-    @EnvironmentObject private var postingUseCase: BulletinPostingUseCase
 
     var isTextFieldFocused: FocusState<Bool>.Binding
 
@@ -132,6 +117,7 @@ private struct Placeholder: View {
 private struct PostTextField: View {
     
     @Bindable var store: StoreOf<BulletinBoardPostFeature>
+    
     @State var fontSize: CGFloat = 48
 
     var isTextFieldFocused: FocusState<Bool>.Binding
@@ -158,11 +144,7 @@ private struct PostTextField: View {
 private struct Footer: View {
     
     @Bindable var store: StoreOf<BulletinBoardPostFeature>
-
-    @EnvironmentObject private var postingUseCase: BulletinPostingUseCase
-
-    @State private var isAnonymitySheetPresented = false
-
+    
     var body: some View {
         HStack {
             Button {
@@ -192,5 +174,7 @@ private struct Footer: View {
 // MARK: - Preview
 
 #Preview {
-    BulletinPostingView()
+    BulletinBoardPostView(store: Store(initialState: BulletinBoardPostFeature.State()){
+        BulletinBoardPostFeature()
+    })
 }
