@@ -121,10 +121,10 @@ struct BulletinBoardFeature {
                 return .run { send in
                     do {
                         let _ = try await bulletinBoardRepository.likeBoard(boardId)
-                        await send(.stopLoading)
                     } catch {
                         print(error)
                     }
+                    await send(.stopLoading)
                 }
                 
             case let .ellipsisButtonTapped(boardId, isMine):

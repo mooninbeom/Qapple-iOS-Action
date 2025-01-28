@@ -96,11 +96,11 @@ struct BulletinBoardPostFeature {
                     do {
                         let _ = try await bulletinBoardRepository.postBoard(content)
                         // TODO: board reset 필요하면 넣기
-                        await send(.stopLoading)
                         // TODO: Navigation 처리
                     } catch {
                         print(error)
                     }
+                    await send(.stopLoading)
                 }
             case .anonymityButtonTapped:
                 state.sheet = .anonymityButtonTap(AnonymityFeature.State())
