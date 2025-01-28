@@ -16,6 +16,7 @@ struct AnswerRepository {
         QappleAPI.PaginationInfo
     )
     var postAnswer: (_ questionId: Int, _ answer: String) async throws -> Void
+    var deleteAnswer: (_ answerId: Int) async throws -> Void
 }
 
 // MARK: - DependencyKey
@@ -50,6 +51,11 @@ extension AnswerRepository: DependencyKey {
             let requestBody = PostAnswerRequest(answer: answer)
             let response: BaseResponse<PostAnswerDTO> = try await networkService.post(url: url, body: requestBody)
             return ()
+        },
+        deleteAnswer: { answerId in
+            let url = try QappleAPI.Answer.delete(answerId: answerId).url()
+            let response: BaseResponse<DeleteAnswerDTO> = try await networkService.delete(url: url)
+            return ()
         }
     )
     
@@ -60,7 +66,8 @@ extension AnswerRepository: DependencyKey {
         fetchAnswerListOfQuestion: { _, _ in
             (stubAnswerList, 25, .init(threshold: "", hasNext: false))
         },
-        postAnswer: { _, _ in }
+        postAnswer: { _, _ in },
+        deleteAnswer: { _ in }
     )
 }
 

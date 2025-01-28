@@ -28,9 +28,7 @@ struct QuestionListFeature {
         case answerButtonTapped(Question)
         case alert(PresentationAction<Alert>)
         
-        enum Alert: Equatable {
-            
-        }
+        enum Alert: Equatable {}
     }
     
     @Dependency(\.questionRepository.fetchQuestionList) var fetchQuestionList

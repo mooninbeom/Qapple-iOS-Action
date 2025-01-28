@@ -122,14 +122,18 @@ private struct AnswerList: View {
             LazyVStack {
                 ForEach(enumerated(store.answerList), id: \.element.id) {
                     index, answer in
-                    AnswerCell(
-                        answer: answer,
-                        index: index,
-                        state: .normal,
-                        seeMoreAction: {
-                            store.send(.seeMoreAction(answer))
-                        }
-                    )
+                    Button {
+                        
+                    } label: {
+                        AnswerCell(
+                            answer: answer,
+                            index: index,
+                            state: .normal,
+                            seeMoreAction: {
+                                store.send(.seeMoreAction(answer))
+                            }
+                        )
+                    }
                     .configurePagination(
                         store.answerList,
                         currentIndex: index,

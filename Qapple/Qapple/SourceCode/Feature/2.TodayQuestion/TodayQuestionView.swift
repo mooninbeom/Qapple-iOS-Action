@@ -10,7 +10,7 @@ import SwiftUI
 
 struct TodayQuestionView: View {
     
-    let store: StoreOf<TodayQuestionFeature>
+    @Bindable var store: StoreOf<TodayQuestionFeature>
     
     var body: some View {
         ZStack {
@@ -33,6 +33,14 @@ struct TodayQuestionView: View {
         }
         .onDisappear {
             store.send(.onDisappear)
+        }
+        .sheet(item: $store.scope(
+            state: \.sheet,
+            action: \.sheet)
+        ) { store in
+            switch store.case {
+            case let .seeMore(store): SeeMoreSheet(store: store)
+            }
         }
     }
 }
@@ -191,14 +199,18 @@ private struct AnswerPreviewList: View {
         VStack(spacing: 0) {
             ForEach(enumerated(store.answerPreviewList), id: \.element.id) {
                 index, answer in
-                AnswerCell(
-                    answer: answer,
-                    index: index,
-                    state: .normal,
-                    seeMoreAction: {
-                        store.send(.seeMoreAnswerButtonTapped(answer))
-                    }
-                )
+                Button {
+                    
+                } label: {
+                    AnswerCell(
+                        answer: answer,
+                        index: index,
+                        state: .normal,
+                        seeMoreAction: {
+                            store.send(.seeMoreAnswerButtonTapped(answer))
+                        }
+                    )
+                }
             }
         }
     }

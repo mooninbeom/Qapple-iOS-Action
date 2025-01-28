@@ -17,6 +17,7 @@ struct TodayQuestionFeature {
         var todayQuestion: Question = .initialState
         var answerPreviewList: [Answer] = []
         var timeRemainingForQuestion: TimeInterval = 0
+        @Presents var sheet: Sheet.State?
     }
     
     enum Action {
@@ -29,6 +30,8 @@ struct TodayQuestionFeature {
         case seeAllAnswerButtonTapped(Question)
         case seeMoreAnswerButtonTapped(Answer)
         case questionTimerTick
+        case cancelQuestionTimer
+        case sheet(PresentationAction<Sheet.Action>)
     }
     
     enum CancelID {
@@ -36,7 +39,7 @@ struct TodayQuestionFeature {
     }
     
     @Dependency(\.questionRepository.fetchMainQuestion) var fetchMainQuestion
-    @Dependency(\.answerRepository.fetchAnswerPreviewList) var fetchAnswerPreviewList
+    @Dependency(\.answerRepository) var answerRepository
     @Dependency(\.continuousClock) var clock
     
     var body: some ReducerOf<Self> {
@@ -46,7 +49,8 @@ struct TodayQuestionFeature {
                 return .run { send in
                     do {
                         let mainQuestion = try await fetchMainQuestion()
-                        let answerList = try await fetchAnswerPreviewList(mainQuestion.id)
+                        let answerList = try await answerRepository.fetchAnswerPreviewList(mainQuestion.id)
+                        await send(.cancelQuestionTimer)
                         await send(.mainQuestionResponse(mainQuestion))
                         await send(.answerListResponse(answerList))
                     } catch {
@@ -55,7 +59,9 @@ struct TodayQuestionFeature {
                 }
                 
             case .onDisappear:
-                return .cancel(id: CancelID.questionTimer)
+                return .run { send in
+                    await send(.cancelQuestionTimer)
+                }
                 
             case let .mainQuestionResponse(mainQuestion):
                 state.todayQuestion = mainQuestion
@@ -84,14 +90,53 @@ struct TodayQuestionFeature {
                 return .none
                 
             case let .seeMoreAnswerButtonTapped(answer):
-                print(answer)
+                state.sheet = .seeMore(
+                    .init(
+                        sheetTarget: answer.isMine ? .mine : .others,
+                        sheetData: .answer(answer)
+                    )
+                )
                 return .none
                 
             case .questionTimerTick:
                 state.timeRemainingForQuestion -= 1
                 return .none
+                
+            case .cancelQuestionTimer:
+                return .cancel(id: CancelID.questionTimer)
+                
+            case let .sheet(.presented(.seeMore(.alert(.presented(.confirmDeletion(sheetData)))))):
+                guard case let .answer(answer) = sheetData else { return .none }
+                return .run { send in
+                    do {
+                        try await answerRepository.deleteAnswer(answer.id)
+                        await send(.sheet(.presented(.seeMore(.completionDeletion))))
+                    } catch {
+                        print(error)
+                    }
+                }
+                
+            case .sheet(.presented(.seeMore(.alert(.presented(.confirmCompletion))))):
+                state.sheet = nil
+                return .run { send in
+                    await send(.refresh)
+                }
+                
+            case .sheet:
+                return .none
             }
         }
+        .ifLet(\.$sheet, action: \.sheet)
+    }
+}
+
+// MARK: - Sheet
+
+extension TodayQuestionFeature {
+    
+    @Reducer(state: .equatable)
+    enum Sheet {
+        case seeMore(SeeMoreSheetFeature)
     }
 }
 
