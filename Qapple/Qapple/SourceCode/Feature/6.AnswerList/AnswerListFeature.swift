@@ -16,6 +16,7 @@ struct AnswerListFeature {
         var answerList: [Answer] = []
         var totalCount: QappleAPI.TotalCount = 0
         var paginationInfo = QappleAPI.PaginationInfo(threshold: "", hasNext: false)
+        @Presents var sheet: Sheet.State?
     }
     
     enum Action {
@@ -33,9 +34,10 @@ struct AnswerListFeature {
         )
         case seeMoreAction(Answer)
         case backButtonTapped
+        case sheet(PresentationAction<Sheet.Action>)
     }
     
-    @Dependency(\.answerRepository.fetchAnswerListOfQuestion) var fetchAnswerListOfQuestion
+    @Dependency(\.answerRepository) var answerRepository
     
     var body: some ReducerOf<Self> {
         Reduce {
@@ -45,9 +47,8 @@ struct AnswerListFeature {
             case .onAppear, .refresh:
                 return .run { [question = state.question] send in
                     do {
-                        let response = try await fetchAnswerListOfQuestion(
-                            question.id,
-                            nil
+                        let response = try await answerRepository.fetchAnswerListOfQuestion(
+                            question.id, nil
                         )
                         await send(
                             .answerListResponse(
@@ -63,7 +64,7 @@ struct AnswerListFeature {
                 
             case .pagination:
                 return .run { [state = state]  send in
-                    let response = try await fetchAnswerListOfQuestion(
+                    let response = try await answerRepository.fetchAnswerListOfQuestion(
                         state.question.id,
                         state.paginationInfo.threshold
                     )
@@ -82,11 +83,45 @@ struct AnswerListFeature {
                 return .none
                 
             case let .seeMoreAction(answer):
+                state.sheet = .seeMore(
+                    .init(
+                        sheetTarget: answer.isMine ? .mine : .others,
+                        sheetData: .answer(answer)
+                    )
+                )
                 return .none
                 
-            case .backButtonTapped:
+            case let .sheet(.presented(.seeMore(.alert(.presented(.confirmDeletion(sheetData)))))):
+                guard case let .answer(answer) = sheetData else { return .none }
+                return .run { send in
+                    do {
+                        try await answerRepository.deleteAnswer(answer.id)
+                        await send(.sheet(.presented(.seeMore(.completionDeletion))))
+                    } catch {
+                        print(error)
+                    }
+                }
+                
+            case .sheet(.presented(.seeMore(.alert(.presented(.confirmCompletion))))):
+                state.sheet = nil
+                return .run { send in
+                    await send(.refresh)
+                }
+                
+            case .backButtonTapped, .sheet:
                 return .none
             }
         }
+        .ifLet(\.$sheet, action: \.sheet)
+    }
+}
+
+// MARK: - Sheet
+
+extension AnswerListFeature {
+    
+    @Reducer(state: .equatable)
+    enum Sheet {
+        case seeMore(SeeMoreSheetFeature)
     }
 }

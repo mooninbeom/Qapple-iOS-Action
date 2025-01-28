@@ -40,7 +40,7 @@ struct SeeMoreSheetFeature {
                 return .none
                 
             case .completionDeletion:
-                state.alert = .completion(from: state.sheetData)
+                state.alert = .deletionComplete(from: state.sheetData)
                 return .none
                 
             case .alert:
@@ -90,7 +90,7 @@ extension AlertState where Action == SeeMoreSheetFeature.Action.Alert {
     }
     
     /// 삭제 완료
-    static func completion(from sheetData: SeeMoreSheetFeature.SheetData) -> Self {
+    static func deletionComplete(from sheetData: SeeMoreSheetFeature.SheetData) -> Self {
         let targetText = sheetData == .bulletinBoard ? "게시글" : "답변"
         return Self {
             TextState("\(targetText)이 삭제되었어요")

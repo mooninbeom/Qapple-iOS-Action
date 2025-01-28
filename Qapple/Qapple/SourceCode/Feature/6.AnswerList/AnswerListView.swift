@@ -10,7 +10,7 @@ import SwiftUI
 
 struct AnswerListView: View {
     
-    let store: StoreOf<AnswerListFeature>
+    @Bindable var store: StoreOf<AnswerListFeature>
     
     var body: some View {
         VStack(spacing: 0) {
@@ -34,6 +34,14 @@ struct AnswerListView: View {
         }
         .refreshable {
             store.send(.refresh)
+        }
+        .sheet(item: $store.scope(
+            state: \.sheet,
+            action: \.sheet)
+        ) { store in
+            switch store.case {
+            case let .seeMore(store): SeeMoreSheet(store: store)
+            }
         }
     }
 }
