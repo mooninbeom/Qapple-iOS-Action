@@ -16,13 +16,18 @@ struct BulletinBoardSearchFeature {
     }
     
     enum Action {
-        
+        case backButtonTapped
     }
+    
+    @Dependency(\.dismiss) var dismiss
     
     var body: some ReducerOf<Self> {
         Reduce { state, action in
             switch action {
-                
+            case .backButtonTapped:
+                return .run { _ in
+                    await self.dismiss()
+                }
             }
         }
     }

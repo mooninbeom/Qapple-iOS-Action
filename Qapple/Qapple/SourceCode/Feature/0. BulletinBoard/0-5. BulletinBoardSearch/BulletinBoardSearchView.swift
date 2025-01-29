@@ -19,7 +19,7 @@ struct BulletinBoardSearchView: View {
         GeometryReader { proxy in
             ZStack {
                 VStack(spacing: 0) {
-                    NavigationBar()
+                    NavigationBar(store: store)
                     
                     SearchBar(searchText: $bulletinBoardUseCase.searchText)
                         .padding(.horizontal, 16)
@@ -60,6 +60,8 @@ struct BulletinBoardSearchView: View {
 
 private struct NavigationBar: View {
     
+    let store: StoreOf<BulletinBoardSearchFeature>
+    
     @EnvironmentObject private var pathModel: Router
     @Environment(\.dismiss) private var dismiss
     
@@ -67,7 +69,7 @@ private struct NavigationBar: View {
         CustomNavigationBar(
             leadingView: {
                 CustomNavigationBackButton(buttonType: .arrow) {
-                    dismiss()
+                    store.send(.backButtonTapped)
                 }
             },
             principalView: {
