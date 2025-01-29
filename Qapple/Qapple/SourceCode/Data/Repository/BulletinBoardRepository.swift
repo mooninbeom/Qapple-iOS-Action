@@ -14,7 +14,7 @@ struct BulletinBoardRepository {
     var postBoard: (_ content: String) async throws -> PostBoardDTO
     var fetchSingleBoard: (_ boardId: Int) async throws -> BulletinBoard
     var deleteBoard: (_ boardId: Int) async throws -> DeleteBoardDTO
-    var likeBoard: (_ boardId: Int) async throws -> LikeBoardDTO
+    var likeBoard: (_ boardId: Int) async throws -> Void
     var searchBoard: (_ keyword: String?, _ threshold: Int?) async throws -> ([BulletinBoard], QappleAPI.PaginationInfo)
 }
 

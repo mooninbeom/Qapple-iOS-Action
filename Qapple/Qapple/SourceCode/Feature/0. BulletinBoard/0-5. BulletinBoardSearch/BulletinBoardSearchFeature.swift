@@ -25,6 +25,7 @@ struct BulletinBoardSearchFeature {
         case fetchSearchBoard(([BulletinBoard], QappleAPI.PaginationInfo))
         
         case backButtonTapped
+        case likeBoardButtonTapped(Int)
         case setSearchText(String)
         case cancelSearchDebounce
         case performSearch(String)
@@ -75,6 +76,21 @@ struct BulletinBoardSearchFeature {
             case .backButtonTapped:
                 return .run { _ in
                     await self.dismiss()
+                }
+                
+            case let .likeBoardButtonTapped(boardId):
+                if let index = state.searchBoardList.firstIndex(where: {$0.id == boardId}) {
+                    state.searchBoardList[index].isLiked.toggle()
+                    state.searchBoardList[index].heartCount += state.searchBoardList[index].isLiked ? 1 : -1
+                }
+                return .run { send in
+                    await send(.toggleLoading(true), animation: .bouncy)
+                    do {
+                        try await bulletinBoardRepository.likeBoard(boardId)
+                    } catch {
+                        print(error)
+                    }
+                    await send(.toggleLoading(false), animation: .bouncy)
                 }
                 
             case let .setSearchText(searchText):

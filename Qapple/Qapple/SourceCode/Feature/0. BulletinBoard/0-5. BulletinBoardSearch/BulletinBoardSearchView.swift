@@ -105,7 +105,7 @@ private struct SearchListView: View {
                             bulletinBoardStore.send(.ellipsisButtonTapped(board.id, board.isMine))
                         },
                         like: {
-                            bulletinBoardStore.send(.likeBoardButtonTapped(board.id))
+                            store.send(.likeBoardButtonTapped(board.id))
                         }
                     )
                     .onAppear {

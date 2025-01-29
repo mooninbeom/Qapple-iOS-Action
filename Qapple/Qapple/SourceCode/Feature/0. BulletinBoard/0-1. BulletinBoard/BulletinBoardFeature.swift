@@ -120,7 +120,7 @@ struct BulletinBoardFeature {
                 }
                 return .run { send in
                     do {
-                        let _ = try await bulletinBoardRepository.likeBoard(boardId)
+                        try await bulletinBoardRepository.likeBoard(boardId)
                         await send(.StopLoading)
                     } catch {
                         print(error)

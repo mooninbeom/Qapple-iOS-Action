@@ -106,12 +106,11 @@ extension BulletinBoardRepository {
     }
     
     /// 게시글 좋아요/취소
-    static func makeLikeBoard() -> (_ boardId: Int) async throws -> LikeBoardDTO {
+    static func makeLikeBoard() -> (_ boardId: Int) async throws -> Void {
         return { boardId in
             let url = try QappleAPI.Board.like(boardId: boardId).url()
             let requestBody: LikeBoardRequest = LikeBoardRequest(boardId: boardId)
             let response: BaseResponse<LikeBoardDTO> = try await NetworkService.shared.post(url: url, body: requestBody)
-            return response.result
         }
     }
     
