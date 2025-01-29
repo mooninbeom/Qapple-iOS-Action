@@ -27,7 +27,6 @@ struct BulletinBoardSearchFeature {
         case backButtonTapped
         case likeBoardButtonTapped(Int)
         case setSearchText(String)
-        case cancelSearchDebounce
         case performSearch(String)
         case toggleLoading(Bool)
     }
@@ -106,9 +105,6 @@ struct BulletinBoardSearchFeature {
                     }
                         .cancellable(id: "searchDebounce", cancelInFlight: true)
                 )
-                
-            case .cancelSearchDebounce:
-                return .cancel(id: "searchDebounce")
                 
             case let .performSearch(searchText):
                 guard !searchText.isEmpty else { return .none }
