@@ -25,7 +25,7 @@ struct BulletinBoardSearchView: View {
                     SearchBar(store: store)
                         .padding(.horizontal, 16)
                     
-                    if !bulletinBoardUseCase.state.searchPosts.isEmpty {
+                    if !store.searchBoardList.isEmpty {
                         SearchListView(store: store, bulletinBoardStore: bulletinBoardStore)
                     } else {
                         NoResultView()
@@ -103,7 +103,7 @@ private struct SearchListView: View {
     @State private var selectedPost: Post?
     
     private var searchBoardList: [BulletinBoard] {
-        store.searchBoard.filter { !$0.isReported }
+        store.searchBoardList.filter { !$0.isReported }
     }
     
     var body: some View {
@@ -120,21 +120,20 @@ private struct SearchListView: View {
                         }
                     )
                     .onAppear {
-                        if index == store.searchBoard.count - 1 && store.hasNext {
+                        if index == store.searchBoardList.count - 1 && store.hasNext {
                             print("게시판 검색 페이지네이션")
-                            // TODO: 검색 게시글 갱신
+                            store.send(.getSearchBoard)
                         }
                     }
                     .onTapGesture {
-                        // TODO: Navigation처리된 액션 삽입
+                        bulletinBoardStore.send(.postBoardButtonTapped)
                     }
                 }
             }
         }
         .scrollDismissesKeyboard(.immediately)
         .refreshable {
-            // TODO: 리프레쉬 넣기
-//            bulletinBoardUseCase.effect(.refreshSearchPost(keyword: bulletinBoardUseCase.searchText))
+            store.send(.refreshSearBoard)
         }
         .sheet(item: $bulletinBoardStore.scope(state: \.sheet?.ellipsisButtonTap, action: \.sheet.ellipsisButtonTap)
         ) { ellipsisStore in
