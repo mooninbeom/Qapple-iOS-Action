@@ -20,7 +20,7 @@ struct BulletinSearchView: View {
                 VStack(spacing: 0) {
                     NavigationBar()
                     
-                    SearchBar(searchText: $bulletinBoardUseCase.searchText)
+                    LagacySearchBar(searchText: $bulletinBoardUseCase.searchText)
                         .padding(.horizontal, 16)
                     
                     if !bulletinBoardUseCase.state.searchPosts.isEmpty {

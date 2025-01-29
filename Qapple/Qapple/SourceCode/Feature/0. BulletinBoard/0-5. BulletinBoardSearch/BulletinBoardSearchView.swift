@@ -21,7 +21,7 @@ struct BulletinBoardSearchView: View {
                 VStack(spacing: 0) {
                     NavigationBar(store: store)
                     
-                    SearchBar(searchText: $bulletinBoardUseCase.searchText)
+                    SearchBar(store: store)
                         .padding(.horizontal, 16)
                     
                     if !bulletinBoardUseCase.state.searchPosts.isEmpty {
@@ -79,6 +79,23 @@ private struct NavigationBar: View {
             },
             trailingView: {},
             backgroundColor: Background.first)
+    }
+}
+
+// MARK: - SearchBar
+
+private struct SearchBar: View {
+    
+    @Bindable var store: StoreOf<BulletinBoardSearchFeature>
+    
+    var body: some View {
+        HStack(spacing: 6) {
+            TextField("검색어를 입력해주세요", text: $store.searchText.sending(\.setSearchText))
+                .pretendard(.semiBold, 15)
+        }
+        .padding(14)
+        .background(GrayScale.secondaryButton)
+        .clipShape(RoundedRectangle(cornerRadius: 10))
     }
 }
 

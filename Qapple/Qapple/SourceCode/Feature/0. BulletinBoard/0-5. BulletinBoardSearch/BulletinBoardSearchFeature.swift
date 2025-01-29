@@ -13,10 +13,12 @@ struct BulletinBoardSearchFeature {
     @ObservableState
     struct State: Equatable {
         var isLoading = false
+        var searchText: String = ""
     }
     
     enum Action {
         case backButtonTapped
+        case setSearchText(String)
     }
     
     @Dependency(\.dismiss) var dismiss
@@ -28,6 +30,10 @@ struct BulletinBoardSearchFeature {
                 return .run { _ in
                     await self.dismiss()
                 }
+                
+            case let .setSearchText(searchText):
+                state.searchText = searchText
+                return .none
             }
         }
     }
