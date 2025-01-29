@@ -13,14 +13,11 @@ struct BulletinBoardSearchView: View {
     @Bindable var store: StoreOf<BulletinBoardSearchFeature>
     let bulletinBoardStore: StoreOf<BulletinBoardFeature>
     
-    @EnvironmentObject private var pathModel: Router
-    @EnvironmentObject private var bulletinBoardUseCase: BulletinBoardUseCase
-    
     var body: some View {
         GeometryReader { proxy in
             ZStack {
                 VStack(spacing: 0) {
-                    NavigationBar(store: store)
+                    SearchNavigationBar(store: store)
                     
                     SearchBar(store: store)
                         .padding(.horizontal, 16)
@@ -47,14 +44,11 @@ struct BulletinBoardSearchView: View {
     }
 }
 
-// MARK: - NavigationBar
+// MARK: - SearchNavigationBar
 
-private struct NavigationBar: View {
+private struct SearchNavigationBar: View {
     
     let store: StoreOf<BulletinBoardSearchFeature>
-    
-    @EnvironmentObject private var pathModel: Router
-    @Environment(\.dismiss) private var dismiss
     
     var body: some View {
         CustomNavigationBar(
@@ -96,11 +90,6 @@ private struct SearchListView: View {
     
     @Bindable var store: StoreOf<BulletinBoardSearchFeature>
     @Bindable var bulletinBoardStore: StoreOf<BulletinBoardFeature>
-    
-    @EnvironmentObject private var pathModel: Router
-    @EnvironmentObject private var bulletinBoardUseCase: BulletinBoardUseCase
-    
-    @State private var selectedPost: Post?
     
     private var searchBoardList: [BulletinBoard] {
         store.searchBoardList.filter { !$0.isReported }
