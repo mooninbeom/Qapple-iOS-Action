@@ -11,6 +11,7 @@ import ComposableArchitecture
 struct BulletinBoardSearchView: View {
     
     @Bindable var store: StoreOf<BulletinBoardSearchFeature>
+    let bulletinBoardStore: StoreOf<BulletinBoardFeature>
     
     @EnvironmentObject private var pathModel: Router
     @EnvironmentObject private var bulletinBoardUseCase: BulletinBoardUseCase
@@ -25,7 +26,7 @@ struct BulletinBoardSearchView: View {
                         .padding(.horizontal, 16)
                     
                     if !bulletinBoardUseCase.state.searchPosts.isEmpty {
-                        SearchListView(searchText: bulletinBoardUseCase.searchText)
+                        SearchListView(store: store, bulletinBoardStore: bulletinBoardStore)
                     } else {
                         NoResultView()
                     }
@@ -42,16 +43,6 @@ struct BulletinBoardSearchView: View {
         }
         .onTapGesture {
             hideKeyboard()
-        }
-        .onChange(of: bulletinBoardUseCase.searchText) { _, newValue in
-            bulletinBoardUseCase.state.searchTheshold = nil
-            bulletinBoardUseCase.state.searchPosts.removeAll()
-            print("아하!")
-            if newValue.isEmpty {
-                bulletinBoardUseCase.isLoading = false
-            } else {
-                bulletinBoardUseCase.isLoading = true
-            }
         }
     }
 }
@@ -103,56 +94,53 @@ private struct SearchBar: View {
 
 private struct SearchListView: View {
     
+    @Bindable var store: StoreOf<BulletinBoardSearchFeature>
+    @Bindable var bulletinBoardStore: StoreOf<BulletinBoardFeature>
+    
     @EnvironmentObject private var pathModel: Router
     @EnvironmentObject private var bulletinBoardUseCase: BulletinBoardUseCase
     
     @State private var selectedPost: Post?
     
-    let searchText: String
-    
-    private var searchPostList: [Post] {
-        bulletinBoardUseCase.state.searchPosts.filter { !$0.isReported }
+    private var searchBoardList: [BulletinBoard] {
+        store.searchBoard.filter { !$0.isReported }
     }
     
     var body: some View {
         ScrollView {
             LazyVStack(spacing: 0) {
-                ForEach(Array(searchPostList.enumerated()), id: \.offset) { index, post in
-                    LegacyBulletinBoardCell(
-                        post: post,
-                        seeMoreAction: {
-                            selectedPost = post
+                ForEach(Array(searchBoardList.enumerated()), id: \.offset) { index, board in
+                    BulletinBoardCell(
+                        board: board,
+                        ellipsis: {
+                            bulletinBoardStore.send(.ellipsisButtonTapped(board.id, board.isMine))
+                        },
+                        like: {
+                            bulletinBoardStore.send(.likeBoardButtonTapped(board.id))
                         }
                     )
                     .onAppear {
-                        if index == bulletinBoardUseCase.state.searchPosts.count - 1 && bulletinBoardUseCase.state.searchHasNext {
+                        if index == store.searchBoard.count - 1 && store.hasNext {
                             print("게시판 검색 페이지네이션")
-                            bulletinBoardUseCase.effect(.searchPost(keyword: bulletinBoardUseCase.searchText))
+                            // TODO: 검색 게시글 갱신
                         }
                     }
                     .onTapGesture {
-                        if !post.isReported {
-                            pathModel.pushView(screen: BulletinBoardPathType.comment(post: post))
-                            bulletinBoardUseCase.isClickComment = true
-                        } else {
-                            HapticService.notification(type: .warning)
-                        }
+                        // TODO: Navigation처리된 액션 삽입
                     }
                 }
             }
         }
         .scrollDismissesKeyboard(.immediately)
         .refreshable {
-            bulletinBoardUseCase.effect(.refreshSearchPost(keyword: bulletinBoardUseCase.searchText))
+            // TODO: 리프레쉬 넣기
+//            bulletinBoardUseCase.effect(.refreshSearchPost(keyword: bulletinBoardUseCase.searchText))
         }
-        .sheet(item: $selectedPost) { post in
-            BulletinBoardSeeMoreSheetView(
-                sheetType: post.isMine ? .mine : .others,
-                post: post,
-                isComment: false
-            )
-            .presentationDetents([.height(84)])
-            .presentationDragIndicator(.visible)
+        .sheet(item: $bulletinBoardStore.scope(state: \.sheet?.ellipsisButtonTap, action: \.sheet.ellipsisButtonTap)
+        ) { ellipsisStore in
+            BulletinBoardEllipsisView(store: ellipsisStore)
+                .presentationDetents([.height(84)])
+                .presentationDragIndicator(.visible)
         }
     }
 }
@@ -175,5 +163,7 @@ private struct NoResultView: View {
 #Preview {
     BulletinBoardSearchView(store: Store(initialState: BulletinBoardSearchFeature.State()){
         BulletinBoardSearchFeature()
+    }, bulletinBoardStore: Store(initialState: BulletinBoardFeature.State()){
+        BulletinBoardFeature()
     })
 }
