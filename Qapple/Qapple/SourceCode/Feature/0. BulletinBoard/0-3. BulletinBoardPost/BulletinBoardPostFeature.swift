@@ -63,7 +63,7 @@ struct BulletinBoardPostFeature {
                 return .none
                 
             case .cancelButtonTapped:
-                if state.content == "" {
+                if state.content.isEmpty {
                     // TODO: Navigation 처리
                 } else {
                     state.alert = .confirmCancel
