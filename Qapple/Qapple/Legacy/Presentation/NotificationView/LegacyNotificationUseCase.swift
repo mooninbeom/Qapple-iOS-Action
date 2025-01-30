@@ -7,7 +7,7 @@
 
 import Foundation
 
-final class NotificationUseCase: ObservableObject {
+final class LegacyNotificationUseCase: ObservableObject {
     
     @Published var state: State
     
@@ -22,10 +22,10 @@ final class NotificationUseCase: ObservableObject {
 
 // MARK: - State
 
-extension NotificationUseCase {
+extension LegacyNotificationUseCase {
     
     struct State {
-        var notificationList: [QappleNoti] = []
+        var notificationList: [LegacyQappleNoti] = []
         var isLoading: Bool = true
         var threshold: Int?
         var hasNext: Bool = false
@@ -34,7 +34,7 @@ extension NotificationUseCase {
 
 // MARK: - UseCase Method
 
-extension NotificationUseCase {
+extension LegacyNotificationUseCase {
     
     @MainActor
     func fetchNotificationList() {
@@ -50,7 +50,7 @@ extension NotificationUseCase {
                 )
                 
                 state.notificationList += response.content.map {
-                    QappleNoti(
+                    LegacyQappleNoti(
                         questionId: $0.questionId ?? "",
                         boardId: $0.boardId ?? "",
                         boardCommentId: $0.boardCommentId,
@@ -90,7 +90,7 @@ extension NotificationUseCase {
                 
                 state.notificationList.removeAll()
                 state.notificationList += notificationList.content.map {
-                    QappleNoti(
+                    LegacyQappleNoti(
                         questionId: $0.questionId ?? "",
                         boardId: $0.boardId ?? "",
                         boardCommentId: $0.boardCommentId,

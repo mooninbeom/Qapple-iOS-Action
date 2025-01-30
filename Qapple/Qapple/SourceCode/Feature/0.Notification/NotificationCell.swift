@@ -2,13 +2,15 @@
 //  NotificationCell.swift
 //  Qapple
 //
-//  Created by Simmons on 8/15/24.
+//  Created by 문인범 on 1/26/25.
 //
 
 import SwiftUI
+import ComposableArchitecture
+
 
 struct NotificationCell: View {
-    let notification: QappleNoti
+    let notification: QappleNotification
     let seeMoreAction: () -> Void
     
     var body: some View {
@@ -25,11 +27,12 @@ struct NotificationCell: View {
     }
 }
 
+
 // MARK: - TitleView
 
 private struct TitleView: View {
     
-    let notification: QappleNoti
+    let notification: QappleNotification
     
     var body: some View {
         HStack(spacing: 8) {
@@ -48,11 +51,12 @@ private struct TitleView: View {
     }
 }
 
+
 // MARK: - ContentView
 
 private struct ContentView: View {
     
-    let notification: QappleNoti
+    let notification: QappleNotification
     
     var body: some View {
         VStack(alignment: .leading, spacing: 4) {
@@ -77,22 +81,5 @@ struct PressableButtonStyle: ButtonStyle {
             .padding(.vertical, 24)
             .background(configuration.isPressed ? .white.opacity(0.05) : Background.first)
             .animation(.none, value: configuration.isPressed)
-    }
-}
-
-#Preview {
-    NotificationCell(
-        notification: .init(
-            questionId: "",
-            boardId: "0",
-            boardCommentId: "0",
-            title: "누군가가 내 게시글에 좋아요 누름!",
-            subtitle: "와 진짜?",
-            content: "대박박",
-            createAt: .now,
-            isReadStatus: false
-        )
-    ) {
-        print("해당 답변")
     }
 }
