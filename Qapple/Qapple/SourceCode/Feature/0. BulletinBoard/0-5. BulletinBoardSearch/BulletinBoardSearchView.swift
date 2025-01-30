@@ -47,16 +47,12 @@ private struct SearchNavigationBar: View {
     
     var body: some View {
         NavigationBar(
+            title: "검색하기",
             backgroundColor: Background.first,
             leadingView: {
                 CustomNavigationBackButton(buttonType: .arrow) {
                     store.send(.backButtonTapped)
                 }
-            },
-            centerView: {
-                Text("검색하기")
-                    .font(Font.pretendard(.semiBold, size: 17))
-                    .foregroundStyle(TextLabel.main)
             })
     }
 }

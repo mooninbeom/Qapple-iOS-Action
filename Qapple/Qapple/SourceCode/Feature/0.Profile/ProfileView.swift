@@ -24,12 +24,8 @@ struct ProfileView: View {
             
             VStack(alignment: .leading, spacing: 0) {
                 NavigationBar(
-                    backgroundColor: Background.second,
-                    centerView: {
-                        Text("프로필")
-                            .font(Font.pretendard(.semiBold, size: 15))
-                            .foregroundStyle(TextLabel.main)
-                    }
+                    title: "프로필",
+                    backgroundColor: Background.second
                 )
                 
                 ProfileSummary(store: store)
