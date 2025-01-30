@@ -23,7 +23,14 @@ struct ProfileView: View {
                 .ignoresSafeArea()
             
             VStack(alignment: .leading, spacing: 0) {
-                NaviBar()
+                NavigationBar(
+                    backgroundColor: Background.second,
+                    centerView: {
+                        Text("프로필")
+                            .font(Font.pretendard(.semiBold, size: 15))
+                            .foregroundStyle(TextLabel.main)
+                    }
+                )
                 
                 MyProfileSummary(
                     nickname: viewModel.myPageInfo.nickname,
@@ -50,26 +57,6 @@ struct ProfileView: View {
             }
             .loadingIndicator(isLoading: store.isLoading)
         }
-    }
-}
-
-// MARK: - NavigationBar
-
-private struct NaviBar: View {
-    
-    @EnvironmentObject private var pathModel: Router
-    @EnvironmentObject private var viewModel: MyPageViewModel
-    
-    var body: some View {
-        LegacyNavigationBar(
-            leadingView: {},
-            centerView: {
-                Text("프로필")
-                    .font(Font.pretendard(.semiBold, size: 15))
-                    .foregroundStyle(TextLabel.main)
-            },
-            trailingView: {},
-            backgroundColor: Background.second)
     }
 }
 

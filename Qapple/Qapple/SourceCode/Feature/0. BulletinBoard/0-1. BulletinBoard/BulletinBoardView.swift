@@ -52,7 +52,35 @@ private struct BoardView: View {
     
     var body: some View {
         VStack(spacing: 0) {
-            CustomTabBar(store: store)
+            NavigationBar(
+                title: "게시판",
+                trailingView: {
+                    HStack(spacing: 12) {
+                        Spacer()
+                        
+                        Button {
+                            store.send(.notificationButtonTapped)
+                        } label: {
+                            Image(.noticeIcon)
+                                .resizable()
+                                .scaledToFill()
+                                .foregroundColor(GrayScale.icon)
+                                .frame(width: 26 , height: 26)
+                        }
+                        
+                        Button {
+                            store.send(.searchButtonTapped)
+                        } label: {
+                            Image(.search)
+                                .resizable()
+                                .scaledToFill()
+                                .foregroundColor(GrayScale.icon)
+                                .frame(width: 26 , height: 26)
+                        }
+                    }
+                    .padding(.trailing, 8)
+                }
+            )
             
             AcademyPlanDayCounter(
                 academyEvents: store.academyEvents
@@ -66,44 +94,6 @@ private struct BoardView: View {
             Spacer()
                 .frame(height: 2)
         }
-    }
-}
-
-// MARK: - 커스텀 탭바
-private struct CustomTabBar: View {
-    
-    let store: StoreOf<BulletinBoardFeature>
-    
-    var body: some View {
-        NavigationBar(
-            title: "게시판",
-            trailingView: {
-                HStack(spacing: 12) {
-                    Spacer()
-                    
-                    Button {
-                        store.send(.notificationButtonTapped)
-                    } label: {
-                        Image(.noticeIcon)
-                            .resizable()
-                            .scaledToFill()
-                            .foregroundColor(GrayScale.icon)
-                            .frame(width: 26 , height: 26)
-                    }
-                    
-                    Button {
-                        store.send(.searchButtonTapped)
-                    } label: {
-                        Image(.search)
-                            .resizable()
-                            .scaledToFill()
-                            .foregroundColor(GrayScale.icon)
-                            .frame(width: 26 , height: 26)
-                    }
-                }
-                .padding(.trailing, 8)
-            }
-        )
     }
 }
 

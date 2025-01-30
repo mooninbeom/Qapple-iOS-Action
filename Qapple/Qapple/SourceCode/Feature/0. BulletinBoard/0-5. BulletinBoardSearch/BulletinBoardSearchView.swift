@@ -57,8 +57,7 @@ private struct SearchNavigationBar: View {
                 Text("검색하기")
                     .font(Font.pretendard(.semiBold, size: 17))
                     .foregroundStyle(TextLabel.main)
-            },
-            trailingView: {})
+            })
     }
 }
 
