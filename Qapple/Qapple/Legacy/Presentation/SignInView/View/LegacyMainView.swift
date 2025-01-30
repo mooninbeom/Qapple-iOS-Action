@@ -7,7 +7,7 @@
 
 import SwiftUI
 
-struct MainView: View {
+struct LegacyMainView: View {
     
     @ObservedObject private(set) var authViewModel: AuthViewModel
     @StateObject private var pathModel: PathModel = .init()
@@ -21,7 +21,7 @@ struct MainView: View {
                     .environmentObject(pathModel)
                     .environmentObject(authViewModel)
             } else {
-                SignInView()
+                LegacySignInView()
                     .environmentObject(pathModel)
                     .environmentObject(authViewModel)
                     .onAppear {
@@ -256,7 +256,7 @@ private struct HomeView: View {
 }
 
 // MARK: - 로그인 뷰
-private struct SignInView: View {
+private struct LegacySignInView: View {
     
     @EnvironmentObject var pathModel: PathModel
     @EnvironmentObject var authViewModel: AuthViewModel
@@ -421,5 +421,5 @@ private struct CustomTabBar: View {
 }
 
 #Preview {
-    MainView(authViewModel: .init())
+    LegacyMainView(authViewModel: .init())
 }

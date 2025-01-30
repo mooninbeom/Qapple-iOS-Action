@@ -13,13 +13,21 @@ struct QappleApp: App {
     
     @UIApplicationDelegateAdaptor private var appDelegate: AppDelegate
     
-    let store = Store(initialState: RootFeature.State()) {
-        RootFeature()
+    private let mainStore = Store(initialState: MainFeature.State()) {
+        MainFeature()
+    }
+    
+    private let signUpStore = Store(initialState: SignUpFeature.State()) {
+        SignUpFeature()
     }
     
     var body: some Scene {
         WindowGroup {
-            RootView(store: store)
+            if signUpStore.isSignIn {
+                MainView(store: mainStore)
+            } else {
+                SignUpView(store: signUpStore)
+            }
         }
     }
 }

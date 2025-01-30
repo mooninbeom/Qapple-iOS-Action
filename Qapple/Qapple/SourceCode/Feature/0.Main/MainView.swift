@@ -1,5 +1,5 @@
 //
-//  RootView.swift
+//  MainView.swift
 //  Qapple
 //
 //  Created by 김민준 on 1/20/25.
@@ -8,9 +8,9 @@
 import ComposableArchitecture
 import SwiftUI
 
-struct RootView: View {
+struct MainView: View {
     
-    @Bindable var store: StoreOf<RootFeature>
+    @Bindable var store: StoreOf<MainFeature>
     
     var body: some View {
         NavigationStack(path: $store.scope(state: \.path, action: \.path)) {
@@ -44,7 +44,7 @@ struct RootView: View {
 // MARK: - Preview
 
 #Preview {
-    RootView(store: Store(initialState: RootFeature.State()) {
-        RootFeature()
+    MainView(store: Store(initialState: MainFeature.State()) {
+        MainFeature()
     })
 }
