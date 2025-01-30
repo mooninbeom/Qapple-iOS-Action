@@ -143,7 +143,7 @@ enum QappleAPI {
                 appending(baseString: "\(boardId)/heart")
                 
             case let .search(keyword, threshold, pageSize):
-                appending(urlQueryItems: [
+                appending(baseString: "search", urlQueryItems: [
                     .init(key: "keyword", value: keyword),
                     .init(key: "threshold", value: threshold),
                     .init(key: "pageSize", value: pageSize),

@@ -9,7 +9,7 @@ import SwiftUI
 
 // MARK: - SearchBar
 
-struct SearchBar: View {
+struct LagacySearchBar: View {
     
     @Binding private(set) var searchText: String
     
@@ -25,5 +25,5 @@ struct SearchBar: View {
 }
 
 #Preview {
-    SearchBar(searchText: .constant(""))
+    LagacySearchBar(searchText: .constant(""))
 }

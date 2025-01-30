@@ -8,7 +8,7 @@
 import SwiftUI
 import ComposableArchitecture
 
-// MARK: - BulletinBoardSeeMoreSheetView
+// MARK: - BulletinBoardEllipsisView
 
 struct BulletinBoardEllipsisView: View {
     
