@@ -8,7 +8,7 @@
 import SwiftUI
 import AuthenticationServices
 
-struct AppleLoginButton: View {
+struct LegacyAppleLoginButton: View {
     
     @EnvironmentObject var pathModel: PathModel
     @EnvironmentObject var authViewModel: AuthViewModel
@@ -37,6 +37,6 @@ struct AppleLoginButton: View {
         Color(Background.first)
             .ignoresSafeArea()
         
-        AppleLoginButton()
+        LegacyAppleLoginButton()
     }
 }

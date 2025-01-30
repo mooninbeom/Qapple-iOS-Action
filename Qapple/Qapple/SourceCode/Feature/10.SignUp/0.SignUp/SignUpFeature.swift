@@ -13,16 +13,29 @@ struct SignUpFeature {
     @ObservableState
     struct State: Equatable {
         var isSignIn = false
+        var socialLogin = SocialLoginFeature.State()
         var path = StackState<Path.State>()
     }
     
     enum Action {
+        case socialLogin(SocialLoginFeature.Action)
         case path(StackActionOf<Path>)
     }
     
     var body: some ReducerOf<Self> {
+        Scope(state: \.socialLogin, action: \.socialLogin) {
+            SocialLoginFeature()
+        }
         Reduce { state, action in
-            return .none
+            switch action {
+            case let .path(stackAction):
+                switch stackAction {
+                default:
+                    return .none
+                }
+            default:
+                return .none
+            }
         }
         .forEach(\.path, action: \.path)
     }

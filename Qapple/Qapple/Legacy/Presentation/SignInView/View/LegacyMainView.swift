@@ -26,7 +26,7 @@ struct LegacyMainView: View {
                     .environmentObject(authViewModel)
                     .onAppear {
                         if authViewModel.isAutoSignInMode {
-                            AppleLoginService.autoLogin { isSingIn in
+                            LegacyAppleLoginService.autoLogin { isSingIn in
                                 if isSingIn {
                                     DispatchQueue.main.async {
                                         authViewModel.isAutoSignInMode = false
@@ -353,7 +353,7 @@ private struct LegacySignInView: View {
             
             Spacer()
             
-            AppleLoginButton()
+            LegacyAppleLoginButton()
                 .disabled(authViewModel.isSignInLoading)
                 .padding(.bottom, 16)
         }

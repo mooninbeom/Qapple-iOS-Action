@@ -13,7 +13,7 @@ struct QuestionRepository {
     var fetchMainQuestion: () async throws -> Question
 }
 
-// MARK: - QuestionRepository
+// MARK: - DependencyKey
 
 extension QuestionRepository: DependencyKey {
     

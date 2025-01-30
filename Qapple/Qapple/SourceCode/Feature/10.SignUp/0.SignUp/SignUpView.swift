@@ -14,7 +14,7 @@ struct SignUpView: View {
     
     var body: some View {
         NavigationStack(path: $store.scope(state: \.path, action: \.path)) {
-            
+            SocialLoginView(store: store.scope(state: \.socialLogin, action: \.socialLogin))
         } destination: { store in
             switch store.case {
             case let .emailForm(store): EmailFormView(store: store)
