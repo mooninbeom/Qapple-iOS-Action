@@ -51,19 +51,19 @@ private struct SearchNavigationBar: View {
     let store: StoreOf<BulletinBoardSearchFeature>
     
     var body: some View {
-        CustomNavigationBar(
+        NavigationBar(
+            backgroundColor: Background.first,
             leadingView: {
                 CustomNavigationBackButton(buttonType: .arrow) {
                     store.send(.backButtonTapped)
                 }
             },
-            principalView: {
+            centerView: {
                 Text("검색하기")
                     .font(Font.pretendard(.semiBold, size: 17))
                     .foregroundStyle(TextLabel.main)
             },
-            trailingView: {},
-            backgroundColor: Background.first)
+            trailingView: {})
     }
 }
 

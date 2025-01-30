@@ -121,7 +121,7 @@ struct BulletinBoardFeature {
                 return .run { send in
                     do {
                         try await bulletinBoardRepository.likeBoard(boardId)
-                        await send(.StopLoading)
+                        await send(.stopLoading)
                     } catch {
                         print(error)
                     }
