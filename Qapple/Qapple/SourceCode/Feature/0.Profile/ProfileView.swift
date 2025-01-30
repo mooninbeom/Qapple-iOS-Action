@@ -32,11 +32,8 @@ struct ProfileView: View {
                     }
                 )
                 
-                MyProfileSummary(
-                    nickname: viewModel.myPageInfo.nickname,
-                    joinDate: viewModel.myPageInfo.joinDate
-                )
-                .padding(.bottom, 24)
+                ProfileSummary(store: store)
+                    .padding(.bottom, 24)
                 
                 MyPageList()
                     .padding(.horizontal, 24)
@@ -57,6 +54,52 @@ struct ProfileView: View {
             }
             .loadingIndicator(isLoading: store.isLoading)
         }
+    }
+}
+
+// MARK: - ProfileSummary
+
+private struct ProfileSummary: View {
+    
+    let store: StoreOf<ProfileFeature>
+    
+    var body: some View {
+        HStack(spacing: 16) {
+            Image(.cappleDefaultProfile)
+                .resizable()
+                .frame(width: 72, height: 72)
+                .background(Color.white)
+                .clipShape(Circle())
+            
+            VStack(alignment: .leading, spacing: 16) {
+                
+                HStack(spacing: 6) {
+                    Text("\(store.nickname)")
+                        .foregroundStyle(TextLabel.main)
+                        .font(Font.pretendard(.bold, size: 20))
+                        .frame(height: 14)
+                    
+                    Button {
+                        store.send(.editProfileButtonTapped)
+//                        pathModel.pushView(
+//                            screen: MyProfilePathType.profileEdit(nickname: viewModel.myPageInfo.nickname)
+//                        )
+                    } label: {
+                        Image(systemName: "gearshape.fill")
+                            .foregroundStyle(GrayScale.icon)
+                    }
+                }
+                
+                Text("\(store.joinDate)")
+                    .foregroundStyle(TextLabel.sub3)
+                    .font(Font.pretendard(.semiBold, size: 14))
+                    .frame(height: 10)
+            }
+            .frame(height: 40)
+            Spacer()
+        }
+        .padding(24)
+        .background(Background.second)
     }
 }
 
