@@ -14,6 +14,7 @@ struct KeychainService {
         case accessToken
         case refreshToken
         case userId
+        case deviceToken
     }
     
     var fetchData: (_ type: KeychainType) throws -> String

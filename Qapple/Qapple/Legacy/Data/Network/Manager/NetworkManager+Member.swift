@@ -19,7 +19,7 @@ extension NetworkManager {
         
         guard let url = URL(string: urlString) else {
             print("Error: cannotCreateURL")
-            throw NetworkError.cannotCreateURL
+            throw LegacyNetworkError.cannotCreateURL
         }
         
         // URLSession 생성
@@ -29,7 +29,7 @@ extension NetworkManager {
         if let response = response as? HTTPURLResponse,
            !(200..<300).contains(response.statusCode) {
             print("Error: badRequest \(response.statusCode)")
-            throw NetworkError.badRequest
+            throw LegacyNetworkError.badRequest
         }
         
         // 디코딩
@@ -39,7 +39,7 @@ extension NetworkManager {
             return decodeData.result
         } catch {
             print("Decode 에러")
-            throw NetworkError.decodeFailed
+            throw LegacyNetworkError.decodeFailed
         }
     }
     
@@ -49,7 +49,7 @@ extension NetworkManager {
         // JSON Request
         guard let requestData = try? JSONEncoder().encode(request) else {
             print("JSON Request 데이터 생성 실패")
-            throw NetworkError.badRequest
+            throw LegacyNetworkError.badRequest
         }
         
         print("요청 데이터: \(request)")
@@ -58,7 +58,7 @@ extension NetworkManager {
         let urlString = ApiEndpoints.basicURLString(path: .signUp)
         guard let url = URL(string: urlString) else {
             print("URL 객체 생성 실패")
-            throw NetworkError.cannotCreateURL
+            throw LegacyNetworkError.cannotCreateURL
         }
         
         // Request 객체 생성
@@ -74,7 +74,7 @@ extension NetworkManager {
         // 에러 체크
         if let response = response as? HTTPURLResponse,
            !(200..<300).contains(response.statusCode) {
-            throw NetworkError.badRequest
+            throw LegacyNetworkError.badRequest
         }
         
         // 디코딩
@@ -84,7 +84,7 @@ extension NetworkManager {
             print("MemberResponse.SignUp: \(decodeData.result)")
             return decodeData.result
         } catch {
-            throw NetworkError.decodeFailed
+            throw LegacyNetworkError.decodeFailed
         }
     }
     
@@ -95,7 +95,7 @@ extension NetworkManager {
         let urlString = ApiEndpoints.basicURLString(path: .resignMember)
         guard let url = URL(string: urlString) else {
             print("Error: cannotCreateURL")
-            throw NetworkError.cannotCreateURL
+            throw LegacyNetworkError.cannotCreateURL
         }
         
         var accessToken = ""
@@ -137,7 +137,7 @@ extension NetworkManager {
         
         guard let url = URL(string: urlString) else {
             print("Error: cannotCreateURL")
-            throw NetworkError.cannotCreateURL
+            throw LegacyNetworkError.cannotCreateURL
         }
         
         // URLSession 생성
@@ -148,7 +148,7 @@ extension NetworkManager {
         if let response = response as? HTTPURLResponse,
            !(200..<300).contains(response.statusCode) {
             print("닉네임 중복 검사 실패")
-            throw NetworkError.badRequest
+            throw LegacyNetworkError.badRequest
         }
         
         // 디코딩
@@ -168,7 +168,7 @@ extension NetworkManager {
         let urlString = ApiEndpoints.basicURLString(path: .myPage)
         guard let url = URL(string: urlString) else {
             print("Error: cannotCreateURL")
-            throw NetworkError.cannotCreateURL
+            throw LegacyNetworkError.cannotCreateURL
         }
         
         var accessToken = ""
@@ -192,7 +192,7 @@ extension NetworkManager {
         if let response = response as? HTTPURLResponse,
            !(200..<300).contains(response.statusCode) {
             print("Error: badRequest")
-            throw NetworkError.badRequest
+            throw LegacyNetworkError.badRequest
         }
         
         // 디코딩
@@ -208,7 +208,7 @@ extension NetworkManager {
         // JSON Request
         guard let requestData = try? JSONEncoder().encode(request) else {
             print("JSON Request 데이터 생성 실패")
-            throw NetworkError.badRequest
+            throw LegacyNetworkError.badRequest
         }
         
         print("요청 데이터: \(request)")
@@ -217,7 +217,7 @@ extension NetworkManager {
         let urlString = ApiEndpoints.basicURLString(path: .myPage)
         guard let url = URL(string: urlString) else {
             print("URL 객체 생성 실패")
-            throw NetworkError.cannotCreateURL
+            throw LegacyNetworkError.cannotCreateURL
         }
         
         var accessToken = ""
@@ -241,7 +241,7 @@ extension NetworkManager {
         // 에러 체크
         if let response = response as? HTTPURLResponse,
            !(200..<300).contains(response.statusCode) {
-            throw NetworkError.badRequest
+            throw LegacyNetworkError.badRequest
         }
         
         // 디코딩
@@ -251,7 +251,7 @@ extension NetworkManager {
             // print("MemberResponse.EditProfile: \(decodeData.result)")
             return decodeData.result
         } catch {
-            throw NetworkError.decodeFailed
+            throw LegacyNetworkError.decodeFailed
         }
     }
 }
@@ -266,7 +266,7 @@ extension NetworkManager {
         let urlString = ApiEndpoints.basicURLString(path: .emailCertification) + "?signUpToken=\(request.signUpToken)" + "&email=\(request.email)"
         guard let url = URL(string: urlString) else {
             print("Error: cannotCreateURL")
-            throw NetworkError.cannotCreateURL
+            throw LegacyNetworkError.cannotCreateURL
         }
         
         // URLSession 생성
@@ -277,7 +277,7 @@ extension NetworkManager {
         if let response = response as? HTTPURLResponse,
            !(200..<300).contains(response.statusCode) {
             print("Error: badRequest")
-            throw NetworkError.badRequest
+            throw LegacyNetworkError.badRequest
         }
         
         // 디코딩
@@ -294,7 +294,7 @@ extension NetworkManager {
         
         guard let url = URL(string: urlString) else {
             print("Error: cannotCreateURL")
-            throw NetworkError.cannotCreateURL
+            throw LegacyNetworkError.cannotCreateURL
         }
         
         // URLSession 생성
@@ -305,7 +305,7 @@ extension NetworkManager {
         if let response = response as? HTTPURLResponse,
            !(200..<300).contains(response.statusCode) {
             print("Error: badRequest")
-            throw NetworkError.badRequest
+            throw LegacyNetworkError.badRequest
         }
         
         // 디코딩

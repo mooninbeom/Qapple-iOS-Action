@@ -19,7 +19,7 @@ extension NetworkManager {
         let urlString = ApiEndpoints.basicURLString(path: .mainQuestion)
         guard let url = URL(string: urlString) else {
             print("Error: cannotCreateURL")
-            throw NetworkError.cannotCreateURL
+            throw LegacyNetworkError.cannotCreateURL
         }
         
         // 토큰 추가
@@ -34,7 +34,7 @@ extension NetworkManager {
         if let response = response as? HTTPURLResponse,
            !(200..<300).contains(response.statusCode) {
             print("Error: badRequest")
-            throw NetworkError.badRequest
+            throw LegacyNetworkError.badRequest
         }
         
         // 디코딩
@@ -44,7 +44,7 @@ extension NetworkManager {
             return decodeData.result
         } catch {
             print("Decode 에러")
-            throw NetworkError.decodeFailed
+            throw LegacyNetworkError.decodeFailed
         }
     }
 }

@@ -16,7 +16,7 @@ extension NetworkManager {
         
         guard let url = URL(string: "\(urlString)/\(boardId)?pageSize=25") else {
             print("잘못된 URL 입니다! in CommentView")
-            throw NetworkError.cannotCreateURL
+            throw LegacyNetworkError.cannotCreateURL
         }
         
         var urlComponent = URLComponents(url: url, resolvingAgainstBaseURL: true)!
@@ -33,7 +33,7 @@ extension NetworkManager {
         
         guard let url = urlComponent.url else {
             print("Error: cannotCreateURL")
-            throw NetworkError.cannotCreateURL
+            throw LegacyNetworkError.cannotCreateURL
         }
         
         print(url)
@@ -48,14 +48,14 @@ extension NetworkManager {
             guard let httpResponse = response as? HTTPURLResponse,
                   httpResponse.statusCode == 200 else {
                 print(response)
-                throw NetworkError.badRequest
+                throw LegacyNetworkError.badRequest
             }
             
             let result = try JSONDecoder().decode(BaseResponse<CommentResponse.Comments>.self, from: data)
             
             return result.result
         } catch {
-            throw NetworkError.badRequest
+            throw LegacyNetworkError.badRequest
         }
     }
     
@@ -65,7 +65,7 @@ extension NetworkManager {
         
         guard let url = URL(string: "\(urlString)/\(id)") else {
             print("잘못된 URL 입니다! in CommentView")
-            throw NetworkError.cannotCreateURL
+            throw LegacyNetworkError.cannotCreateURL
         }
         
         var accessToken = ""
@@ -92,10 +92,10 @@ extension NetworkManager {
             guard let httpResponse = response as? HTTPURLResponse,
                   httpResponse.statusCode == 200 else {
                 print(response)
-                throw NetworkError.badRequest
+                throw LegacyNetworkError.badRequest
             }
         } catch {
-            throw NetworkError.decodeFailed
+            throw LegacyNetworkError.decodeFailed
         }
     }
     
@@ -105,7 +105,7 @@ extension NetworkManager {
         
         guard let url = URL(string: "\(urlString)/\(commentId)") else {
             print("잘못된 URL 입니다! in CommentView")
-            throw NetworkError.cannotCreateURL
+            throw LegacyNetworkError.cannotCreateURL
         }
         
         var accessToken = ""
@@ -127,11 +127,11 @@ extension NetworkManager {
             guard let httpResponse = response as? HTTPURLResponse,
                   httpResponse.statusCode == 200 else {
                 print(response)
-                throw NetworkError.badRequest
+                throw LegacyNetworkError.badRequest
             }
             
         } catch {
-            throw NetworkError.badRequest
+            throw LegacyNetworkError.badRequest
         }
     }
     
@@ -141,7 +141,7 @@ extension NetworkManager {
         
         guard let url = URL(string: "\(urlString)/\(commentId)") else {
             print("잘못된 URL 입니다! in Delete")
-            throw NetworkError.cannotCreateURL
+            throw LegacyNetworkError.cannotCreateURL
         }
         
         var accessToken = ""
@@ -163,11 +163,11 @@ extension NetworkManager {
             guard let httpResponse = response as? HTTPURLResponse,
                   httpResponse.statusCode == 200 else {
                 print(response)
-                throw NetworkError.badRequest
+                throw LegacyNetworkError.badRequest
             }
             
         } catch {
-            throw NetworkError.badRequest
+            throw LegacyNetworkError.badRequest
         }
     }
     
@@ -177,7 +177,7 @@ extension NetworkManager {
         
         guard let url = URL(string: "\(urlString)") else {
             print("잘못된 URL 입니다! in Delete")
-            throw NetworkError.cannotCreateURL
+            throw LegacyNetworkError.cannotCreateURL
         }
         
         var accessToken = ""
@@ -202,11 +202,11 @@ extension NetworkManager {
             guard let httpResponse = response as? HTTPURLResponse,
                   httpResponse.statusCode == 200 else {
                 print(response)
-                throw NetworkError.badRequest
+                throw LegacyNetworkError.badRequest
             }
             
         } catch {
-            throw NetworkError.badRequest
+            throw LegacyNetworkError.badRequest
         }
     }
 }

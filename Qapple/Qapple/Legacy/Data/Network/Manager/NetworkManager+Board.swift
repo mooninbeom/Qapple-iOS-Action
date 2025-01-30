@@ -25,7 +25,7 @@ extension NetworkManager {
         
         guard let url = URL(string: urlString) else {
             print("Error: cannotCreateURL")
-            throw NetworkError.cannotCreateURL
+            throw LegacyNetworkError.cannotCreateURL
         }
         
         // 토큰 추가
@@ -40,7 +40,7 @@ extension NetworkManager {
         if let response = response as? HTTPURLResponse,
            !(200..<300).contains(response.statusCode) {
             print("Error: badRequest")
-            throw NetworkError.badRequest
+            throw LegacyNetworkError.badRequest
         }
         
         // 디코딩
@@ -57,7 +57,7 @@ extension NetworkManager {
         let urlString = ApiEndpoints.basicURLString(path: .boards) + "/\(request.boardId)"
         guard let url = URL(string: urlString) else {
             print("Error: cannotCreateURL")
-            throw NetworkError.cannotCreateURL
+            throw LegacyNetworkError.cannotCreateURL
         }
         
         // 토큰 추가
@@ -72,7 +72,7 @@ extension NetworkManager {
         if let response = response as? HTTPURLResponse,
            !(200..<300).contains(response.statusCode) {
             print("Error: badRequest")
-            throw NetworkError.badRequest
+            throw LegacyNetworkError.badRequest
         }
         
         // 디코딩
@@ -93,7 +93,7 @@ extension NetworkManager {
         
         guard let url = URL(string: urlString) else {
             print("Error: cannotCreateURL")
-            throw NetworkError.cannotCreateURL
+            throw LegacyNetworkError.cannotCreateURL
         }
         
         // 토큰 추가
@@ -108,7 +108,7 @@ extension NetworkManager {
         if let response = response as? HTTPURLResponse,
            !(200..<300).contains(response.statusCode) {
             print("Error: badRequest")
-            throw NetworkError.badRequest
+            throw LegacyNetworkError.badRequest
         }
         
         // 디코딩
@@ -123,14 +123,14 @@ extension NetworkManager {
         // JSON Request
         guard let requestData = try? JSONEncoder().encode(request) else {
             print("JSON Request 데이터 생성 실패")
-            throw NetworkError.badRequest
+            throw LegacyNetworkError.badRequest
         }
         
         // URL 객체 생성
         let urlString = ApiEndpoints.basicURLString(path: .boards)
         guard let url = URL(string: urlString) else {
             print("Error: cannotCreateURL")
-            throw NetworkError.cannotCreateURL
+            throw LegacyNetworkError.cannotCreateURL
         }
         
         // 토큰 추가
@@ -146,7 +146,7 @@ extension NetworkManager {
         if let response = response as? HTTPURLResponse,
            !(200..<300).contains(response.statusCode) {
             print("Error: badRequest")
-            throw NetworkError.badRequest
+            throw LegacyNetworkError.badRequest
         }
         
         // 디코딩
@@ -155,7 +155,7 @@ extension NetworkManager {
             let decodeData = try decoder.decode(BaseResponse<BoardResponse.PostBoard>.self, from: data)
             return decodeData.result
         } catch {
-            throw NetworkError.decodeFailed
+            throw LegacyNetworkError.decodeFailed
         }
     }
     
@@ -165,14 +165,14 @@ extension NetworkManager {
         // JSON Request
         guard let requestData = try? JSONEncoder().encode(request) else {
             print("JSON Request 데이터 생성 실패")
-            throw NetworkError.badRequest
+            throw LegacyNetworkError.badRequest
         }
         
         // URL 객체 생성
         let urlString = ApiEndpoints.basicURLString(path: .boards) + "/\(request.boardId)/heart"
         guard let url = URL(string: urlString) else {
             print("Error: cannotCreateURL")
-            throw NetworkError.cannotCreateURL
+            throw LegacyNetworkError.cannotCreateURL
         }
         
         // 토큰 추가
@@ -193,7 +193,7 @@ extension NetworkManager {
             print(response)
             print(response.statusCode)
             print("Error: badRequest")
-            throw NetworkError.badRequest
+            throw LegacyNetworkError.badRequest
         }
         
         // 디코딩
@@ -202,7 +202,7 @@ extension NetworkManager {
             let decodeData = try decoder.decode(BaseResponse<BoardResponse.LikeBoard>.self, from: data)
             return decodeData.result
         } catch {
-            throw NetworkError.decodeFailed
+            throw LegacyNetworkError.decodeFailed
         }
     }
     
@@ -213,7 +213,7 @@ extension NetworkManager {
         let urlString = ApiEndpoints.basicURLString(path: .boards) + "/\(request.boardId)"
         guard let url = URL(string: urlString) else {
             print("Error: cannotCreateURL")
-            throw NetworkError.cannotCreateURL
+            throw LegacyNetworkError.cannotCreateURL
         }
         
         // 토큰 추가
@@ -228,7 +228,7 @@ extension NetworkManager {
         if let response = response as? HTTPURLResponse,
            !(200..<300).contains(response.statusCode) {
             print("Error: badRequest")
-            throw NetworkError.badRequest
+            throw LegacyNetworkError.badRequest
         }
         
         // 디코딩

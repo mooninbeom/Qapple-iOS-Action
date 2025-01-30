@@ -19,10 +19,16 @@ struct SocialLoginFeature {
     enum Action {
         case appleLoginOnRequest(ASAuthorizationAppleIDRequest)
         case appleLoginOnCompletion(Result<ASAuthorization, Error>)
+        case delegate(Delegate)
+        
+        enum Delegate {
+            case signInResponse(Bool)
+        }
     }
     
     @Dependency(\.appleLoginService) var appleLoginService
     @Dependency(\.keychainService) var keychainService
+    @Dependency(\.memberRepository) var memberRepository
     
     var body: some ReducerOf<Self> {
         Reduce { state, action in
@@ -35,10 +41,16 @@ struct SocialLoginFeature {
                 return .run { send in
                     do {
                         let authCode = try await appleLoginService.loginCompletion(result)
+                        let deviceToken = try keychainService.fetchData(.deviceToken)
+                        let isSignUp = try await memberRepository.signIn(authCode, deviceToken)
+                        await send(.delegate(.signInResponse(isSignUp)))
                     } catch {
                         print(error)
                     }
                 }
+                
+            case .delegate:
+                return .none
             }
         }
     }

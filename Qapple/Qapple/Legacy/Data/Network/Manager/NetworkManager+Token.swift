@@ -16,7 +16,7 @@ extension NetworkManager {
         let urlString = ApiEndpoints.basicURLString(path: .tokenRefresh)
         guard let url = URL(string: urlString) else {
             print("Error: cannotCreateURL")
-            throw NetworkError.cannotCreateURL
+            throw LegacyNetworkError.cannotCreateURL
         }
         
         // 토큰 추가
@@ -31,7 +31,7 @@ extension NetworkManager {
         if let response = response as? HTTPURLResponse,
            !(200..<300).contains(response.statusCode) {
             print("Error: badRequest: \(response.statusCode)")
-            throw NetworkError.badRequest
+            throw LegacyNetworkError.badRequest
         }
         
         // 디코딩

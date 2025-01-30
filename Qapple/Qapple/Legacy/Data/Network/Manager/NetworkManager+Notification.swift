@@ -15,7 +15,7 @@ extension NetworkManager {
         
         let urlString = ApiEndpoints.basicURLString(path: .notifications)
         guard let url = URL(string: urlString) else {
-            throw NetworkError.cannotCreateURL
+            throw LegacyNetworkError.cannotCreateURL
         }
         
         var urlComponent = URLComponents(url: url, resolvingAgainstBaseURL: true)!
@@ -32,7 +32,7 @@ extension NetworkManager {
         
         guard let url = urlComponent.url else {
             print("Error: cannotCreateURL")
-            throw NetworkError.cannotCreateURL
+            throw LegacyNetworkError.cannotCreateURL
         }
         
         print("알림 조회하기: \(url)\n")
@@ -49,7 +49,7 @@ extension NetworkManager {
         if let response = response as? HTTPURLResponse,
            !(200..<300).contains(response.statusCode) {
             print("Error: badRequest: \(response.statusCode)")
-            throw NetworkError.badRequest
+            throw LegacyNetworkError.badRequest
         }
         
         // 디코딩
@@ -59,7 +59,7 @@ extension NetworkManager {
             return decodeData.result
         } catch {
             print("Decode 에러")
-            throw NetworkError.decodeFailed
+            throw LegacyNetworkError.decodeFailed
         }
     }
 }

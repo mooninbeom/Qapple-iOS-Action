@@ -33,9 +33,6 @@ final class LegacyKeychainService {
     /// 키체인에서 액세스 토큰을 반환합니다.
     func token(_ type: KeychainType) throws -> String {
         
-        let testToken = ""
-        return "Bearer \(testToken)"
-        
         // 1. 키체인에서 검색할 query
         let searchQuery: [CFString: Any] = [
             kSecClass: kSecClassKey,

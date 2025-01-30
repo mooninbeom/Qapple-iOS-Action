@@ -5,11 +5,14 @@
 //  Created by Simmons on 8/18/24.
 //
 
+import ComposableArchitecture
 import SwiftUI
 import Firebase
 import FirebaseMessaging
 
 class AppDelegate: NSObject, UIApplicationDelegate{
+    
+    @Dependency(\.keychainService) var keychainService
     
     let gcmMessageIDKey = "gcm.message_id"
     
@@ -57,6 +60,12 @@ class AppDelegate: NSObject, UIApplicationDelegate{
         // print("✅ [Device Token Successed]\n\(deviceTokenString)\n")
         
         // Device Token 업데이트
+        do {
+            try keychainService.createData(.deviceToken, deviceTokenString)
+        } catch {
+            print("디바이스 토큰 에러")
+        }
+        
         LegacyKeychainService.shared.deviceToken = deviceTokenString
       
         // deviceToken을 Firebase 메세징에 전달해 APNs 토큰을 설정
