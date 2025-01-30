@@ -48,12 +48,7 @@ struct ProfileView: View {
                     await viewModel.requestMyPageInfo()
                 }
             }
-            
-            if store.isLoading {
-                ProgressView()
-                    .progressViewStyle(.circular)
-                    .tint(.primary)
-            }
+            .loadingIndicator(isLoading: store.isLoading)
         }
     }
 }

@@ -30,19 +30,11 @@ struct BulletinBoardView: View {
                         y: proxy.size.height - 40
                     )
                 )
-                
-                if store.isLoading {
-                    ProgressView()
-                        .progressViewStyle(.circular)
-                        .tint(.primary)
-                }
+                .loadingIndicator(isLoading: store.isLoading)
             }
             .background(Background.first)
         }
         .onAppear{
-//            bulletinBoardUseCase.isClickComment = false
-//            bulletinBoardUseCase.state.searchPosts.removeAll() // 어떻게 처리할 지 고민
-//            bulletinBoardUseCase.searchText = ""
             store.send(.getBulletinBoardList)
             
         }

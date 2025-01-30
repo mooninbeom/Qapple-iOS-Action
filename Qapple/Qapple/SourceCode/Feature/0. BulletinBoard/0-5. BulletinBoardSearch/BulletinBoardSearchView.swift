@@ -28,12 +28,7 @@ struct BulletinBoardSearchView: View {
                         NoResultView()
                     }
                 }
-                
-                if store.isLoading {
-                    ProgressView()
-                        .progressViewStyle(.circular)
-                        .tint(.primary)
-                }
+                .loadingIndicator(isLoading: store.isLoading)
             }
             .background(Background.first)
             .navigationBarBackButtonHidden()
