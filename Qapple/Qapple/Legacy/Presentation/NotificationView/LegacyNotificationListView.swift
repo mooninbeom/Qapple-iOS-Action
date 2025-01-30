@@ -1,5 +1,5 @@
 //
-//  NotificationListView.swift
+//  LegacyNotificationListView.swift
 //  Qapple
 //
 //  Created by Simmons on 8/15/24.
@@ -7,11 +7,11 @@
 
 import SwiftUI
 
-// MARK: - NotificationListView
+// MARK: - LegacyNotificationListView
 
-struct NotificationListView: View {
+struct LegacyNotificationListView: View {
     
-    @StateObject private var notificationUseCase = NotificationUseCase()
+    @StateObject private var notificationUseCase = LegacyNotificationUseCase()
     
     var body: some View {
         ZStack {
@@ -35,7 +35,7 @@ struct NotificationListView: View {
 private struct NotificationContentView: View {
     
     @EnvironmentObject private var pathModel: Router
-    @EnvironmentObject private var notificationUseCase: NotificationUseCase
+    @EnvironmentObject private var notificationUseCase: LegacyNotificationUseCase
     @EnvironmentObject private var bulletinBoardUseCase: BulletinBoardUseCase
     
     @StateObject var viewModel: QuestionViewModel = .init()
@@ -44,11 +44,11 @@ private struct NotificationContentView: View {
     
     var body: some View {
         VStack(spacing: 0) {
-            CustomNavigationBar(
+            LegacyNavigationBar(
                 leadingView: { CustomNavigationBackButton(buttonType: .arrow) {
                     pathModel.pop()
                 }},
-                principalView: {
+                centerView: {
                     Text("알림")
                         .font(Font.pretendard(.semiBold, size: 17))
                         .foregroundStyle(TextLabel.main)
@@ -60,7 +60,7 @@ private struct NotificationContentView: View {
                 LazyVStack(spacing: 0) {
                     ForEach(Array(notificationUseCase.state.notificationList.enumerated()), id: \.offset) { index, notification in
                         
-                        NotificationCell(notification: notification) {
+                        LegacyNotificationCell(notification: notification) {
                             if let boardId = Int(notification.boardId) {
                                 // 게시글 댓글로 이동
                                 Task {
@@ -139,7 +139,7 @@ private struct NotificationContentView: View {
 // MARK: - Preview
 
 #Preview {
-    NotificationListView()
-        .environmentObject(NotificationUseCase())
+    LegacyNotificationListView()
+        .environmentObject(LegacyNotificationUseCase())
         .environmentObject(BulletinBoardUseCase())
 }

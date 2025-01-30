@@ -10,11 +10,13 @@ import Foundation
 
 struct AnswerRepository {
     var fetchAnswerPreviewList: (_ questionId: Int) async throws -> [Answer]
-    var fetchAnswerListOfQuestion: (_ questionId: Int, _ threshold: Int?) async throws -> (
+    var fetchAnswerListOfQuestion: (_ questionId: Int, _ threshold: String?) async throws -> (
         [Answer],
         QappleAPI.TotalCount,
         QappleAPI.PaginationInfo
     )
+    var postAnswer: (_ questionId: Int, _ answer: String) async throws -> Void
+    var deleteAnswer: (_ answerId: Int) async throws -> Void
 }
 
 // MARK: - DependencyKey
@@ -35,13 +37,24 @@ extension AnswerRepository: DependencyKey {
         },
         fetchAnswerListOfQuestion: { questionId, threshold in
             let url = try QappleAPI.Answer.listOfQuestion(
-                questionId: Int(questionId),
+                questionId: questionId,
                 threshold: threshold,
                 pageSize: 25
             ).url()
             
             let response: BaseResponse<AnswersOfQuestionDTO> = try await networkService.get(url: url)
             return response.result.toEntityWithInfo
+        },
+        postAnswer: { questionId, answer in
+            let url = try QappleAPI.Answer.post(questionId: questionId).url()
+            let requestBody = PostAnswerRequest(answer: answer)
+            let response: BaseResponse<PostAnswerDTO> = try await networkService.post(url: url, body: requestBody)
+            return ()
+        },
+        deleteAnswer: { answerId in
+            let url = try QappleAPI.Answer.delete(answerId: answerId).url()
+            let response: BaseResponse<DeleteAnswerDTO> = try await networkService.delete(url: url)
+            return ()
         }
     )
     
@@ -51,7 +64,9 @@ extension AnswerRepository: DependencyKey {
         },
         fetchAnswerListOfQuestion: { _, _ in
             (stubAnswerList, 25, .init(threshold: "", hasNext: false))
-        }
+        },
+        postAnswer: { _, _ in },
+        deleteAnswer: { _ in }
     )
 }
 

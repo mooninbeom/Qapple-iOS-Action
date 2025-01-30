@@ -7,7 +7,7 @@
 
 import SwiftUI
 
-struct AnswerListView: View {
+struct LegacyAnswerListView: View {
     
     @EnvironmentObject var pathModel: Router
     @StateObject var viewModel: AnswerListViewModel = .init()
@@ -90,13 +90,13 @@ private struct CustomNavigationView: View {
     @EnvironmentObject var pathModel: Router
     
     var body: some View {
-        CustomNavigationBar(
+        LegacyNavigationBar(
             leadingView:{
                 CustomNavigationBackButton(buttonType: .arrow) {
                     pathModel.pop()
                 }
             },
-            principalView: {
+            centerView: {
                 Text("답변 리스트")
                     .font(Font.pretendard(.semiBold, size: 15))
                     .foregroundStyle(TextLabel.main)
@@ -217,7 +217,7 @@ private struct AnswerScrollView: View {
 }
 
 #Preview {
-    AnswerListView(
+    LegacyAnswerListView(
         questionId: 1,
         questionContent: "디폴트"
     )

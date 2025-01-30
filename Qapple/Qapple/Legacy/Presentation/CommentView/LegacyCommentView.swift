@@ -189,13 +189,13 @@ private struct HeaderView: View {
     @EnvironmentObject private var pathModel: Router
     
     var body: some View {
-        CustomNavigationBar(
+        LegacyNavigationBar(
             leadingView: {
                 CustomNavigationBackButton(buttonType: .arrow) {
                     pathModel.pop()
                 }
             },
-            principalView: {
+            centerView: {
                 Text("댓글")
                     .font(.pretendard(.semiBold, size: 17))
             },

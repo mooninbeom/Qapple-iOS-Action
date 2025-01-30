@@ -18,7 +18,7 @@ struct BulletinSearchView: View {
         GeometryReader { proxy in
             ZStack {
                 VStack(spacing: 0) {
-                    NavigationBar()
+                    NaviBar()
                     
                     LagacySearchBar(searchText: $bulletinBoardUseCase.searchText)
                         .padding(.horizontal, 16)
@@ -57,19 +57,19 @@ struct BulletinSearchView: View {
 
 // MARK: - NavigationBar
 
-private struct NavigationBar: View {
+private struct NaviBar: View {
     
     @EnvironmentObject private var pathModel: Router
     @Environment(\.dismiss) private var dismiss
     
     var body: some View {
-        CustomNavigationBar(
+        LegacyNavigationBar(
             leadingView: {
                 CustomNavigationBackButton(buttonType: .arrow) {
                     dismiss()
                 }
             },
-            principalView: {
+            centerView: {
                 Text("검색하기")
                     .font(Font.pretendard(.semiBold, size: 17))
                     .foregroundStyle(TextLabel.main)

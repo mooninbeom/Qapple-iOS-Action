@@ -29,12 +29,12 @@ struct SignUpAuthCodeView: View {
     var body: some View {
         ZStack {
             VStack(alignment: .leading) {
-                CustomNavigationBar(
+                LegacyNavigationBar(
                     leadingView: { CustomNavigationBackButton(buttonType: .arrow) {
                         authViewModel.resetAuthCodeInfo()
                         pathModel.paths.removeLast()
                     }},
-                    principalView: { Text("회원가입")
+                    centerView: { Text("회원가입")
                             .font(Font.pretendard(.semiBold, size: 15))
                         .foregroundStyle(TextLabel.main) },
                     trailingView: { },
@@ -180,7 +180,7 @@ struct SignUpAuthCodeView: View {
                     
                     Spacer()
                     
-                    ActionButton("다음", isActive: $authViewModel.isCertifyCodeVerified, action: {
+                    LegacyActionButton("다음", isActive: $authViewModel.isCertifyCodeVerified, action: {
                         pathModel.paths.append(.inputNickName)
                     })
                     .padding(.bottom, 16)

@@ -14,11 +14,11 @@ struct SignUpServiceTermsView: View {
         
         VStack(spacing: 0) {
             
-            CustomNavigationBar(
+            LegacyNavigationBar(
                 leadingView: { CustomNavigationBackButton(buttonType: .arrow)   {
                     pathModel.paths.removeLast()
                 }},
-                principalView: { Text("서비스 이용 약관")
+                centerView: { Text("서비스 이용 약관")
                     .font(Font.pretendard(.semiBold, size: 15))
                     .foregroundStyle(TextLabel.main) },
                 trailingView: { },

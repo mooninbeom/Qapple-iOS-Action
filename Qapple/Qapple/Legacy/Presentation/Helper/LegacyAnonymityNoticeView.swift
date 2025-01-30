@@ -7,7 +7,7 @@
 
 import SwiftUI
 
-struct AnonymityNoticeView: View {
+struct LegacyAnonymityNoticeView: View {
     
     @Binding var isAnonymitySheetPresented: Bool
     
@@ -76,7 +76,7 @@ struct AnonymityNoticeView: View {
                 Spacer()
                     //.frame(height: 16)
                 
-                ActionButton("확인", isActive: $isAnonymitySheetPresented) {
+                LegacyActionButton("확인", isActive: $isAnonymitySheetPresented) {
                     isAnonymitySheetPresented.toggle()
                 }
             }
@@ -111,5 +111,5 @@ private struct NoticeCell: View {
 }
 
 #Preview {
-    AnonymityNoticeView(isAnonymitySheetPresented: .constant(true))
+    LegacyAnonymityNoticeView(isAnonymitySheetPresented: .constant(true))
 }

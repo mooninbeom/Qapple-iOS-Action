@@ -10,7 +10,7 @@ import SwiftUI
 
 struct TodayQuestionView: View {
     
-    let store: StoreOf<TodayQuestionFeature>
+    @Bindable var store: StoreOf<TodayQuestionFeature>
     
     var body: some View {
         ZStack {
@@ -34,6 +34,15 @@ struct TodayQuestionView: View {
         .onDisappear {
             store.send(.onDisappear)
         }
+        .loadingIndicator(isLoading: store.isLoading)
+        .sheet(item: $store.scope(
+            state: \.sheet,
+            action: \.sheet)
+        ) { store in
+            switch store.case {
+            case let .seeMore(store): SeeMoreSheet(store: store)
+            }
+        }
     }
 }
 
@@ -45,26 +54,29 @@ private struct HeaderView: View {
     
     var body: some View {
         VStack(spacing: 0) {
-            Image(store.questionState.graphicImage)
-                .resizable()
-                .scaledToFill()
-                .frame(width: 120, height: 120)
-            
-            Text(store.questionState.mainTitle)
-                .font(.pretendard(.bold, size: 23))
-                .foregroundStyle(.wh)
-                .tracking(-1)
-                .padding(.top, 16)
-            
-            if store.questionState == .creating {
-                Text(store.timeRemainingForQuestion.timerFormat)
-                    .font(.pretendard(.bold, size: 38))
-                    .foregroundStyle(LinearGradient.timerGradient)
-                    .frame(height: 27)
-                    .padding(.top, 12)
-                    .monospacedDigit()
-                    .kerning(-2)
+            Group {
+                Image(store.questionState.graphicImage)
+                    .resizable()
+                    .scaledToFill()
+                    .frame(width: 120, height: 120)
+                
+                Text(store.questionState.mainTitle)
+                    .font(.pretendard(.bold, size: 23))
+                    .foregroundStyle(.wh)
+                    .tracking(-1)
+                    .padding(.top, 16)
+                
+                if store.questionState == .creating {
+                    Text(store.timeRemainingForQuestion.timerFormat)
+                        .font(.pretendard(.bold, size: 38))
+                        .foregroundStyle(LinearGradient.timerGradient)
+                        .frame(height: 27)
+                        .padding(.top, 12)
+                        .monospacedDigit()
+                        .kerning(-2)
+                }
             }
+            .opacity(store.isLoading ? 0 : 1)
         }
         .frame(maxWidth: .infinity)
         .frame(height: store.questionState == .creating ? 270 : 230)
@@ -86,7 +98,7 @@ private struct QuestionButton: View {
                 .cornerRadius(32, corners: [.bottomLeft, .bottomRight])
             
             Button {
-                store.send(.questionButtonTapped)
+                store.send(.questionButtonTapped(store.todayQuestion))
             } label: {
                 Text(title)
                     .font(.pretendard(.semiBold, size: 17))
@@ -96,6 +108,7 @@ private struct QuestionButton: View {
                     .background(backgroundColor)
                     .clipShape(RoundedRectangle(cornerRadius: 20))
             }
+            .opacity(store.isLoading ? 0 : 1)
         }
         .frame(maxWidth: .infinity)
         .background(.first)
@@ -154,6 +167,7 @@ private struct AnswerPreviewList: View {
                 }
             }
             .frame(maxWidth: .infinity)
+            .opacity(store.isLoading ? 0 : 1)
         }
     }
     
@@ -181,7 +195,7 @@ private struct AnswerPreviewList: View {
             
             if store.todayQuestion.isAnswered {
                 SeeAllButton {
-                    store.send(.seeAllAnswerButtonTapped)
+                    store.send(.seeAllAnswerButtonTapped(store.todayQuestion))
                 }
             }
         }
@@ -191,13 +205,18 @@ private struct AnswerPreviewList: View {
         VStack(spacing: 0) {
             ForEach(enumerated(store.answerPreviewList), id: \.element.id) {
                 index, answer in
-                AnswerCell(
-                    answer: answer,
-                    state: .normal(index: index),
-                    seeMoreAction: {
-                        store.send(.seeMoreAnswerButtonTapped(answer))
-                    }
-                )
+                Button {
+                    
+                } label: {
+                    AnswerCell(
+                        answer: answer,
+                        index: index,
+                        state: .normal,
+                        seeMoreAction: {
+                            store.send(.seeMoreAnswerButtonTapped(answer))
+                        }
+                    )
+                }
             }
         }
     }

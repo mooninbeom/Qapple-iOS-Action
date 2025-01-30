@@ -28,7 +28,7 @@ struct AnswerView: View {
                 .ignoresSafeArea()
             
             VStack {	
-                CustomNavigationBar(
+                LegacyNavigationBar(
                     leadingView: {
                         CustomNavigationBackButton(buttonType: .xmark) {
                             if self.viewModel.answer.isEmpty {
@@ -39,7 +39,7 @@ struct AnswerView: View {
                             }
                         }
                     },
-                    principalView: {},
+                    centerView: {},
                     trailingView: {
                         CustomNavigationTextButton(
                             title: "완료",
@@ -143,7 +143,7 @@ struct AnswerView: View {
                             .foregroundStyle(BrandPink.text)
                     }
                     .sheet(isPresented: $isAnonymitySheetPresented) {
-                        AnonymityNoticeView(isAnonymitySheetPresented: $isAnonymitySheetPresented)
+                        LegacyAnonymityNoticeView(isAnonymitySheetPresented: $isAnonymitySheetPresented)
                             .presentationDetents([.height(560)])
                     }
                     
