@@ -52,7 +52,7 @@ struct BulletinBoardEllipsisFeature {
                 let boardId = state.boardId
                 return .run { send in
                     await send(.delegate(.successDelete))
-                    let _ = try await bulletinBoardRepository.deleteBoard(boardId)
+                    try await bulletinBoardRepository.deleteBoard(boardId)
                 }
                 
             case .alert:

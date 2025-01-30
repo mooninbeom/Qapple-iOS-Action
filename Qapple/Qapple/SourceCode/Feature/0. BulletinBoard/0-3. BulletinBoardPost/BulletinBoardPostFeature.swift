@@ -94,7 +94,7 @@ struct BulletinBoardPostFeature {
                 return .run { send in
                     await send(.toggleLoading(true), animation: .bouncy)
                     do {
-                        let _ = try await bulletinBoardRepository.postBoard(content)
+                        try await bulletinBoardRepository.postBoard(content)
                         // TODO: board reset 필요하면 넣기
                         // TODO: Navigation 처리
                     } catch {

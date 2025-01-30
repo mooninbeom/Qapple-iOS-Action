@@ -11,9 +11,9 @@ import ComposableArchitecture
 struct BulletinBoardRepository {
     
     var fetchBulletinBoardList: (_ threshold: Int?) async throws -> ([BulletinBoard], QappleAPI.PaginationInfo)
-    var postBoard: (_ content: String) async throws -> PostBoardDTO
+    var postBoard: (_ content: String) async throws -> Void
     var fetchSingleBoard: (_ boardId: Int) async throws -> BulletinBoard
-    var deleteBoard: (_ boardId: Int) async throws -> DeleteBoardDTO
+    var deleteBoard: (_ boardId: Int) async throws -> Void
     var likeBoard: (_ boardId: Int) async throws -> Void
     var searchBoard: (_ keyword: String?, _ threshold: Int?) async throws -> ([BulletinBoard], QappleAPI.PaginationInfo)
 }

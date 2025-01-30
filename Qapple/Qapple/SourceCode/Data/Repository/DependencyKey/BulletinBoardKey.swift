@@ -78,12 +78,11 @@ extension BulletinBoardRepository {
     }
     
     /// 게시글 생성
-    static func makePostBoard() -> (_ content: String) async throws -> PostBoardDTO {
+    static func makePostBoard() -> (_ content: String) async throws -> Void {
         return { content in
             let url = try QappleAPI.Board.post.url()
             let requestBody: PostBoardRequest = PostBoardRequest(content: content, boardType: "FREEBOARD")
             let response: BaseResponse<PostBoardDTO> = try await NetworkService.shared.post(url: url, body: requestBody)
-            return response.result
         }
     }
     
@@ -97,11 +96,10 @@ extension BulletinBoardRepository {
     }
     
     /// 게시글 삭제
-    static func makeDeleteBoard() -> (_ boardId: Int) async throws -> DeleteBoardDTO {
+    static func makeDeleteBoard() -> (_ boardId: Int) async throws -> Void {
         return { boardId in
             let url = try QappleAPI.Board.delete(boardId: boardId).url()
             let response: BaseResponse<DeleteBoardDTO> = try await NetworkService.shared.delete(url: url)
-            return response.result
         }
     }
     
