@@ -7,16 +7,16 @@
 
 import SwiftUI
 
-struct CompleteAnswerView: View {
+struct LegacyCompleteAnswerView: View {
     
     @EnvironmentObject var pathModel: Router
     @ObservedObject var viewModel: AnswerViewModel
     
     var body: some View {
         VStack(spacing: 0) {
-            CustomNavigationBar(
+            LegacyNavigationBar(
                 leadingView: {},
-                principalView: {},
+                centerView: {},
                 trailingView: {},
                 backgroundColor: Background.first)
             
@@ -41,7 +41,7 @@ struct CompleteAnswerView: View {
             
             Spacer()
             
-            ActionButton("확인", isActive: .constant(true)) {
+            LegacyActionButton("확인", isActive: .constant(true)) {
                 pathModel.popToRoot()
                 if pathModel.searchPathType == .questionList {
                     pathModel.pushView(
@@ -69,6 +69,6 @@ struct CompleteAnswerView: View {
 }
 
 #Preview {
-    CompleteAnswerView(viewModel: .init())
+    LegacyCompleteAnswerView(viewModel: .init())
         .environmentObject(Router(pathType: .questionList))
 }

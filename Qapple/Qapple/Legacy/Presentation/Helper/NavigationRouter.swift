@@ -64,11 +64,11 @@ final class Router: ObservableObject, NavigationRouter {
                     questionContent: questionContent
                 )
             case .completeAnswer:
-                CompleteAnswerView(viewModel: answerViewModel!)
+                LegacyCompleteAnswerView(viewModel: answerViewModel!)
             case .notifications:
                 LegacyNotificationListView()
             case .todayAnswer(questionId: let questionId, questionContent: let questionContent):
-                AnswerListView(questionId: questionId, questionContent: questionContent)
+                LegacyAnswerListView(questionId: questionId, questionContent: questionContent)
             case .alert:
                 AlertView()
             case .comment(post: let post):
@@ -101,9 +101,9 @@ final class Router: ObservableObject, NavigationRouter {
                     questionContent: questionContent
                 )
             case .completeAnswer:
-                CompleteAnswerView(viewModel: answerViewModel!)
+                LegacyCompleteAnswerView(viewModel: answerViewModel!)
             case .todayAnswer(questionId: let questionId, questionContent: let questionContent):
-                AnswerListView(questionId: questionId, questionContent: questionContent)
+                LegacyAnswerListView(questionId: questionId, questionContent: questionContent)
             }
         } else if pathType == .myProfile {
             let view = view as! MyProfilePathType

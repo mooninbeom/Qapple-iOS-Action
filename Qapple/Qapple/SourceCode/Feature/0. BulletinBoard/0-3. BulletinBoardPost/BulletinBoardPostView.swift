@@ -17,7 +17,7 @@ struct BulletinBoardPostView: View {
     var body: some View {
         ZStack{
             VStack(spacing: 0) {
-                NavigationBar(store: store)
+                BulletinBoardPostNavigationBar(store: store)
                 Spacer()
                 WritingView(store: store, isTextFieldFocused: $isTextFieldFocused)
                 Spacer()
@@ -42,34 +42,27 @@ struct BulletinBoardPostView: View {
 
 // MARK: - NavigationBar
 
-private struct NavigationBar: View {
+private struct BulletinBoardPostNavigationBar: View {
     
     let store: StoreOf<BulletinBoardPostFeature>
 
     var body: some View {
-        CustomNavigationBar(
+        NavigationBar(
+            title: "게시판",
             leadingView: {
-                Button("취소") {
+                NavigationButton(buttonType: .text("취소", .icon)) {
                     store.send(.cancelButtonTapped)
                 }
-                .foregroundStyle(GrayScale.icon)
-            },
-            principalView: {
-                Text("게시판")
-                    .pretendard(.semiBold, 17)
-                    .foregroundStyle(TextLabel.main)
             },
             trailingView: {
-                Button("올리기") {
+                NavigationButton(buttonType: .text("올리기", store.content.isEmpty ? .disable : .button)) {
                     if !store.content.isEmpty {
                         HapticService.notification(type: .success)
                         store.send(.postBoardButtonTapped)
                     }
                 }
-                .foregroundStyle(store.content.isEmpty ? .disable : BrandPink.button)
                 .disabled(store.content.isEmpty)
-            },
-            backgroundColor: .clear
+            }
         )
     }
 }

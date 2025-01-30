@@ -7,7 +7,7 @@
 
 import SwiftUI
 
-struct ActionButton: View {
+struct LegacyActionButton: View {
     
     @Binding var isActive: Bool
     
@@ -41,6 +41,6 @@ struct ActionButton: View {
         Color.Background.first
             .ignoresSafeArea()
         
-        ActionButton("버튼입니당", isActive: .constant(true), action: {})
+        LegacyActionButton("버튼입니당", isActive: .constant(true), action: {})
     }
 }

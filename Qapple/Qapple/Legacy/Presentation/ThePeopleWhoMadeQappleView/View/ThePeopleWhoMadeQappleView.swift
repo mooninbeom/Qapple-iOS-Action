@@ -54,7 +54,7 @@ private struct CustomTabBar: View {
     @EnvironmentObject var pathModel: Router
     
     var body: some View {
-        CustomNavigationBar(
+        LegacyNavigationBar(
             leadingView: {
                 HStack(spacing: 12) {
                     
@@ -71,7 +71,7 @@ private struct CustomTabBar: View {
                 }
                 .padding(.trailing, 8)
             },
-            principalView: {
+            centerView: {
                 Text("케플을 만든 사람들")
                     .font(Font.pretendard(.semiBold, size: 15))
                     .foregroundStyle(TextLabel.main)

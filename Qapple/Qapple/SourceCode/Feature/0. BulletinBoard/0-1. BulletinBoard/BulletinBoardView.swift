@@ -83,13 +83,8 @@ private struct CustomTabBar: View {
     let store: StoreOf<BulletinBoardFeature>
     
     var body: some View {
-        CustomNavigationBar(
-            leadingView: {},
-            principalView: {
-                Text("게시판")
-                    .font(Font.pretendard(.semiBold, size: 15))
-                    .foregroundStyle(TextLabel.main)
-            },
+        NavigationBar(
+            title: "게시판",
             trailingView: {
                 HStack(spacing: 12) {
                     Spacer()
@@ -115,8 +110,8 @@ private struct CustomTabBar: View {
                     }
                 }
                 .padding(.trailing, 8)
-            },
-            backgroundColor: Background.first)
+            }
+        )
     }
 }
 

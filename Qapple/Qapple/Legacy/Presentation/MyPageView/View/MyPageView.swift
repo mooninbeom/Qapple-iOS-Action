@@ -20,7 +20,7 @@ struct MyPageView: View {
                 .ignoresSafeArea()
             
             VStack(alignment: .leading, spacing: 0) {
-                NavigationBar()
+                NaviBar()
                 
                 MyProfileSummary(
                     nickname: viewModel.myPageInfo.nickname,
@@ -57,15 +57,15 @@ struct MyPageView: View {
 
 // MARK: - NavigationBar
 
-private struct NavigationBar: View {
+private struct NaviBar: View {
     
     @EnvironmentObject private var pathModel: Router
     @EnvironmentObject private var viewModel: MyPageViewModel
     
     var body: some View {
-        CustomNavigationBar(
+        LegacyNavigationBar(
             leadingView: {},
-            principalView: {
+            centerView: {
                 Text("프로필")
                     .font(Font.pretendard(.semiBold, size: 15))
                     .foregroundStyle(TextLabel.main)

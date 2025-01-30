@@ -29,4 +29,17 @@ struct Answer: Identifiable, Equatable {
     
     /// 탈퇴한 사용자의 답변인지 여부
     let isResignMember: Bool
+    
+    /// 초기화용 답변 엔티티
+    static var initialState: Answer {
+        Answer(
+            id: 0,
+            content: "",
+            authorNickname: "",
+            publishedDate: .now,
+            isReported: false,
+            isMine: true,
+            isResignMember: false
+        )
+    }
 }

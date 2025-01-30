@@ -35,13 +35,13 @@ struct ReportView: View {
                 .ignoresSafeArea()
             
             VStack {
-                CustomNavigationBar(
+                LegacyNavigationBar(
                     leadingView:{
                         CustomNavigationBackButton(buttonType: .arrow)  {
                             pathModel.pop()
                         }
                     },
-                    principalView: {
+                    centerView: {
                         Text("신고하기")
                             .font(Font.pretendard(.semiBold, size: 15))
                             .foregroundStyle(TextLabel.main)

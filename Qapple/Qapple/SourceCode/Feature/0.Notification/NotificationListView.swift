@@ -47,17 +47,14 @@ private struct NotificationContentView: View {
     
     var body: some View {
         VStack(spacing: 0) {
-            CustomNavigationBar(
-                leadingView: { CustomNavigationBackButton(buttonType: .arrow) {
-                    // TODO: Navigation 적용
-                }},
-                principalView: {
-                    Text("알림")
-                        .font(Font.pretendard(.semiBold, size: 17))
-                        .foregroundStyle(TextLabel.main)
-                },
-                trailingView: {},
-                backgroundColor: Background.first)
+            NavigationBar(
+                title: "알림",
+                leadingView: {
+                    NavigationButton(buttonType: .back) {
+                        // TODO: Navigation 적용
+                    }
+                }
+            )
             
             ScrollView {
                 LazyVStack(spacing: 0) {

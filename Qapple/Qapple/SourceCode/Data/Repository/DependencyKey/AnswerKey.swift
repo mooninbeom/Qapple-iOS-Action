@@ -30,8 +30,8 @@ extension QappleRepository {
     /// 질문에 대한 답변 조회
     static func makeFetchAnswerListOfQuestion() -> (_ questionId: Int, _ threshold: Int?) async throws -> ([AnswerOfQuestion], QappleAPI.PaginationInfo) {
         return { questionId, threshold in
-            let url = try QappleAPI.Answer.listOfQuestion(questionId: Int(questionId), threshold: threshold, pageSize: 25).url()
-            let response: BaseResponse<AnswersOfQuestionDTO> = try await NetworkService.shared.get(url: url)
+            let url = try QappleAPI.Answer.listOfQuestion(questionId: Int(questionId), threshold: String(threshold ?? 0), pageSize: 25).url()
+            let _: BaseResponse<AnswersOfQuestionDTO> = try await NetworkService.shared.get(url: url)
             return ([], .init(threshold: "", hasNext: false))
         }
     }

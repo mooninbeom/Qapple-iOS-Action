@@ -7,7 +7,6 @@
 
 import Foundation
 import ComposableArchitecture
-import DependenciesMacros
 
 struct QappleRepository {
     let networkClient = NetworkService.shared

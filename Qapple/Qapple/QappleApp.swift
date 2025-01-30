@@ -13,13 +13,13 @@ struct QappleApp: App {
     
     @UIApplicationDelegateAdaptor private var appDelegate: AppDelegate
     
-    static let store = Store(initialState: RootFeature.State()) {
+    let store = Store(initialState: RootFeature.State()) {
         RootFeature()
     }
     
     var body: some Scene {
         WindowGroup {
-            RootView(store: QappleApp.store)
+            RootView(store: store)
         }
     }
 }

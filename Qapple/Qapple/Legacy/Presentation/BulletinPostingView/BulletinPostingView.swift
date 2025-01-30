@@ -20,7 +20,7 @@ struct BulletinPostingView: View {
     var body: some View {
         ZStack{
             VStack(spacing: 0) {
-                NavigationBar(isBackAlertPresented: $isBackAlertPresented)
+                NaviBar(isBackAlertPresented: $isBackAlertPresented)
                 Spacer()
                 WritingView(isTextFieldFocused: $isTextFieldFocused)
                 Spacer()
@@ -55,7 +55,7 @@ struct BulletinPostingView: View {
 
 // MARK: - NavigationBar
 
-private struct NavigationBar: View {
+private struct NaviBar: View {
 
     @EnvironmentObject private var pathModel: Router
     @EnvironmentObject private var bulletinBoardUseCase: BulletinBoardUseCase
@@ -64,7 +64,7 @@ private struct NavigationBar: View {
     @Binding private(set) var isBackAlertPresented: Bool
 
     var body: some View {
-        CustomNavigationBar(
+        LegacyNavigationBar(
             leadingView: {
                 Button("취소") {
                     if postingUseCase._state.content.isEmpty {
@@ -75,7 +75,7 @@ private struct NavigationBar: View {
                 }
                 .foregroundStyle(GrayScale.icon)
             },
-            principalView: {
+            centerView: {
                 Text("게시판")
                     .pretendard(.semiBold, 17)
                     .foregroundStyle(TextLabel.main)
@@ -198,7 +198,7 @@ private struct Footer: View {
                     .foregroundStyle(BrandPink.text)
             }
             .sheet(isPresented: $isAnonymitySheetPresented) {
-                AnonymityNoticeView(isAnonymitySheetPresented: $isAnonymitySheetPresented)
+                LegacyAnonymityNoticeView(isAnonymitySheetPresented: $isAnonymitySheetPresented)
                     .presentationDetents([.height(560)])
             }
             
