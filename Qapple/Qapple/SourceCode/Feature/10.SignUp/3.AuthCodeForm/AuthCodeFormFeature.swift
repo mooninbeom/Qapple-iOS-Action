@@ -1,5 +1,5 @@
 //
-//  SignUpFeature.swift
+//  AuthCodeFormFeature.swift
 //  Qapple
 //
 //  Created by 김민준 on 1/30/25.
@@ -8,11 +8,11 @@
 import ComposableArchitecture
 
 @Reducer
-struct SignUpFeature {
+struct AuthCodeFormFeature {
     
     @ObservableState
     struct State: Equatable {
-        var isSignIn = false
+        
     }
     
     enum Action {
