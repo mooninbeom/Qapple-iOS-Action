@@ -37,7 +37,7 @@ struct BulletinBoardFeature {
         case searchButtonTapped
         case notificationButtonTapped
         case postBoardButtonTapped
-        case StopLoading
+        case stopLoading
         
         enum Alert {
             case confirmReport
@@ -100,7 +100,7 @@ struct BulletinBoardFeature {
                 state.threshold = Int(paginationInfo.threshold)
                 state.hasNext = paginationInfo.hasNext
                 return .run { send in
-                    await send(.StopLoading)
+                    await send(.stopLoading)
                 }
                 
             case let .boardButtonTapped(board):
@@ -121,10 +121,10 @@ struct BulletinBoardFeature {
                 return .run { send in
                     do {
                         let _ = try await bulletinBoardRepository.likeBoard(boardId)
-                        await send(.StopLoading)
                     } catch {
                         print(error)
                     }
+                    await send(.stopLoading)
                 }
                 
             case let .ellipsisButtonTapped(boardId, isMine):
@@ -147,7 +147,7 @@ struct BulletinBoardFeature {
                 // TODO: Navigiation 처리
                 return .none
                 
-            case .StopLoading:
+            case .stopLoading:
                 state.isLoading = false
                 return .none
             }
