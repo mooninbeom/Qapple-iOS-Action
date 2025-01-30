@@ -22,6 +22,7 @@ struct SocialLoginFeature {
     }
     
     @Dependency(\.appleLoginService) var appleLoginService
+    @Dependency(\.keychainService) var keychainService
     
     var body: some ReducerOf<Self> {
         Reduce { state, action in

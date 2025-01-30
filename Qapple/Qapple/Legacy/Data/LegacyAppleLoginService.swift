@@ -13,7 +13,7 @@ struct LegacyAppleLoginService {
     
     static func autoLogin(completion: @escaping (Bool) -> Void) {
         let appleIDProvider = ASAuthorizationAppleIDProvider()
-        let userID = try? KeychainService.shared.userID()
+        let userID = try? LegacyKeychainService.shared.userID()
         
         appleIDProvider.getCredentialState(forUserID: userID ?? "") { credentialState, error in
             switch credentialState {
@@ -21,8 +21,8 @@ struct LegacyAppleLoginService {
                 Task {
                     do {
                         let response = try await NetworkManager.refreshToken()
-                        try KeychainService.shared.createToken(.access, token: response.accessToken)
-                        try KeychainService.shared.createToken(.refresh, token: response.refreshToken)
+                        try LegacyKeychainService.shared.createToken(.access, token: response.accessToken)
+                        try LegacyKeychainService.shared.createToken(.refresh, token: response.refreshToken)
                         
                         print("✅ [Auto Login Successed]\n")
                         print("유효한 토큰 확인, 메인 화면으로 이동")

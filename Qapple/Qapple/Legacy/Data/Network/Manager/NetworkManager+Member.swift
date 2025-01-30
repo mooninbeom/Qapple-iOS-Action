@@ -101,7 +101,7 @@ extension NetworkManager {
         var accessToken = ""
         
         do {
-            accessToken = try KeychainService.shared.token(.access)
+            accessToken = try LegacyKeychainService.shared.token(.access)
         } catch {
             print("액세스 토큰 반환 실패")
         }
@@ -174,7 +174,7 @@ extension NetworkManager {
         var accessToken = ""
         
         do {
-            accessToken = try KeychainService.shared.token(.access)
+            accessToken = try LegacyKeychainService.shared.token(.access)
         } catch {
             print("액세스 토큰 반환 실패")
         }
@@ -223,7 +223,7 @@ extension NetworkManager {
         var accessToken = ""
         
         do {
-            accessToken = try KeychainService.shared.token(.access)
+            accessToken = try LegacyKeychainService.shared.token(.access)
         } catch {
             print("액세스 토큰 반환 실패")
         }

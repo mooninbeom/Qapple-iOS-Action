@@ -25,7 +25,7 @@ extension NetworkManager {
         // 토큰 추가
         var request = URLRequest(url: url)
         request.httpMethod = "GET"
-        request.setValue("Bearer \(try KeychainService.shared.token(.access))", forHTTPHeaderField: "Authorization")
+        request.setValue("Bearer \(try LegacyKeychainService.shared.token(.access))", forHTTPHeaderField: "Authorization")
         
         // URLSession 실행
         let (data, response) = try await URLSession.shared.data(for: request)

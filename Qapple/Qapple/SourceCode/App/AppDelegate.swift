@@ -57,7 +57,7 @@ class AppDelegate: NSObject, UIApplicationDelegate{
         // print("✅ [Device Token Successed]\n\(deviceTokenString)\n")
         
         // Device Token 업데이트
-        KeychainService.shared.deviceToken = deviceTokenString
+        LegacyKeychainService.shared.deviceToken = deviceTokenString
       
         // deviceToken을 Firebase 메세징에 전달해 APNs 토큰을 설정
         Messaging.messaging().apnsToken = deviceToken

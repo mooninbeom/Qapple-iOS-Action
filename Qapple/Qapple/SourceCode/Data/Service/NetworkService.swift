@@ -106,7 +106,7 @@ extension NetworkService {
         do {
             var request = URLRequest(url: url)
             request.httpMethod = method
-            request.setValue(try KeychainService.shared.token(.access),
+            request.setValue(try LegacyKeychainService.shared.token(.access),
                 forHTTPHeaderField: "Authorization"
             )
             

@@ -124,17 +124,17 @@ extension AuthViewModel {
                         let signInResponse = try await NetworkManager.requestSignIn(
                             request: .init(
                                 code: authorizationCode,
-                                deviceToken: KeychainService.shared.deviceToken
+                                deviceToken: LegacyKeychainService.shared.deviceToken
                             )
                         )
-                        try KeychainService.shared.createToken(.access, token: signInResponse.accessToken ?? "")
-                        try KeychainService.shared.createToken(.refresh, token: signInResponse.refreshToken ?? "")
+                        try LegacyKeychainService.shared.createToken(.access, token: signInResponse.accessToken ?? "")
+                        try LegacyKeychainService.shared.createToken(.refresh, token: signInResponse.refreshToken ?? "")
                         userID = appleIDCredential.user
                         
                         // 로그인 상태에 따른 화면 분기처리
                         if signInResponse.isMember {
                             isSignIn = true
-                            try KeychainService.shared.createUserID(userID)
+                            try LegacyKeychainService.shared.createUserID(userID)
                             print("로그인 고고")
                         } else {
                             isSignUp = true
@@ -166,19 +166,19 @@ extension AuthViewModel {
             // 회원가입 API
             let signUpData = try await NetworkManager.requestSignUp(
                 request: .init(
-                    signUpToken: try KeychainService.shared.token(.refresh),
+                    signUpToken: try LegacyKeychainService.shared.token(.refresh),
                     email: "\(email)\(academyEmailAddress)",
                     nickname: nickname,
                     profileImage: "",
-                    deviceToken: KeychainService.shared.deviceToken
+                    deviceToken: LegacyKeychainService.shared.deviceToken
                 )
             )
             
             // 토큰 데이터 업데이트
-            try KeychainService.shared.createToken(.access, token: signUpData.accessToken ?? "")
-            try KeychainService.shared.createToken(.refresh, token: signUpData.refreshToken ?? "")
-            try KeychainService.shared.createUserID(userID)
-            print("UserID!\n\(try KeychainService.shared.userID())\n")
+            try LegacyKeychainService.shared.createToken(.access, token: signUpData.accessToken ?? "")
+            try LegacyKeychainService.shared.createToken(.refresh, token: signUpData.refreshToken ?? "")
+            try LegacyKeychainService.shared.createUserID(userID)
+            print("UserID!\n\(try LegacyKeychainService.shared.userID())\n")
             
             self.isLoading = false
         } catch {
@@ -203,7 +203,7 @@ extension AuthViewModel {
         do {
             let _ = try await NetworkManager.requestEmailCertificationCode(
                 request: .init(
-                    signUpToken: try KeychainService.shared.token(.refresh),
+                    signUpToken: try LegacyKeychainService.shared.token(.refresh),
                     email: "\(email)\(academyEmailAddress)"
                 )
             )
@@ -229,7 +229,7 @@ extension AuthViewModel {
             do {
                 let response = try await NetworkManager.requestCodeCertificationCode(
                     request: .init(
-                        signUpToken: try KeychainService.shared.token(.refresh),
+                        signUpToken: try LegacyKeychainService.shared.token(.refresh),
                         email: "\(email)\(academyEmailAddress)",
                         certCode: certifyCode
                     )
