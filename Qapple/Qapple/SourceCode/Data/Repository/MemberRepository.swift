@@ -62,7 +62,38 @@ extension MemberRepository: DependencyKey {
             let response: BaseResponse<SignUpDTO> = try await NetworkService.shared.post(url: url, body: requestBody)
             return response.result
         }
-        
+    )
+    
+    static let previewValue = Self(
+        certification: { signUpToken, email in
+            print("인증 요청: token=\(signUpToken), email=\(email)")
+            return true
+        },
+        certificationCodeCheck: { signUpToken, email, certCode in
+            print("인증 코드 확인: token=\(signUpToken), email=\(email), code=\(certCode)")
+            return certCode == "123456"
+        },
+        fetchMyPage: {
+            MyProfile(nickname: "프리뷰 유저", profileImage: nil, joinDate: "2025-01-31")
+        },
+        editMyPage: { nickname, profileImage in
+            print("프로필 수정: nickname=\(nickname), profileImage=\(profileImage ?? "없음")")
+        },
+        nicknameCheck: { nickname in
+            print("닉네임 중복 확인: \(nickname)")
+            return nickname != "이미사용중"
+        },
+        resign: {
+            print("회원 탈퇴 요청")
+            return true
+        },
+        signIn: { code, deviceToken in
+            print("로그인 요청: code=\(code), deviceToken=\(deviceToken)")
+        },
+        signUp: { signUpToken, email, nickname, profileImage, deviceToken in
+            print("회원가입 요청: token=\(signUpToken), email=\(email), nickname=\(nickname)")
+            return SignUpDTO(accessToken: "dummy_access_token", refreshToken: "dummy_refresh_token")
+        }
     )
 }
 
