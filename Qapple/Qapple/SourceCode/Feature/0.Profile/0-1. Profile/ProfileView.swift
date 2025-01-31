@@ -109,7 +109,7 @@ private struct ProfileList: View {
         VStack(spacing: 48) {
             QuestionAnswerSection(store: store)
             InquiriesReportsSection(store: store)
-            AccountSection()
+            AccountSection(store: store)
         }
     }
 }
@@ -173,6 +173,8 @@ private struct InquiriesReportsSection: View {
 
 private struct AccountSection: View {
     
+    @Bindable var store: StoreOf<ProfileFeature>
+    
     @EnvironmentObject private var pathModel: Router
     @EnvironmentObject private var authViewModel: AuthViewModel
     @EnvironmentObject private var viewModel: MyPageViewModel
@@ -189,7 +191,7 @@ private struct AccountSection: View {
                 title: "로그아웃",
                 icon: .signOutIcon,
                 tapAction: {
-                    isLogOutAlertPresented.toggle()
+                    store.send(.logOutButtonTapped)
                     HapticService.notification(type: .warning)
                 }
             )
@@ -199,36 +201,12 @@ private struct AccountSection: View {
                 icon: .resign,
                 isDistructive: true,
                 tapAction: {
-                    isResignAlertPresented.toggle()
+                    store.send(.resignButtonTapped)
                     HapticService.notification(type: .warning)
                 }
             )
         }
-        .alert("로그아웃 할까요?", isPresented: $isLogOutAlertPresented) {
-            HStack {
-                Button("취소", role: .cancel, action: {})
-                Button("로그아웃", role: .none, action: {
-                    pathModel.popToRoot()
-                    authViewModel.isSignIn = false
-                    viewModel.signOut()
-                })
-            }
-        } message: {
-            Text("언제든 다시 돌아올 수 있습니다!")
-        }
-        .alert("정말 탈퇴하시겠어요?", isPresented: $isResignAlertPresented) {
-            HStack {
-                Button("취소", role: .cancel, action: {})
-                Button("회원 탈퇴", role: .destructive, action: {
-                    viewModel.requestDeleteMember()
-                    pathModel.popToRoot()
-                    authViewModel.isSignIn = false
-                    authViewModel.isSignUp = false
-                })
-            }
-        } message: {
-            Text("탈퇴하면 계정은 복구되지 않아요\n단, 이미 작성한 답변은 남아있어요")
-        }
+        .alert($store.scope(state: \.alert, action: \.alert))
     }
 }
 

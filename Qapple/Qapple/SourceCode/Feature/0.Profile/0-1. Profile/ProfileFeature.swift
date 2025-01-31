@@ -29,13 +29,19 @@ struct ProfileFeature {
         case editProfileButtonTapped
         case MyAnswerListButtonTapped
         case inquiryButtonTapped
+        case logOutButtonTapped
+        case resignButtonTapped
         
         enum Alert {
             case confirmEmailDisabled
+            case confirmLogOut
+            case confirmResign
         }
         
         enum Delegate {
             case confirmEmailDisabled
+            case confirmLogOut
+            case confirmResign
         }
     }
     
@@ -51,6 +57,18 @@ struct ProfileFeature {
             case .alert(.presented(.confirmEmailDisabled)):
                 return .run { send in
                     await send(.delegate(.confirmEmailDisabled))
+                }
+                
+            case .alert(.presented(.confirmLogOut)):
+                return .run { send in
+                    await send(.delegate(.confirmLogOut))
+                    // TODO: Navigation 처리(Root)
+                }
+                
+            case .alert(.presented(.confirmResign)):
+                return .run { send in
+                    await send(.delegate(.confirmResign))
+                    // TODO: Navigation 처리(Root)
                 }
                 
             case .alert:
@@ -73,6 +91,14 @@ struct ProfileFeature {
                 } else {
                     state.sheet = .inquiryButtonTap
                 }
+                return .none
+                
+            case .logOutButtonTapped:
+                state.alert = .confirmLogout
+                return .none
+                
+            case .resignButtonTapped:
+                state.alert = .confirmResign
                 return .none
             }
         }
@@ -103,5 +129,31 @@ extension AlertState where Action == ProfileFeature.Action.Alert {
         }
     } message: {
         TextState("메일 앱에 로그인하거나\n공식 메일 주소로 문의주세요\n(0.team.capple@gmail.com)")
+    }
+    
+    static let confirmLogout = Self {
+        TextState("로그아웃 할까요?")
+    } actions: {
+        ButtonState(role: .cancel) {
+            TextState("취소")
+        }
+        ButtonState(role: .destructive, action: .confirmLogOut) {
+            TextState("로그아웃")
+        }
+    } message: {
+        TextState("언제든 다시 돌아올 수 있습니다!")
+    }
+    
+    static let confirmResign = Self {
+        TextState("정말 탈퇴하시겠어요?")
+    } actions: {
+        ButtonState(role: .cancel) {
+            TextState("취소")
+        }
+        ButtonState(role: .destructive, action: .confirmResign) {
+            TextState("회원 탈퇴")
+        }
+    } message: {
+        TextState("탈퇴하면 계정은 복구되지 않아요\n단, 이미 작성한 답변은 남아있어요")
     }
 }
