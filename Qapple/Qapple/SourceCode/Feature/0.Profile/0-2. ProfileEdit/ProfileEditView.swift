@@ -1,8 +1,8 @@
 //
 //  ProfileEditView.swift
-//  Capple
+//  Qapple
 //
-//  Created by Kyungsoo Lee on 2/25/24.
+//  Created by Simmons on 2/1/25.
 //
 
 import SwiftUI
@@ -43,16 +43,13 @@ struct ProfileEditView: View {
     var body: some View {
         ZStack {
             VStack(alignment: .leading, spacing: 0) {
-                LegacyNavigationBar(
+                NavigationBar(
+                    title: "프로필 수정",
+                    backgroundColor: Background.second,
                     leadingView: {
                         CustomNavigationBackButton(buttonType: .arrow) {
                             pathModel.pop()
                         }
-                    },
-                    centerView: {
-                        Text("프로필 수정")
-                            .font(Font.pretendard(.semiBold, size: 15))
-                            .foregroundStyle(TextLabel.main)
                     },
                     trailingView: {
                         Button {
@@ -75,8 +72,9 @@ struct ProfileEditView: View {
                         } message: {
                             Text("다시 요청해주세요")
                         }
-                    },
-                    backgroundColor: Background.second)
+                    }
+                )
+                
                 
                 HStack {
                     Spacer()
@@ -206,3 +204,4 @@ struct ProfileEditView: View {
 #Preview {
     ProfileEditView(nickName: "튼튼한 민톨")
 }
+
