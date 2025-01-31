@@ -31,7 +31,7 @@ struct ProfileView: View {
                 ProfileSummary(store: store)
                     .padding(.bottom, 24)
                 
-                MyPageList()
+                ProfileList(store: store)
                     .padding(.horizontal, 24)
                 
                 BottomSection()
@@ -99,13 +99,16 @@ private struct ProfileSummary: View {
     }
 }
 
-// MARK: - MyPageList
+// MARK: - ProfileList
 
-private struct MyPageList: View {
+private struct ProfileList: View {
+    
+    let store: StoreOf<ProfileFeature>
+    
     var body: some View {
         VStack(spacing: 48) {
-            QuestionAnswerSection()
-            InquiriesReportsSection()
+            QuestionAnswerSection(store: store)
+            InquiriesReportsSection(store: store)
             AccountSection()
         }
     }
@@ -115,7 +118,7 @@ private struct MyPageList: View {
 
 private struct QuestionAnswerSection: View {
     
-    @EnvironmentObject private var pathModel: Router
+    let store: StoreOf<ProfileFeature>
     
     var body: some View {
         VStack(alignment: .leading, spacing: 0) {
@@ -126,7 +129,7 @@ private struct QuestionAnswerSection: View {
                 title: "내 답변",
                 icon: .writeAnswerIcon,
                 tapAction: {
-                    pathModel.pushView(screen: MyProfilePathType.writtenAnswer)
+                    store.send(.MyAnswerListButtonTapped)
                 }
             )
         }
@@ -136,6 +139,8 @@ private struct QuestionAnswerSection: View {
 // MARK: - InquiriesReportsSection
 
 private struct InquiriesReportsSection: View {
+    
+    @Bindable var store: StoreOf<ProfileFeature>
     
     @EnvironmentObject private var pathModel: Router
     
@@ -152,20 +157,13 @@ private struct InquiriesReportsSection: View {
                 title: "문의하기",
                 icon: .inquiryIcon,
                 tapAction: {
-                    if !MFMailComposeViewController.canSendMail() {
-                        isEmailDisabledAlert.toggle()
-                    } else {
-                        isShowingMailView.toggle()
-                    }
+                    store.send(.inquiryButtonTapped)
                 }
             )
         }
-        .alert("메일 앱에 로그인할 수 없어요", isPresented: $isEmailDisabledAlert) {
-            Button("확인", role: .none, action: {})
-        } message: {
-            Text("메일 앱에 로그인하거나\n공식 메일 주소로 문의주세요\n(0.team.capple@gmail.com)")
-        }
-        .sheet(isPresented: $isShowingMailView) {
+        .alert($store.scope(state: \.alert, action: \.alert))
+        .sheet(item: $store.scope(state: \.sheet?.inquiryButtonTap, action: \.sheet.inquiryButtonTap)
+        ) { _ in 
             MailService.makeMailView(result: $mailResult)
         }
     }

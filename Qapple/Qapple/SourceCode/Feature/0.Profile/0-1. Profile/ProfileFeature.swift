@@ -1,0 +1,107 @@
+//
+//  ProfileFeature.swift
+//  Qapple
+//
+//  Created by Simmons on 1/30/25.
+//
+
+import Foundation
+import ComposableArchitecture
+import MessageUI
+
+@Reducer
+struct ProfileFeature {
+    @ObservableState
+    struct State: Equatable {
+        @Presents var sheet: Sheet.State?
+        @Presents var alert: AlertState<Action.Alert>?
+        var nickname: String = ""
+        var joinDate: String = ""
+        var Image: String?
+        var isLoading = false
+    }
+    
+    enum Action {
+        case sheet(PresentationAction<Sheet.Action>)
+        case alert(PresentationAction<Alert>)
+        case delegate(Delegate)
+        
+        case editProfileButtonTapped
+        case MyAnswerListButtonTapped
+        case inquiryButtonTapped
+        
+        enum Alert {
+            case confirmEmailDisabled
+        }
+        
+        enum Delegate {
+            case confirmEmailDisabled
+        }
+    }
+    
+    var body: some ReducerOf<Self> {
+        Reduce { state, action in
+            switch action {
+            case .sheet(.presented(.inquiryButtonTap)):
+                return .none
+                
+            case .sheet:
+                return .none
+                
+            case .alert(.presented(.confirmEmailDisabled)):
+                return .run { send in
+                    await send(.delegate(.confirmEmailDisabled))
+                }
+                
+            case .alert:
+                return .none
+                
+            case .delegate:
+                return .none
+                
+            case .editProfileButtonTapped:
+                // TODO: Navigation 처리
+                return .none
+                
+            case .MyAnswerListButtonTapped:
+                // TODO: Navigation 처리
+                return .none
+                
+            case .inquiryButtonTapped:
+                if !MFMailComposeViewController.canSendMail() {
+                    state.alert = .confirmEmailDisabled
+                } else {
+                    state.sheet = .inquiryButtonTap
+                }
+                return .none
+            }
+        }
+        .ifLet(\.$sheet, action: \.sheet)
+        .ifLet(\.$alert, action: \.alert)
+    }
+}
+
+// MARK: - ProfileSheet
+
+extension ProfileFeature {
+    @Reducer
+    enum Sheet {
+        case inquiryButtonTap
+    }
+}
+
+extension ProfileFeature.Sheet.State: Equatable {}
+
+// MARK: - ProfileAlert
+
+extension AlertState where Action == ProfileFeature.Action.Alert {
+    static let confirmEmailDisabled = Self {
+        TextState("메일 앱에 로그인할 수 없어요")
+    } actions: {
+        ButtonState(role: .cancel) {
+            TextState("확인")
+        }
+    } message: {
+        TextState("메일 앱에 로그인하거나\n공식 메일 주소로 문의주세요\n(0.team.capple@gmail.com)")
+    }
+}
