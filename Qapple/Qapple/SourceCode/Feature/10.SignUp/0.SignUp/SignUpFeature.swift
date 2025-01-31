@@ -39,6 +39,10 @@ struct SignUpFeature {
                 
             case let .path(stackAction):
                 switch stackAction {
+                case .element(id: _, action: .emailForm(.sendCertificationEmailResponse)):
+                    state.path.append(.authCodeForm(.init()))
+                    return .none
+                    
                 default:
                     return .none
                 }

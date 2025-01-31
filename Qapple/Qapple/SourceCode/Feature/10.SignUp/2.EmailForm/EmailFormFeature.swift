@@ -20,10 +20,12 @@ struct EmailFormFeature {
     enum Action: BindableAction {
         case backButtonTapped
         case sendMailButtonTapped
+        case sendCertificationEmailResponse
         case toggleLoading(Bool)
         case binding(BindingAction<State>)
     }
     
+    @Dependency(\.memberRepository) var memberRepository
     @Dependency(\.dismiss) var dismiss
     
     var body: some ReducerOf<Self> {
@@ -36,6 +38,18 @@ struct EmailFormFeature {
                 }
                 
             case .sendMailButtonTapped:
+                return .run { [email = state.emailText + Constant.academyEmail]  send in
+                    await send(.toggleLoading(true), animation: .bouncy)
+                    do {
+                        let _ = try await memberRepository.sendCertificationEmail(email)
+                        await send(.sendCertificationEmailResponse)
+                    } catch {
+                        print(error)
+                    }
+                    await send(.toggleLoading(false), animation: .bouncy)
+                }
+                
+            case .sendCertificationEmailResponse:
                 return .none
                 
             case let .toggleLoading(bool):

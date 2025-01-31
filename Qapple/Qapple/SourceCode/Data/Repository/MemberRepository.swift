@@ -10,6 +10,8 @@ import Foundation
 
 struct MemberRepository {
     var signIn: (_ code: String, _ deviceToken: String) async throws -> Bool
+    // var checkDuplicateEmail: (_ emaul: String) async throws -> Bool
+    var sendCertificationEmail: (_ email: String) async throws -> Bool
 }
 
 // MARK: - DependencyKey
@@ -25,6 +27,18 @@ extension MemberRepository: DependencyKey {
             try keychainService.createData(.accessToken, response.result.accessToken ?? "")
             try keychainService.createData(.refreshToken, response.result.refreshToken ?? "")
             return response.result.isMember
+        },
+        // TODO: API 동작이 정상적으로 되지 않는 것 같음.
+//        checkDuplicateEmail: { email in
+//            let url = try QappleAPI.Member.check(email: email).url()
+//            let response: BaseResponse<Bool> = try await NetworkService.shared.get(url: url)
+//            return response.result
+//        },
+        sendCertificationEmail: { email in
+            let refreshToken = try keychainService.fetchData(.refreshToken)
+            let url = try QappleAPI.Member.certification(signUpToken: refreshToken, email: email).url()
+            let response: BaseResponse<Bool> = try await NetworkService.shared.get(url: url)
+            return response.result
         }
     )
 }

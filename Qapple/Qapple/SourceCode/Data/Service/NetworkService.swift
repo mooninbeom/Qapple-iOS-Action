@@ -113,12 +113,16 @@ extension NetworkService {
     }
     
     /// StatusCode의 상태값이 성공인지 확인합니다.
-    func checkStatusCode(statusCode: Int) throws {
+    func checkStatusCode(response: URLResponse) throws {
         
         // 성공 범위 안에 들지 못하면 에러 던지기
+        let statusCode = statusCode(response)
         let successStatusCodeRange = 200...299
         if !successStatusCodeRange.contains(statusCode) {
-            throw NetworkError.invalidResponse(statusCode: statusCode)
+            throw NetworkError.invalidResponse(
+                urlString: response.url?.absoluteString ?? "",
+                statusCode: statusCode
+            )
         }
     }
 }
@@ -142,8 +146,7 @@ extension NetworkService {
     /// 응답을 검증하고 데이터를 디코딩한 결과를 반환합니다.
     func decodeResponse<T: Decodable>(data: Data, response: URLResponse) throws -> T {
         // StatusCode 체크
-        let statusCode = statusCode(response)
-        try checkStatusCode(statusCode: statusCode)
+        try checkStatusCode(response: response)
         
         // Decoding 및 반환
         return try decoding(to: data)
@@ -159,7 +162,7 @@ enum NetworkError: Error {
     case urlRequestFailure(urlString: String)
     
     /// 유효하지 않은 Response입니다.
-    case invalidResponse(statusCode: Int)
+    case invalidResponse(urlString: String, statusCode: Int)
     
     /// Decoding에 실패했습니다.
     case decodingFailure(data: Data)
