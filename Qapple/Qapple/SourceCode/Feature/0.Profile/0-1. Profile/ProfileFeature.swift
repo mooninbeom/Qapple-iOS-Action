@@ -17,7 +17,7 @@ struct ProfileFeature {
         @Presents var alert: AlertState<Action.Alert>?
         var nickname: String = ""
         var joinDate: String = ""
-        var Image: String?
+        var profileImage: String?
         var isLoading = false
     }
     
@@ -26,11 +26,15 @@ struct ProfileFeature {
         case alert(PresentationAction<Alert>)
         case delegate(Delegate)
         
+        case getProfile
+        case fetchProfile(MyProfile)
+        
         case editProfileButtonTapped
         case MyAnswerListButtonTapped
         case inquiryButtonTapped
         case logOutButtonTapped
         case resignButtonTapped
+        case toggleLoading(Bool)
         
         enum Alert {
             case confirmEmailDisabled
@@ -44,6 +48,8 @@ struct ProfileFeature {
             case confirmResign
         }
     }
+    
+    @Dependency(\.memberRepository) var memberRepository
     
     var body: some ReducerOf<Self> {
         Reduce { state, action in
@@ -62,12 +68,21 @@ struct ProfileFeature {
             case .alert(.presented(.confirmLogOut)):
                 return .run { send in
                     await send(.delegate(.confirmLogOut))
+                    try? KeychainService.shared.createUserID("")
                     // TODO: Navigation 처리(Root)
                 }
                 
             case .alert(.presented(.confirmResign)):
                 return .run { send in
                     await send(.delegate(.confirmResign))
+                    await send(.toggleLoading(true), animation: .bouncy)
+                    do {
+                        let data = try await memberRepository.resign()
+                        try? KeychainService.shared.createUserID("")
+                    } catch {
+                        print(error)
+                    }
+                    await send(.toggleLoading(false), animation: .bouncy)
                     // TODO: Navigation 처리(Root)
                 }
                 
@@ -75,6 +90,26 @@ struct ProfileFeature {
                 return .none
                 
             case .delegate:
+                return .none
+                
+            case .getProfile:
+                return .run { send in
+                    await send(.toggleLoading(true), animation: .bouncy)
+                    do {
+                        let data = try await memberRepository.fetchMyPage()
+                        await send(.fetchProfile(data))
+                    } catch {
+                        print(error)
+                    }
+                    await send(.toggleLoading(false), animation: .bouncy)
+                }
+                
+            case let .fetchProfile(profile):
+                state.nickname = profile.nickname
+                state.joinDate = profile.joinDate
+                if let profileImage = profile.profileImage {
+                    state.profileImage = profileImage
+                }
                 return .none
                 
             case .editProfileButtonTapped:
@@ -99,6 +134,10 @@ struct ProfileFeature {
                 
             case .resignButtonTapped:
                 state.alert = .confirmResign
+                return .none
+                
+            case let .toggleLoading(bool):
+                state.isLoading = bool
                 return .none
             }
         }

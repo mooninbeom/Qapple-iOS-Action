@@ -44,9 +44,7 @@ struct ProfileView: View {
             .navigationBarBackButtonHidden()
             .navigationBarTitleDisplayMode(.inline)
             .onAppear {
-                Task {
-                    await viewModel.requestMyPageInfo()
-                }
+                store.send(.getProfile)
             }
             .loadingIndicator(isLoading: store.isLoading)
         }
