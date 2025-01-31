@@ -47,6 +47,7 @@ struct EmailFormView: View {
                     QPSubButton(
                         title: "메일 발송",
                         isActive: store.isEmailTextValid || store.isLoading,
+                        variation: .primary,
                         tapAction: {
                             store.send(.sendMailButtonTapped)
                         }

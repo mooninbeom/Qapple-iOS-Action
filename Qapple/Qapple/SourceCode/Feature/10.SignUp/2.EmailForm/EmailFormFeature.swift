@@ -20,7 +20,7 @@ struct EmailFormFeature {
     enum Action: BindableAction {
         case backButtonTapped
         case sendMailButtonTapped
-        case sendCertificationEmailResponse
+        case sendCertificationEmailResponse(String)
         case toggleLoading(Bool)
         case binding(BindingAction<State>)
     }
@@ -42,7 +42,7 @@ struct EmailFormFeature {
                     await send(.toggleLoading(true), animation: .bouncy)
                     do {
                         let _ = try await memberRepository.sendCertificationEmail(email)
-                        await send(.sendCertificationEmailResponse)
+                        await send(.sendCertificationEmailResponse(email))
                     } catch {
                         print(error)
                     }

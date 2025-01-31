@@ -45,7 +45,7 @@ struct QPTextField<TopTrailing: View, BottomTrailing: View>: View {
     }
     
     var body: some View {
-        VStack(alignment: .leading, spacing: 20) {
+        VStack(alignment: .leading, spacing: 0) {
             Text(title)
                 .foregroundStyle(.sub3)
                 .font(.pretendard(.medium, size: 14))
@@ -73,23 +73,24 @@ struct QPTextField<TopTrailing: View, BottomTrailing: View>: View {
                 }
                 .frame(height: 14)
             }
-            .padding(.top, 6)
+            .padding(.top, 24)
             
             Rectangle()
                 .frame(height: 2)
                 .foregroundStyle(strokeColor)
-                .padding(.top, -4)
+                .padding(.top, 20)
             
             HStack(alignment: .top) {
                 Text(helperText)
                     .font(.pretendard(.semiBold, size: 14))
                     .foregroundStyle(helperTextColor)
+                    .lineSpacing(6)
                 
                 Spacer()
                 
                 bottomTrailingView
             }
-            .padding(.top, -4)
+            .padding(.top, 16)
         }
     }
     

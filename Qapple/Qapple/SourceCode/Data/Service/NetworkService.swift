@@ -17,6 +17,13 @@ struct NetworkService {
     
     @Dependency(\.keychainService.fetchData) var fetchData
     
+    func signIn<T: Decodable>(url: URL) async throws -> T {
+        var request = URLRequest(url: url)
+        request.httpMethod = "GET"
+        let (data, response) = try await URLSession.shared.data(for: request)
+        return try decodeResponse(data: data, response: response)
+    }
+    
     /// GET 요청을 수행합니다.
     func get<T>(url: URL) async throws -> T where T: Decodable {
         do {
@@ -113,15 +120,15 @@ extension NetworkService {
     }
     
     /// StatusCode의 상태값이 성공인지 확인합니다.
-    func checkStatusCode(response: URLResponse) throws {
-        
-        // 성공 범위 안에 들지 못하면 에러 던지기
+    func checkStatusCode(response: URLResponse, data: Data) throws {
+        let baseResponse: NetworkError.BaseResponse? = try? decoding(to: data)
         let statusCode = statusCode(response)
         let successStatusCodeRange = 200...299
         if !successStatusCodeRange.contains(statusCode) {
             throw NetworkError.invalidResponse(
                 urlString: response.url?.absoluteString ?? "",
-                statusCode: statusCode
+                statusCode: statusCode,
+                message: baseResponse?.message
             )
         }
     }
@@ -139,14 +146,14 @@ extension NetworkService {
             let decodedData = try JSONDecoder().decode(T.self, from: data)
             return decodedData
         } catch {
-            throw NetworkError.decodingFailure(data: data)
+            throw NetworkError.decodingFailure(type: T.self)
         }
     }
     
     /// 응답을 검증하고 데이터를 디코딩한 결과를 반환합니다.
     func decodeResponse<T: Decodable>(data: Data, response: URLResponse) throws -> T {
         // StatusCode 체크
-        try checkStatusCode(response: response)
+        try checkStatusCode(response: response, data: data)
         
         // Decoding 및 반환
         return try decoding(to: data)
@@ -162,8 +169,14 @@ enum NetworkError: Error {
     case urlRequestFailure(urlString: String)
     
     /// 유효하지 않은 Response입니다.
-    case invalidResponse(urlString: String, statusCode: Int)
+    case invalidResponse(urlString: String, statusCode: Int, message: String?)
     
     /// Decoding에 실패했습니다.
-    case decodingFailure(data: Data)
+    case decodingFailure(type: Decodable.Type)
+    
+    struct BaseResponse: Decodable {
+        let timeStamp: String
+        let code: String
+        let message: String
+    }
 }

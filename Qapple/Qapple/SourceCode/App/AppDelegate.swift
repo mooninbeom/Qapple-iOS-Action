@@ -57,7 +57,6 @@ class AppDelegate: NSObject, UIApplicationDelegate{
     func application(_ application: UIApplication, didRegisterForRemoteNotificationsWithDeviceToken deviceToken: Data) {
         
         let deviceTokenString = deviceToken.map { String(format: "%02x", $0) }.joined()
-        // print("✅ [Device Token Successed]\n\(deviceTokenString)\n")
         
         // Device Token 업데이트
         do {

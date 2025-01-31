@@ -29,18 +29,21 @@ struct SignUpFeature {
         Reduce { state, action in
             switch action {
             case let .socialLogin(.delegate(.signInResponse(isSignUp))):
-                state.path.append(.emailForm(.init()))
-//                if isSignUp {
-//                    state.isSignIn = true
-//                } else {
-//                    state.path.append(.emailForm(.init()))
-//                }
+                if isSignUp {
+                    state.isSignIn = true
+                } else {
+                    state.path.append(.emailForm(.init()))
+                }
                 return .none
                 
             case let .path(stackAction):
                 switch stackAction {
-                case .element(id: _, action: .emailForm(.sendCertificationEmailResponse)):
-                    state.path.append(.authCodeForm(.init()))
+                case let .element(id: _, action: .emailForm(.sendCertificationEmailResponse(email))):
+                    state.path.append(.authCodeForm(.init(emailText: email)))
+                    return .none
+                    
+                case .element(id: _, action: .authCodeForm(.nextButtonTapped)):
+                    state.path.append(.nicknameForm(.init()))
                     return .none
                     
                 default:
