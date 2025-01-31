@@ -44,6 +44,7 @@ struct SocialLoginView: View {
         .padding(.horizontal, 24)
         .background(LinearGradient.backgroundGradient)
         .ignoresSafeArea()
+        .loadingIndicator(isLoading: store.isLoading)
     }
 }
 

@@ -19,6 +19,7 @@ struct SocialLoginFeature {
     enum Action {
         case appleLoginOnRequest(ASAuthorizationAppleIDRequest)
         case appleLoginOnCompletion(Result<ASAuthorization, Error>)
+        case toggleLoading(Bool)
         case delegate(Delegate)
         
         enum Delegate {
@@ -39,6 +40,7 @@ struct SocialLoginFeature {
                 
             case let .appleLoginOnCompletion(result):
                 return .run { send in
+                    await send(.toggleLoading(true), animation: .bouncy)
                     do {
                         let authCode = try await appleLoginService.loginCompletion(result)
                         let deviceToken = try keychainService.fetchData(.deviceToken)
@@ -47,7 +49,12 @@ struct SocialLoginFeature {
                     } catch {
                         print(error)
                     }
+                    await send(.toggleLoading(false), animation: .bouncy)
                 }
+                
+            case let .toggleLoading(bool):
+                state.isLoading = bool
+                return .none
                 
             case .delegate:
                 return .none

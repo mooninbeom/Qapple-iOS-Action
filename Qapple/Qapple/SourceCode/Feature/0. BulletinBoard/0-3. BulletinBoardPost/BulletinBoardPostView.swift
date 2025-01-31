@@ -100,7 +100,7 @@ private struct Placeholder: View {
                 .font(.pretendard(.medium, size: 16))
                 .lineSpacing(6)
         }
-        .foregroundStyle(TextLabel.placeholder)
+        .foregroundStyle(TextLabel.ph)
         .padding(.horizontal, 24)
     }
 }

@@ -109,7 +109,7 @@ struct ProfileEditView: View {
                     ZStack(alignment: .leading) {
                         if viewModel.nickname.isEmpty {
                             Text("닉네임을 입력해주세요")
-                                .foregroundStyle(TextLabel.placeholder)
+                                .foregroundStyle(TextLabel.ph)
                                 .font(Font.pretendard(.semiBold, size: 20))
                                 .frame(height: 14)
                         }
@@ -140,7 +140,7 @@ struct ProfileEditView: View {
                                 }
                             
                             Text("\(viewModel.nickname.count)/\(nicknameLimit)")
-                                .foregroundStyle(TextLabel.placeholder)
+                                .foregroundStyle(TextLabel.ph)
                                 .font(Font.pretendard(.semiBold, size: 14))
                                 .frame(height: 8)
                         }

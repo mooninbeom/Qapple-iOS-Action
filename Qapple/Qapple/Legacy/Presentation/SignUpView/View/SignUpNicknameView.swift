@@ -76,7 +76,7 @@ struct SignUpNicknameView: View {
                     ZStack(alignment: .leading) {
                         if authViewModel.nickname.isEmpty {
                             Text("닉네임을 입력해주세요")
-                                .foregroundStyle(TextLabel.placeholder)
+                                .foregroundStyle(TextLabel.ph)
                                 .font(Font.pretendard(.semiBold, size: 20))
                                 .frame(height: 14)
                         }
@@ -107,7 +107,7 @@ struct SignUpNicknameView: View {
                                 }
                             
                             Text("\(authViewModel.nickname.count)/\(nicknameLimit)")
-                                .foregroundStyle(TextLabel.placeholder)
+                                .foregroundStyle(TextLabel.ph)
                                 .font(Font.pretendard(.semiBold, size: 14))
                                 .frame(height: 8)
                         }

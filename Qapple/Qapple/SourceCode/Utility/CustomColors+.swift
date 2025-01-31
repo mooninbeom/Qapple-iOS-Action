@@ -53,7 +53,7 @@ extension Color {
         static let sub3 = Color(.sub3)
         static let sub4 = Color(.sub4)
         static let disable = Color(.disable)
-        static let placeholder = Color(.placeholder)
+        static let ph = Color(.placeholder)
         static let bk = Color(.bk)
     }
 }

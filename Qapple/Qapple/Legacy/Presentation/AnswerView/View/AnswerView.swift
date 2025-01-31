@@ -86,12 +86,12 @@ struct AnswerView: View {
                         VStack(spacing: 16) {
                             Text("자유롭게 생각을\n작성해주세요")
                                 .font(.pretendard(.semiBold, size: 48))
-                                .foregroundStyle(TextLabel.placeholder)
+                                .foregroundStyle(TextLabel.ph)
                                 .padding(.horizontal, 24)
                             
                             Text("* 부적절하거나 불쾌감을 줄 수 있는\n콘텐츠는 제재를 받을 수 있어요")
                                 .font(.pretendard(.medium, size: 16))
-                                .foregroundStyle(TextLabel.placeholder)
+                                .foregroundStyle(TextLabel.ph)
                                 .padding(.horizontal, 24)
                                 .lineSpacing(6)
                         }

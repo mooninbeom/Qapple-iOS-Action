@@ -120,7 +120,7 @@ private struct AnswerTextField: View {
             Text("* 부적절하거나 불쾌감을 줄 수 있는\n콘텐츠는 제재를 받을 수 있어요")
                 .font(.pretendard(.medium, size: 16))
         }
-        .foregroundStyle(TextLabel.placeholder)
+        .foregroundStyle(TextLabel.ph)
         .padding(.horizontal, 24)
         .multilineTextAlignment(.center)
         .lineSpacing(6)
