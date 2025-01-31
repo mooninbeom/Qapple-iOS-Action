@@ -149,3 +149,11 @@ private struct PostListView: View {
         .disabled(store.isLoading)
     }
 }
+
+// MARK: - Preview
+
+#Preview {
+    BulletinBoardView(store: Store(initialState: BulletinBoardFeature.State()) {
+        BulletinBoardFeature()
+    })
+}
