@@ -6,13 +6,16 @@
 //
 
 import SwiftUI
+import ComposableArchitecture
 
 struct ProfileEditView: View {
+    
+    @Bindable var store: StoreOf<ProfileEditFeature>
     
     @EnvironmentObject var pathModel: Router
     @StateObject private var viewModel: ProfileEditViewModel = .init()
     
-    @State var defaultNickName: String
+    @State private var defaultNickName: String?
     @State private var isEditFailed = false
     @State private var isNicknameCheckButtonTapped = false
     
@@ -36,9 +39,9 @@ struct ProfileEditView: View {
         }
     }
     
-    init(nickName: String) {
-        defaultNickName = nickName
-    }
+//    init(nickName: String) {
+//        defaultNickName = nickName
+//    }
     
     var body: some View {
         ZStack {
@@ -47,31 +50,15 @@ struct ProfileEditView: View {
                     title: "프로필 수정",
                     backgroundColor: Background.second,
                     leadingView: {
-                        CustomNavigationBackButton(buttonType: .arrow) {
-                            pathModel.pop()
+                        NavigationButton(buttonType: .xmark) {
+                            store.send(.backButtonTapped)
                         }
                     },
                     trailingView: {
-                        Button {
-                            Task {
-                                do {
-                                    try await viewModel.requestEditProfile()
-                                    pathModel.pop()
-                                } catch {
-                                    isEditFailed.toggle()
-                                }
-                            }
-                        } label: {
-                            Text("완료")
-                                .font(.pretendard(.semiBold, size: 16))
-                                .foregroundStyle(viewModel.isNicknameCanUse ? BrandPink.text : TextLabel.sub4)
+                        NavigationButton(buttonType: .text("완료", store.nicknameCheck ? BrandPink.text : TextLabel.sub4)) {
+                            store.send(.successButtonTapped)
                         }
-                        .disabled(!viewModel.isNicknameCanUse)
-                        .alert("회원 정보 수정에 실패했습니다", isPresented: $isEditFailed) {
-                            Button("확인", role: .none, action: {})
-                        } message: {
-                            Text("다시 요청해주세요")
-                        }
+                        .disabled(!store.nicknameCheck)
                     }
                 )
                 
@@ -196,12 +183,15 @@ struct ProfileEditView: View {
         .navigationBarBackButtonHidden()
         .navigationBarTitleDisplayMode(.inline)
         .onAppear {
-            viewModel.nickname = defaultNickName
+            viewModel.nickname = defaultNickName ?? ""
         }
+        .alert($store.scope(state: \.alert, action: \.alert))
     }
 }
 
 #Preview {
-    ProfileEditView(nickName: "튼튼한 민톨")
+    ProfileEditView(store: Store(initialState: ProfileEditFeature.State()) {
+        ProfileEditFeature()
+    })
 }
 

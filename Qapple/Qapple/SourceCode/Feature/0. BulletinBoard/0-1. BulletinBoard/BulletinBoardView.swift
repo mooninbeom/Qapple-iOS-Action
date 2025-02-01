@@ -56,26 +56,11 @@ private struct BoardView: View {
                 title: "게시판",
                 trailingView: {
                     HStack(spacing: 12) {
-                        Spacer()
-                        
-                        Button {
+                        NavigationButton(buttonType: .image(.noticeIcon)) {
                             store.send(.notificationButtonTapped)
-                        } label: {
-                            Image(.noticeIcon)
-                                .resizable()
-                                .scaledToFill()
-                                .foregroundColor(GrayScale.icon)
-                                .frame(width: 26 , height: 26)
                         }
-                        
-                        Button {
+                        NavigationButton(buttonType: .image(.search)) {
                             store.send(.searchButtonTapped)
-                        } label: {
-                            Image(.search)
-                                .resizable()
-                                .scaledToFill()
-                                .foregroundColor(GrayScale.icon)
-                                .frame(width: 26 , height: 26)
                         }
                     }
                     .padding(.trailing, 8)

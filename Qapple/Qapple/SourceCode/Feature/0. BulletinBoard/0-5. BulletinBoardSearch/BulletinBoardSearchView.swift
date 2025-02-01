@@ -50,7 +50,7 @@ private struct SearchNavigationBar: View {
             title: "검색하기",
             backgroundColor: Background.first,
             leadingView: {
-                CustomNavigationBackButton(buttonType: .arrow) {
+                NavigationButton(buttonType: .xmark) {
                     store.send(.backButtonTapped)
                 }
             })
