@@ -10,7 +10,7 @@ import SwiftUI
 
 struct TermsAgreementView: View {
     
-    let store: StoreOf<TermsAgreementFeature>
+    @Bindable var store: StoreOf<TermsAgreementFeature>
     
     var body: some View {
         VStack(alignment: .leading, spacing: 0) {
@@ -61,6 +61,12 @@ struct TermsAgreementView: View {
         .background(.first)
         .navigationBarBackButtonHidden()
         .loadingIndicator(isLoading: store.isLoading)
+        .sheet(item: $store.scope(state: \.sheet, action: \.sheet)) { sheet in
+            switch sheet.case {
+            case .termsOfService: TermsContentView(title: "서비스 이용 약관", content: Constant.termsOfService)
+            case .privacyPolicy: TermsContentView(title: "개인정보 처리 방침", content: Constant.privacyPolicy)
+            }
+        }
     }
 }
 
@@ -102,9 +108,6 @@ private struct TermsList: View {
             TermCell(
                 title: "* 필수) 최종 사용자 사용권 계약",
                 isActive: store.isUserLicenseAgree,
-                goToPageAction: {
-                    store.send(.userLicensePageButtonTapped)
-                },
                 toggleCheckBox: {
                     store.send(.userLicenseAgreeButtonTapped, animation: .bouncy)
                 }

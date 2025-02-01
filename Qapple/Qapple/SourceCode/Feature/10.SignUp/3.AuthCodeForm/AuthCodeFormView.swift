@@ -55,7 +55,7 @@ struct AuthCodeFormView: View {
                             isActive: true,
                             variation: .secondary,
                             tapAction: {
-                                store.send(.reSendMailButtonTapped)
+                                store.send(.reSendMailButtonTapped, animation: .bouncy)
                             }
                         )
                     }
@@ -100,7 +100,7 @@ struct AuthCodeFormView: View {
             isActive: store.isAuthCodeEnterComplete || store.isLoading,
             variation: .primary,
             tapAction: {
-                store.send(.checkAuthCodeButtonTapped)
+                store.send(.checkAuthCodeButtonTapped, animation: .bouncy)
             }
         )
     }

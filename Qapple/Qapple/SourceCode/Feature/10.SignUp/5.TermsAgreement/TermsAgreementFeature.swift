@@ -17,6 +17,7 @@ struct TermsAgreementFeature {
         var isPrivacyPolicyAgree = false
         var isUserLicenseAgree = false
         var isLoading = false
+        @Presents var sheet: Sheet.State?
     }
     
     enum Action {
@@ -28,8 +29,8 @@ struct TermsAgreementFeature {
         case userLicenseAgreeButtonTapped
         case termsOfServicePageButtonTapped
         case privacyPolicyPageButtonTapped
-        case userLicensePageButtonTapped
         case toggleLoading(Bool)
+        case sheet(PresentationAction<Sheet.Action>)
     }
     
     @Dependency(\.dismiss) var dismiss
@@ -74,18 +75,32 @@ struct TermsAgreementFeature {
                 return .none
                 
             case .termsOfServicePageButtonTapped:
+                state.sheet = .termsOfService
                 return .none
                 
             case .privacyPolicyPageButtonTapped:
-                return .none
-                
-            case .userLicensePageButtonTapped:
+                state.sheet = .privacyPolicy
                 return .none
                 
             case let .toggleLoading(bool):
                 state.isLoading = bool
                 return .none
+                
+            case .sheet:
+                return .none
             }
         }
+        .ifLet(\.$sheet, action: \.sheet)
+    }
+}
+
+// MARK: - Sheet
+
+extension TermsAgreementFeature {
+    
+    @Reducer(state: .equatable)
+    enum Sheet {
+        case termsOfService
+        case privacyPolicy
     }
 }

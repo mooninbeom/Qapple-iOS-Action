@@ -56,7 +56,7 @@ struct NicknameFormView: View {
                         isActive: !store.nicknameText.isEmpty && store.isNicknameValidate,
                         variation: .primary,
                         tapAction: {
-                            store.send(.checkDuplicateButtonTapped)
+                            store.send(.checkDuplicateButtonTapped, animation: .bouncy)
                         }
                     )
                 }

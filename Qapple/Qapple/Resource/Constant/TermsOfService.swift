@@ -1,5 +1,5 @@
 //
-//  ServiceTerms.swift
+//  TermsOfService.swift
 //  Qapple
 //
 //  Created by 김민준 on 1/20/25.
@@ -8,7 +8,7 @@
 import Foundation
 
 extension Constant {
-    static let serviceTermsText = """
+    static let termsOfService = """
     # 서비스 이용약관
     
     ### 제 1 장 총칙
