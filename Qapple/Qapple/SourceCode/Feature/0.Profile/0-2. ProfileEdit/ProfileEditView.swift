@@ -12,37 +12,6 @@ struct ProfileEditView: View {
     
     @Bindable var store: StoreOf<ProfileEditFeature>
     
-    @EnvironmentObject var pathModel: Router
-    @StateObject private var viewModel: ProfileEditViewModel = .init()
-    
-    @State private var defaultNickName: String?
-    @State private var isEditFailed = false
-    @State private var isNicknameCheckButtonTapped = false
-    
-    private let nicknameLimit = 15
-    
-    /// 중복 검사 전 설명 문자입니다.
-    private var beforeDescription: String {
-        if viewModel.isNicknameFieldAvailable {
-            return "* 캐플은 익명 닉네임을 권장해요"
-        } else {
-            return "초성, 숫자, 특수문자는 사용할 수 없어요"
-        }
-    }
-    
-    /// 중복 검사 후 설명 문자입니다.
-    private var afterDescription: String {
-        if viewModel.isNicknameCanUse {
-            return "사용 가능한 닉네임이에요"
-        } else {
-            return "이미 사용 중인 닉네임이에요"
-        }
-    }
-    
-//    init(nickName: String) {
-//        defaultNickName = nickName
-//    }
-    
     var body: some View {
         ZStack {
             VStack(alignment: .leading, spacing: 0) {
@@ -160,10 +129,6 @@ private struct WriteNickname: View {
 private struct NicknameCheck: View {
     
     let store: StoreOf<ProfileEditFeature>
-    
-    @StateObject private var viewModel: ProfileEditViewModel = .init()
-    @State private var isNicknameCheckButtonTapped = false
-    @State private var defaultNickName: String?
     
     /// 중복 검사 전 설명 문자입니다.
     private var beforeDescription: String {

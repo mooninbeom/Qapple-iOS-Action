@@ -25,7 +25,6 @@ struct ProfileEditFeature {
     
     enum Action: BindableAction {
         case alert(PresentationAction<Alert>)
-        case delegate(Delegate)
         
         case backButtonTapped
         case successButtonTapped
@@ -40,10 +39,6 @@ struct ProfileEditFeature {
         enum Alert {
             case confirmFailEdit
         }
-        
-        enum Delegate {
-            case confirmFailEdit
-        }
     }
     
     @Dependency(\.memberRepository) var memberRepository
@@ -52,7 +47,7 @@ struct ProfileEditFeature {
         BindingReducer()
         Reduce { state, action in
             switch action {
-            case .alert, .delegate, .binding:
+            case .alert, .binding:
                 return .none
                 
             case .backButtonTapped:
