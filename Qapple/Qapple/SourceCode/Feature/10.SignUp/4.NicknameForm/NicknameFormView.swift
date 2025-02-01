@@ -14,7 +14,7 @@ struct NicknameFormView: View {
     @FocusState private var isTextFieldFocused: Bool
     
     var body: some View {
-        VStack(alignment: .leading) {
+        VStack(alignment: .leading, spacing: 0) {
             NavigationBar(
                 title: "회원가입",
                 leadingView: {
@@ -34,7 +34,7 @@ struct NicknameFormView: View {
                 .font(.pretendard(.medium, size: 16))
                 .foregroundStyle(.sub3)
                 .lineLimit(2)
-                .padding(.top, 4)
+                .padding(.top, 12)
                 .padding(.horizontal, 24)
             
             QPTextField(
