@@ -1,5 +1,5 @@
 //
-//  SignUpView.swift
+//  SignUpFlowView.swift
 //  Qapple
 //
 //  Created by 김민준 on 1/30/25.
@@ -8,9 +8,9 @@
 import ComposableArchitecture
 import SwiftUI
 
-struct SignUpView: View {
+struct SignUpFlowView: View {
     
-    @Bindable var store: StoreOf<SignUpFeature>
+    @Bindable var store: StoreOf<SignUpFlowFeature>
     
     var body: some View {
         NavigationStack(path: $store.scope(state: \.path, action: \.path)) {
@@ -21,6 +21,7 @@ struct SignUpView: View {
             case let .authCodeForm(store): AuthCodeFormView(store: store)
             case let .nicknameForm(store): NicknameFormView(store: store)
             case let .termsAgreement(store): TermsAgreementView(store: store)
+            case let .signUpComplete(store): SignUpCompleteView(store: store)
             }
         }
     }
@@ -29,7 +30,7 @@ struct SignUpView: View {
 // MARK: - Preview
 
 #Preview {
-    SignUpView(store: Store(initialState: SignUpFeature.State()) {
-        SignUpFeature()
+    SignUpFlowView(store: Store(initialState: SignUpFlowFeature.State()) {
+        SignUpFlowFeature()
     })
 }

@@ -171,7 +171,13 @@ private struct TermCell: View {
 // MARK: - Preview
 
 #Preview {
-    TermsAgreementView(store: Store(initialState: TermsAgreementFeature.State()) {
+    TermsAgreementView(
+        store: Store(
+            initialState: TermsAgreementFeature.State(
+                emailText: "",
+                nicknameText: ""
+            )
+        ) {
         TermsAgreementFeature()
     })
 }

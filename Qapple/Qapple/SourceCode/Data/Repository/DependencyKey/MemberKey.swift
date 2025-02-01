@@ -77,7 +77,7 @@ extension QappleRepository {
     static func makeSignUp() -> (_ signUpToken: String, _ email: String, _ nickname: String, _ profileImage: String?, _ deviceToken: String) async throws -> SignUpDTO {
         return { signUpToken, email, nickname, profileImage, deviceToken in
             let url = try QappleAPI.Member.signUp.url()
-            let requestBody: SignUpRequest = SignUpRequest(signUpToken: signUpToken, email: email, nickname: nickname, profileImage: profileImage, deviceToken: deviceToken)
+            let requestBody: SignUpRequest = SignUpRequest(signUpToken: signUpToken, email: email, nickname: nickname, deviceToken: deviceToken)
             let response: BaseResponse<SignUpDTO> = try await NetworkService.shared.post(url: url, body: requestBody)
             return response.result
         }

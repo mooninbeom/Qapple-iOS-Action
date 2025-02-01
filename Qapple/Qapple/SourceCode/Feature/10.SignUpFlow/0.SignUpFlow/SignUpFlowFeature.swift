@@ -1,5 +1,5 @@
 //
-//  SignUpFeature.swift
+//  SignUpFlowFeature.swift
 //  Qapple
 //
 //  Created by 김민준 on 1/30/25.
@@ -8,7 +8,7 @@
 import ComposableArchitecture
 
 @Reducer
-struct SignUpFeature {
+struct SignUpFlowFeature {
     
     @ObservableState
     struct State: Equatable {
@@ -42,12 +42,20 @@ struct SignUpFeature {
                     state.path.append(.authCodeForm(.init(emailText: email)))
                     return .none
                     
-                case .element(id: _, action: .authCodeForm(.nextButtonTapped)):
-                    state.path.append(.nicknameForm(.init()))
+                case let .element(id: _, action: .authCodeForm(.authCodeFormComplete(email))):
+                    state.path.append(.nicknameForm(.init(emailText: email)))
                     return .none
                     
-                case .element(id: _, action: .nicknameForm(.nextButtonTapped)):
-                    state.path.append(.termsAgreement(.init()))
+                case let .element(id: _, action: .nicknameForm(.nicknameFormComplete(email, nickname))):
+                    state.path.append(.termsAgreement(.init(emailText: email, nicknameText: nickname)))
+                    return .none
+                    
+                case .element(id: _, action: .termsAgreement(.signUpResponse)):
+                    state.path.append(.signUpComplete(.init()))
+                    return .none
+                    
+                case .element(id: _, action: .signUpComplete(.startButtonTapped)):
+                    state.isSignIn = true
                     return .none
                     
                 default:
@@ -63,7 +71,7 @@ struct SignUpFeature {
 
 // MARK: - Path
 
-extension SignUpFeature {
+extension SignUpFlowFeature {
     
     @Reducer(state: .equatable)
     enum Path {
@@ -71,5 +79,6 @@ extension SignUpFeature {
         case authCodeForm(AuthCodeFormFeature)
         case nicknameForm(NicknameFormFeature)
         case termsAgreement(TermsAgreementFeature)
+        case signUpComplete(SignUpCompleteFeature)
     }
 }

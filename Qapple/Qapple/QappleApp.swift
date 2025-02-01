@@ -17,16 +17,16 @@ struct QappleApp: App {
         MainFeature()
     }
     
-    private let signUpStore = Store(initialState: SignUpFeature.State()) {
-        SignUpFeature()
+    private let signUpFlowStore = Store(initialState: SignUpFlowFeature.State()) {
+        SignUpFlowFeature()
     }
     
     var body: some Scene {
         WindowGroup {
-            if signUpStore.isSignIn {
+            if signUpFlowStore.isSignIn {
                 MainView(store: mainStore)
             } else {
-                SignUpView(store: signUpStore)
+                SignUpFlowView(store: signUpFlowStore)
             }
         }
     }

@@ -13,12 +13,13 @@ struct NicknameFormFeature {
     
     @ObservableState
     struct State: Equatable {
+        let emailText: String
+        let nicknameLimit = 15
         var nicknameText = ""
         var isNicknameValidate = true
         var isNicknameDuplicate = false
         var isNicknameCheckComplete = false
         var isLoading = false
-        let nicknameLimit = 15
     }
     
     enum Action: BindableAction {
@@ -26,6 +27,7 @@ struct NicknameFormFeature {
         case nextButtonTapped
         case checkDuplicateButtonTapped
         case checkNicknameDuplicateResponse
+        case nicknameFormComplete(email: String, nickname: String)
         case toggleLoading(Bool)
         case binding(BindingAction<State>)
     }
@@ -43,7 +45,9 @@ struct NicknameFormFeature {
                 }
                 
             case .nextButtonTapped:
-                return .none
+                return .run { [email = state.emailText, nickname = state.nicknameText] send in
+                    await send(.nicknameFormComplete(email: email, nickname: nickname))
+                }
                 
             case .checkDuplicateButtonTapped:
                 return .run { [nickname = state.nicknameText] send in
@@ -59,6 +63,9 @@ struct NicknameFormFeature {
                 
             case .checkNicknameDuplicateResponse:
                 state.isNicknameCheckComplete = true
+                return .none
+                
+            case .nicknameFormComplete:
                 return .none
                 
             case let .toggleLoading(bool):

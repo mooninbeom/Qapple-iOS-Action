@@ -91,7 +91,7 @@ struct NicknameFormView: View {
 // MARK: - Preview
 
 #Preview {
-    NicknameFormView(store: Store(initialState: NicknameFormFeature.State()) {
+    NicknameFormView(store: Store(initialState: NicknameFormFeature.State(emailText: "")) {
         NicknameFormFeature()
     })
 }

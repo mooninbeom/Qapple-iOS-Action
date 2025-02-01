@@ -12,6 +12,8 @@ struct TermsAgreementFeature {
     
     @ObservableState
     struct State: Equatable {
+        let emailText: String
+        let nicknameText: String
         var isAllTermsAgree = false
         var isTermsOfServiceAgree = false
         var isPrivacyPolicyAgree = false
@@ -29,10 +31,12 @@ struct TermsAgreementFeature {
         case userLicenseAgreeButtonTapped
         case termsOfServicePageButtonTapped
         case privacyPolicyPageButtonTapped
+        case signUpResponse
         case toggleLoading(Bool)
         case sheet(PresentationAction<Sheet.Action>)
     }
     
+    @Dependency(\.memberRepository) var memberRepository
     @Dependency(\.dismiss) var dismiss
     
     var body: some ReducerOf<Self> {
@@ -44,7 +48,16 @@ struct TermsAgreementFeature {
                 }
                 
             case .nextButtonTapped:
-                return .none
+                return .run { [email = state.emailText, nickname = state.nicknameText] send in
+                    await send(.toggleLoading(true), animation: .bouncy)
+                    do {
+                        try await memberRepository.signUp(email, nickname)
+                        await send(.signUpResponse)
+                    } catch {
+                        print(error)
+                    }
+                    await send(.toggleLoading(false), animation: .bouncy)
+                }
                 
             case .allTermsAgreeButtonTapped:
                 state.isAllTermsAgree.toggle()
@@ -80,6 +93,9 @@ struct TermsAgreementFeature {
                 
             case .privacyPolicyPageButtonTapped:
                 state.sheet = .privacyPolicy
+                return .none
+                
+            case .signUpResponse:
                 return .none
                 
             case let .toggleLoading(bool):

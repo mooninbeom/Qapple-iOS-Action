@@ -12,13 +12,13 @@ struct AuthCodeFormFeature {
     
     @ObservableState
     struct State: Equatable {
-        var emailText: String
+        let emailText: String
+        let authCodeLimit = 5
         var authCodeText: String = ""
         var isAuthCodeEnterComplete = false
         var isAuthCodeValidate = true
         var isAuthCheckComplete = false
         var isLoading = false
-        let authCodeLimit = 5
     }
     
     enum Action: BindableAction {
@@ -28,6 +28,7 @@ struct AuthCodeFormFeature {
         case checkAuthCodeResponse
         case checkAuthCodeFailed
         case nextButtonTapped
+        case authCodeFormComplete(email: String)
         case toggleLoading(Bool)
         case binding(BindingAction<State>)
     }
@@ -80,6 +81,11 @@ struct AuthCodeFormFeature {
                 return .none
                 
             case .nextButtonTapped:
+                return .run { [email = state.emailText] send in
+                    await send(.authCodeFormComplete(email: email))
+                }
+                
+            case .authCodeFormComplete:
                 return .none
                 
             case let .toggleLoading(bool):

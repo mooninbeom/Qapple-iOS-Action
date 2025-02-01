@@ -301,7 +301,7 @@ private struct LegacySignInView: View {
                             SignUpServiceTermsView()
                             
                         case .signUpCompleted:
-                            SignUpCompletedView()
+                            LegacySignUpCompletedView()
                             
                         default:
                             EmptyView()
