@@ -15,10 +15,11 @@ struct ProfileEditFeature {
         @Presents var alert: AlertState<Action.Alert>?
         let textLimit = 15
         let pattern = "^[가-힣a-zA-Z\\s]*$"
-        var nickname: String = ""
+        var nickname: String
         var defaultNickname: String
-        var nicknameCheck: Bool = false
+        var nicknameCheck: Bool = true
         var nicknameFieldAvailable: Bool = true
+        var nicknameChange: Bool = false
         var isLoading = false
     }
     
@@ -28,7 +29,10 @@ struct ProfileEditFeature {
         
         case backButtonTapped
         case successButtonTapped
+        case nicknameCheckButtonTapped
         case failEdit
+        case toggleNicknameCheck(Bool)
+        case toggleNicknameChange(Bool)
         case binding(BindingAction<State>)
         case nicknameChanged(String)
         case toggleLoading(Bool)
@@ -56,31 +60,50 @@ struct ProfileEditFeature {
                 return .none
                 
             case .successButtonTapped:
-                // TODO: Navigation 처리
                 let nickname = state.nickname
                 return .run { send in
                     await send(.toggleLoading(true), animation: .bouncy)
                     do {
                         try await memberRepository.editMyPage(nickname, nil)
+                        // TODO: Navigation 처리
                     } catch {
                         print(error)
                         await send(.failEdit)
                     }
                     await send(.toggleLoading(false), animation: .bouncy)
                 }
+                
+            case .nicknameCheckButtonTapped:
+                let nickname = state.nickname
+                return .run { send in
+                    await send(.toggleLoading(true), animation: .bouncy)
+                    do {
+                        let data = try await memberRepository.nicknameCheck(nickname)
+                        await send(.toggleNicknameCheck(!data))
+                        await send(.toggleNicknameChange(false))
+                    } catch {
+                        print(error)
+                    }
+                    await send(.toggleLoading(false), animation: .bouncy)
+                }
+                
             case .failEdit:
                 state.alert = .confirmFailEdit
+                return .none
+                
+            case let .toggleNicknameCheck(bool):
+                state.nicknameCheck = bool
+                return .none
+                
+            case let .toggleNicknameChange(bool):
+                state.nicknameChange = bool
                 return .none
                 
             case .binding(\.nickname):
                 return .none
                 
             case let .nicknameChanged(nickname):
-                if state.defaultNickname == nickname {
-                    state.nicknameCheck = true
-                } else {
-                    state.nicknameCheck = false
-                }
+                let defaultNickname = state.defaultNickname
                 
                 state.nickname = nickname.trimmingCharacters(in: .whitespacesAndNewlines)
                 
@@ -97,7 +120,14 @@ struct ProfileEditFeature {
                     }
                 }
                 
-                return .none
+                return .run { send in
+                    if defaultNickname == nickname {
+                        await send(.toggleNicknameCheck(true))
+                        await send(.toggleNicknameChange(false))
+                    } else {
+                        await send(.toggleNicknameChange(true))
+                    }
+                }
                 
             case let .toggleLoading(bool):
                 state.isLoading = bool

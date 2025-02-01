@@ -55,10 +55,10 @@ struct ProfileEditView: View {
                         }
                     },
                     trailingView: {
-                        NavigationButton(buttonType: .text("완료", store.nicknameCheck ? BrandPink.text : TextLabel.sub4)) {
+                        NavigationButton(buttonType: .text("완료", store.nicknameCheck && !store.nicknameChange ? BrandPink.text : TextLabel.sub4)) {
                             store.send(.successButtonTapped)
                         }
-                        .disabled(!store.nicknameCheck)
+                        .disabled(!store.nicknameCheck && !store.nicknameChange)
                     }
                 )
                 
@@ -74,9 +74,6 @@ struct ProfileEditView: View {
         .background(Background.second)
         .navigationBarBackButtonHidden()
         .navigationBarTitleDisplayMode(.inline)
-        .onAppear {
-            viewModel.nickname = defaultNickName ?? ""
-        }
         .alert($store.scope(state: \.alert, action: \.alert))
     }
 }
@@ -179,7 +176,7 @@ private struct NicknameCheck: View {
     
     /// 중복 검사 후 설명 문자입니다.
     private var afterDescription: String {
-        if viewModel.isNicknameCanUse {
+        if store.nicknameCheck {
             return "사용 가능한 닉네임이에요"
         } else {
             return "이미 사용 중인 닉네임이에요"
@@ -188,37 +185,34 @@ private struct NicknameCheck: View {
     
     var body: some View {
         HStack {
-            Text(!isNicknameCheckButtonTapped ? beforeDescription : afterDescription)
+            Text(store.nicknameChange ? beforeDescription : afterDescription)
                 .font(.pretendard(.semiBold, size: 14))
-                .foregroundStyle(viewModel.isNicknameFieldAvailable ? TextLabel.sub1 : Context.warning)
+                .foregroundStyle(store.nicknameFieldAvailable ? TextLabel.sub1 : Context.warning)
             
             Spacer()
             
-            if viewModel.nickname != defaultNickName {
+            if store.nicknameChange {
                 Button {
-                    Task {
-                        await viewModel.requestNicknameCheck()
-                        isNicknameCheckButtonTapped = true
-                    }
+                    store.send(.nicknameCheckButtonTapped)
                 } label: {
                     Text("중복 검사")
                         .font(.pretendard(.medium, size: 14))
-                        .foregroundStyle((viewModel.nickname.isEmpty || !viewModel.isNicknameFieldAvailable) ? TextLabel.sub4 : TextLabel.main)
+                        .foregroundStyle((store.nickname.isEmpty || !store.nicknameFieldAvailable) ? TextLabel.sub4 : TextLabel.main)
                 }
                 .padding(.horizontal, 12)
                 .padding(.vertical, 8)
                 .background(
-                    (viewModel.nickname.isEmpty || !viewModel.isNicknameFieldAvailable) ? GrayScale.secondaryButton : BrandPink.button)
+                    (store.nickname.isEmpty || !store.nicknameFieldAvailable) ? GrayScale.secondaryButton : BrandPink.button)
                 .cornerRadius(20, corners: .allCorners)
-                .disabled(viewModel.nickname.isEmpty ||
-                          !viewModel.isNicknameFieldAvailable)
+                .disabled(store.nickname.isEmpty ||
+                          !store.nicknameFieldAvailable)
             }
         }
     }
 }
     
 #Preview {
-    ProfileEditView(store: Store(initialState: ProfileEditFeature.State(defaultNickname: "simmons")) {
+    ProfileEditView(store: Store(initialState: ProfileEditFeature.State(nickname: "simmons", defaultNickname: "simmons")) {
         ProfileEditFeature()
     })
 }
