@@ -109,31 +109,7 @@ private struct ProfileImageEdit: View {
 
 private struct WriteNickname: View {
     
-    let store: StoreOf<ProfileEditFeature>
-    
-    @StateObject private var viewModel: ProfileEditViewModel = .init()
-    @State private var isNicknameCheckButtonTapped = false
-    @State private var defaultNickName: String?
-    
-    private let nicknameLimit = 15
-    
-    /// 중복 검사 전 설명 문자입니다.
-    private var beforeDescription: String {
-        if viewModel.isNicknameFieldAvailable {
-            return "* 캐플은 익명 닉네임을 권장해요"
-        } else {
-            return "초성, 숫자, 특수문자는 사용할 수 없어요"
-        }
-    }
-    
-    /// 중복 검사 후 설명 문자입니다.
-    private var afterDescription: String {
-        if viewModel.isNicknameCanUse {
-            return "사용 가능한 닉네임이에요"
-        } else {
-            return "이미 사용 중인 닉네임이에요"
-        }
-    }
+    @Bindable var store: StoreOf<ProfileEditFeature>
     
     var body: some View {
         VStack(alignment: .leading, spacing: 0) {
@@ -152,31 +128,16 @@ private struct WriteNickname: View {
                 }
                 
                 HStack(spacing: 0) {
-                    TextField("", text: $viewModel.nickname)
+                    TextField(text: $store.nickname) {}
                         .foregroundStyle(TextLabel.main)
                         .font(Font.pretendard(.semiBold, size: 20))
                         .frame(height: 14)
                         .autocorrectionDisabled()
-                        .onChange(of: viewModel.nickname) { _ , nickname in
-                            
-                            // 닉네임 중복 검사 값  및 사용 가능 초기화
-                            isNicknameCheckButtonTapped = false
-                            viewModel.isNicknameCanUse = false
-                            
-                            // 글자 수 제한 로직
-                            if nickname.count > nicknameLimit {
-                                viewModel.nickname = String(nickname.prefix(nicknameLimit))
-                                return
-                            }
-                            
-                            // 띄어쓰기 방지 로직
-                            viewModel.nickname = nickname.trimmingCharacters(in: .whitespacesAndNewlines)
-                            
-                            // 특수문자 방지 로직
-                            viewModel.koreaLangCheck(nickname)
+                        .onChange(of: store.nickname) { _, nickname in
+                            store.send(.nicknameChanged(nickname))
                         }
                     
-                    Text("\(viewModel.nickname.count)/\(nicknameLimit)")
+                    Text("\(store.nickname.count)/\(store.textLimit)")
                         .foregroundStyle(TextLabel.placeholder)
                         .font(Font.pretendard(.semiBold, size: 14))
                         .frame(height: 8)
@@ -187,10 +148,10 @@ private struct WriteNickname: View {
             
             Rectangle()
                 .frame(height: 2)
-                .foregroundStyle(viewModel.isNicknameCanUse ? GrayScale.wh : (viewModel.nickname.isEmpty ? GrayScale.wh : BrandPink.button))
+                .foregroundStyle(store.nicknameCheck ? GrayScale.wh : (store.nickname.isEmpty ? GrayScale.wh : BrandPink.button))
                 .padding(.bottom, 8)
             
-            NicknameCheck()
+            NicknameCheck(store: store)
             
             Spacer()
         }
@@ -201,15 +162,15 @@ private struct WriteNickname: View {
 
 private struct NicknameCheck: View {
     
+    let store: StoreOf<ProfileEditFeature>
+    
     @StateObject private var viewModel: ProfileEditViewModel = .init()
     @State private var isNicknameCheckButtonTapped = false
     @State private var defaultNickName: String?
     
-    private let nicknameLimit = 15
-    
     /// 중복 검사 전 설명 문자입니다.
     private var beforeDescription: String {
-        if viewModel.isNicknameFieldAvailable {
+        if store.nicknameFieldAvailable {
             return "* 캐플은 익명 닉네임을 권장해요"
         } else {
             return "초성, 숫자, 특수문자는 사용할 수 없어요"
@@ -257,7 +218,7 @@ private struct NicknameCheck: View {
 }
     
 #Preview {
-    ProfileEditView(store: Store(initialState: ProfileEditFeature.State()) {
+    ProfileEditView(store: Store(initialState: ProfileEditFeature.State(defaultNickname: "simmons")) {
         ProfileEditFeature()
     })
 }

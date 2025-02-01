@@ -13,18 +13,24 @@ struct ProfileEditFeature {
     @ObservableState
     struct State: Equatable {
         @Presents var alert: AlertState<Action.Alert>?
+        let textLimit = 15
+        let pattern = "^[가-힣a-zA-Z\\s]*$"
         var nickname: String = ""
+        var defaultNickname: String
         var nicknameCheck: Bool = false
+        var nicknameFieldAvailable: Bool = true
         var isLoading = false
     }
     
-    enum Action {
+    enum Action: BindableAction {
         case alert(PresentationAction<Alert>)
         case delegate(Delegate)
         
         case backButtonTapped
         case successButtonTapped
         case failEdit
+        case binding(BindingAction<State>)
+        case nicknameChanged(String)
         case toggleLoading(Bool)
         
         enum Alert {
@@ -39,12 +45,10 @@ struct ProfileEditFeature {
     @Dependency(\.memberRepository) var memberRepository
     
     var body: some ReducerOf<Self> {
+        BindingReducer()
         Reduce { state, action in
             switch action {
-            case .alert:
-                return .none
-                
-            case .delegate:
+            case .alert, .delegate, .binding:
                 return .none
                 
             case .backButtonTapped:
@@ -66,6 +70,33 @@ struct ProfileEditFeature {
                 }
             case .failEdit:
                 state.alert = .confirmFailEdit
+                return .none
+                
+            case .binding(\.nickname):
+                return .none
+                
+            case let .nicknameChanged(nickname):
+                if state.defaultNickname == nickname {
+                    state.nicknameCheck = true
+                } else {
+                    state.nicknameCheck = false
+                }
+                
+                state.nickname = nickname.trimmingCharacters(in: .whitespacesAndNewlines)
+                
+                if nickname.count > state.textLimit {
+                    state.nickname = String(state.nickname.prefix(state.textLimit))
+                }
+                
+                if let regex = try? NSRegularExpression(pattern: state.pattern, options: .caseInsensitive) {
+                    let range = NSRange(location: 0, length: nickname.utf16.count)
+                    if regex.firstMatch(in: nickname, options: [], range: range) != nil {
+                        state.nicknameFieldAvailable = true
+                    } else {
+                        state.nicknameFieldAvailable = false
+                    }
+                }
+                
                 return .none
                 
             case let .toggleLoading(bool):
