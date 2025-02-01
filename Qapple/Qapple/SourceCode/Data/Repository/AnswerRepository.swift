@@ -9,6 +9,7 @@ import ComposableArchitecture
 import Foundation
 
 struct AnswerRepository {
+    var fetchAnswerListOfProfile: (_ threshold: Int?) async throws -> ([AnswerOfProfile], QappleAPI.PaginationInfo)
     var fetchAnswerPreviewList: (_ questionId: Int) async throws -> [Answer]
     var fetchAnswerListOfQuestion: (_ questionId: Int, _ threshold: String?) async throws -> (
         [Answer],
@@ -25,6 +26,11 @@ extension AnswerRepository: DependencyKey {
     private static let networkService = NetworkService.shared
     
     static let liveValue = Self(
+        fetchAnswerListOfProfile: { threshold in
+            let url = try QappleAPI.Answer.listOfProfile(threshold: threshold, pageSize: 25).url()
+            let response: BaseResponse<AnswersOfProfileDTO> = try await NetworkService.shared.get(url: url)
+            return response.result.toEntityWithThreshold
+        },
         fetchAnswerPreviewList: { questionId in
             let url = try QappleAPI.Answer.listOfQuestion(
                 questionId: Int(questionId),
@@ -59,6 +65,19 @@ extension AnswerRepository: DependencyKey {
     )
     
     static let previewValue = Self(
+        fetchAnswerListOfProfile: { _ in
+            let stubProfiles = (0..<10).map { i in
+                AnswerOfProfile(
+                    id: i,
+                    answerId: i,
+                    writerId: i,
+                    nickname: "러너 \(i)",
+                    content: "테스트 답변 \(i)",
+                    writeAt: "2025-01-23"
+                )
+            }
+            return (stubProfiles, .init(threshold: "10", hasNext: false))
+        },
         fetchAnswerPreviewList: { questionId in
             stubAnswerList.dropLast(22)
         },
