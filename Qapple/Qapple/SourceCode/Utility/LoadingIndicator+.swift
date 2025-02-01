@@ -13,13 +13,15 @@ struct LoadingIndicatorModifier: ViewModifier {
     
     func body(content: Content) -> some View {
         content
-            .disabled(isLoading)
             .overlay {
                 if isLoading {
-                    ProgressView()
-                        .scaleEffect(1.5)
-                        .progressViewStyle(.circular)
-                        .tint(.primary)
+                    ZStack {
+                        Color.black.opacity(0.0001).ignoresSafeArea()
+                        ProgressView()
+                            .scaleEffect(1.5)
+                            .progressViewStyle(.circular)
+                            .tint(.primary)
+                    }
                 }
             }
     }
