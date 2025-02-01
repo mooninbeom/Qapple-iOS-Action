@@ -63,6 +63,11 @@ struct AuthCodeFormView: View {
             )
             .padding(.top, 64)
             .padding(.horizontal, 24)
+            .disabled(store.isAuthCheckComplete)
+            .onChange(of: store.authCodeText) { _, value in
+                store.authCodeText = value.slice(to: store.authCodeLimit)
+                store.authCodeText = value.uppercased()
+            }
             
             Spacer()
             
@@ -83,7 +88,8 @@ struct AuthCodeFormView: View {
     }
     
     private var helperText: String {
-        store.isAuthCodeValidate
+        guard !store.isAuthCheckComplete else { return "인증이 완료되었어요" }
+        return store.isAuthCodeValidate
         ? "메일이 오지 않았나요? 스팸 메일함 혹은\n이메일 주소를 다시 한번 확인해주세요"
         : "인증 코드를 다시 입력해주세요"
     }

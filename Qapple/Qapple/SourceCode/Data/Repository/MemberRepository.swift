@@ -12,6 +12,7 @@ struct MemberRepository {
     var signIn: (_ code: String, _ deviceToken: String) async throws -> Bool
     var sendCertificationEmail: (_ email: String) async throws -> Bool
     var checkAuthCode: (_ email: String, _ certCode: String) async throws -> Bool
+    var checkNicknameDuplicate: (_ nickname: String) async throws -> Bool
 }
 
 // MARK: - DependencyKey
@@ -37,6 +38,11 @@ extension MemberRepository: DependencyKey {
         checkAuthCode: { email, certCode in
             let refreshToken = try keychainService.fetchData(.refreshToken)
             let url = try QappleAPI.Member.certificationCodeCheck(signUpToken: refreshToken, email: email, certCode: certCode).url()
+            let response: BaseResponse<Bool> = try await NetworkService.shared.get(url: url)
+            return response.result
+        },
+        checkNicknameDuplicate: { nickname in
+            let url = try QappleAPI.Member.nicknameCheck(nickname: nickname).url()
             let response: BaseResponse<Bool> = try await NetworkService.shared.get(url: url)
             return response.result
         }

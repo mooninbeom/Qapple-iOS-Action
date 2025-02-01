@@ -46,6 +46,10 @@ struct SignUpFeature {
                     state.path.append(.nicknameForm(.init()))
                     return .none
                     
+                case .element(id: _, action: .nicknameForm(.nextButtonTapped)):
+                    state.path.append(.termsAgreement(.init()))
+                    return .none
+                    
                 default:
                     return .none
                 }

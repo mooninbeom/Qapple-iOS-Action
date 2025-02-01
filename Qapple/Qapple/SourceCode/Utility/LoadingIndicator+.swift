@@ -13,6 +13,7 @@ struct LoadingIndicatorModifier: ViewModifier {
     
     func body(content: Content) -> some View {
         content
+            .disabled(isLoading)
             .overlay {
                 if isLoading {
                     ProgressView()

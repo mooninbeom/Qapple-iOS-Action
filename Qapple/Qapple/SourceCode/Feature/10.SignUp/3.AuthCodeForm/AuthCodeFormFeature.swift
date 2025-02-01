@@ -22,7 +22,6 @@ struct AuthCodeFormFeature {
     }
     
     enum Action: BindableAction {
-        case typeAuthCodeText
         case backButtonTapped
         case checkAuthCodeButtonTapped
         case reSendMailButtonTapped
@@ -40,17 +39,6 @@ struct AuthCodeFormFeature {
         BindingReducer()
         Reduce { state, action in
             switch action {
-            case .typeAuthCodeText:
-                if state.authCodeText.count < 5 {
-                    state.isAuthCodeEnterComplete = false
-                } else {
-                    state.authCodeText = state.authCodeText.slice(to: state.authCodeLimit)
-                    state.isAuthCodeEnterComplete = true
-                }
-                state.authCodeText = state.authCodeText.uppercased()
-                
-                return .none
-                
             case .backButtonTapped:
                 return .run { send in
                     await dismiss()
@@ -100,9 +88,8 @@ struct AuthCodeFormFeature {
                 
             case .binding(\.authCodeText):
                 state.isAuthCodeValidate = true
-                return .run { send in
-                    await send(.typeAuthCodeText)
-                }
+                state.isAuthCodeEnterComplete = state.authCodeText.count >= 5
+                return .none
                 
             case .binding:
                 return .none
