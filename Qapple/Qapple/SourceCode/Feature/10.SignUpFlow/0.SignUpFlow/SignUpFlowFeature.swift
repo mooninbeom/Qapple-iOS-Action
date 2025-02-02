@@ -18,9 +18,13 @@ struct SignUpFlowFeature {
     }
     
     enum Action {
+        case onAppear
+        case autoLoginResponse
         case socialLogin(SocialLoginFeature.Action)
         case path(StackActionOf<Path>)
     }
+    
+    @Dependency(\.appleLoginService) var appleLoginService
     
     var body: some ReducerOf<Self> {
         Scope(state: \.socialLogin, action: \.socialLogin) {
@@ -28,6 +32,20 @@ struct SignUpFlowFeature {
         }
         Reduce { state, action in
             switch action {
+            case .onAppear:
+                return .run { send in
+                    do {
+                        try await appleLoginService.autoLogin()
+                        await send(.autoLoginResponse)
+                    } catch {
+                        print(error)
+                    }
+                }
+                
+            case .autoLoginResponse:
+                state.isSignIn = true
+                return .none
+                
             case let .socialLogin(.delegate(.signInResponse(isSignUp))):
                 if isSignUp {
                     state.isSignIn = true

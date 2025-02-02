@@ -13,11 +13,15 @@ typealias AuthorizationCode = String
 struct AppleLoginService {
     var requestLogin: (_ request: ASAuthorizationAppleIDRequest) -> Void
     var loginCompletion: (_ result: Result<ASAuthorization, Error>) async throws -> AuthorizationCode
+    var autoLogin: () async throws -> Void
 }
 
 // MARK: - DependencyKey
 
 extension AppleLoginService: DependencyKey {
+    
+    @Dependency(\.keychainService) static var keychainService
+    
     static let liveValue = Self(
         requestLogin: { request in
             request.requestedScopes = [.fullName, .email]
@@ -32,6 +36,7 @@ extension AppleLoginService: DependencyKey {
                         encoding: .utf8) else {
                         throw AppleLoginError.failedGenerateAuthCode
                     }
+                    try keychainService.createData(.userId, appleIDCredential.user)
                     return authorizationCode
                     
                 default:
@@ -41,6 +46,27 @@ extension AppleLoginService: DependencyKey {
             case let .failure(error):
                 throw error
             }
+        },
+        autoLogin: {
+            let appleIDProvider = ASAuthorizationAppleIDProvider()
+            let userId = try keychainService.fetchData(.userId)
+            let credentialState = try await appleIDProvider.credentialState(forUserID: userId)
+            switch credentialState {
+            case .authorized:
+                return
+                
+            case .revoked:
+                throw AppleLoginError.autoLoginFailed("revoked")
+                
+            case .notFound:
+                throw AppleLoginError.autoLoginFailed("notFound")
+                
+            case .transferred:
+                throw AppleLoginError.autoLoginFailed("transferred")
+                
+            @unknown default:
+                throw AppleLoginError.autoLoginFailed("unknown")
+            }
         }
     )
 }
@@ -49,6 +75,7 @@ extension AppleLoginService: DependencyKey {
 
 enum AppleLoginError: Error {
     case failedGenerateAuthCode
+    case autoLoginFailed(String)
     case unknownError
 }
 

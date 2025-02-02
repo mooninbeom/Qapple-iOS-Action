@@ -24,6 +24,9 @@ struct SignUpFlowView: View {
             case let .signUpComplete(store): SignUpCompleteView(store: store)
             }
         }
+        .onAppear {
+            store.send(.onAppear)
+        }
     }
 }
 

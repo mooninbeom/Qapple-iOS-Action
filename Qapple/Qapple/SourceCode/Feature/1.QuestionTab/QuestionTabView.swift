@@ -33,8 +33,9 @@ struct QuestionTabView: View {
                 )
                 .tag(QuestionTabFeature.QuestionTab.questionList)
             }
+            .background(.first)
+            .tabViewStyle(PageTabViewStyle(indexDisplayMode: .never))
         }
-        .tabViewStyle(PageTabViewStyle(indexDisplayMode: .never))
     }
 }
 
