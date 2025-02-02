@@ -1,5 +1,5 @@
 //
-//  MainView.swift
+//  MainFlowView.swift
 //  Qapple
 //
 //  Created by 김민준 on 1/20/25.
@@ -8,9 +8,9 @@
 import ComposableArchitecture
 import SwiftUI
 
-struct MainView: View {
+struct MainFlowView: View {
     
-    @Bindable var store: StoreOf<MainFeature>
+    @Bindable var store: StoreOf<MainFlowFeature>
     
     var body: some View {
         NavigationStack(path: $store.scope(state: \.path, action: \.path)) {
@@ -44,7 +44,7 @@ struct MainView: View {
 // MARK: - Preview
 
 #Preview {
-    MainView(store: Store(initialState: MainFeature.State()) {
-        MainFeature()
+    MainFlowView(store: Store(initialState: MainFlowFeature.State()) {
+        MainFlowFeature()
     })
 }
