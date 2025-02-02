@@ -75,7 +75,7 @@ private struct MyAnswerList: View {
                             currentIndex: index,
                             hasNext: store.paginationInfo.hasNext,
                             pagination: {
-                                
+                                store.send(.pagination)
                             }
                         )
                     }

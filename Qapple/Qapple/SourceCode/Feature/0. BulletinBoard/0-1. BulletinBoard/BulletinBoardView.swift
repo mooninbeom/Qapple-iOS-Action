@@ -91,7 +91,7 @@ private struct PostListView: View {
     var body: some View {
         ScrollView {
             LazyVStack(spacing: 0) {
-                ForEach(Array(store.bulletinBoardList.enumerated()), id: \.offset) { index, board in
+                ForEach(enumerated(store.bulletinBoardList), id: \.offset) { index, board in
                     BulletinBoardCell(
                         board: board,
                         ellipsis: {
