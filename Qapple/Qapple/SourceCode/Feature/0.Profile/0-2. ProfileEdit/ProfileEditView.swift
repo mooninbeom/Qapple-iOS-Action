@@ -27,7 +27,7 @@ struct ProfileEditView: View {
                         NavigationButton(buttonType: .text("완료", store.nicknameCheck && !store.nicknameChange ? BrandPink.text : TextLabel.sub4)) {
                             store.send(.successButtonTapped)
                         }
-                        .disabled(!store.nicknameCheck && !store.nicknameChange)
+                        .disabled(!store.nicknameCheck && !store.nicknameChange) // TODO: 복잡한 로직 개선
                     }
                 )
                 

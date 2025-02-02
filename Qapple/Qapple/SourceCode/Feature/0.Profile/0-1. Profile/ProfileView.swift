@@ -13,10 +13,6 @@ struct ProfileView: View {
     
     let store: StoreOf<ProfileFeature>
     
-    @EnvironmentObject private var pathModel: Router
-    @EnvironmentObject private var authViewModel: AuthViewModel
-    @StateObject private var viewModel = MyPageViewModel()
-    
     var body: some View {
         ZStack {
             Color(Background.first)
@@ -45,7 +41,6 @@ struct ProfileView: View {
                 
                 Spacer()
             }
-            .environmentObject(viewModel)
             .navigationBarBackButtonHidden()
             .navigationBarTitleDisplayMode(.inline)
             .onAppear {
@@ -80,9 +75,6 @@ private struct ProfileSummary: View {
                     
                     Button {
                         store.send(.editProfileButtonTapped)
-//                        pathModel.pushView(
-//                            screen: MyProfilePathType.profileEdit(nickname: viewModel.myPageInfo.nickname)
-//                        )
                     } label: {
                         Image(systemName: "gearshape.fill")
                             .foregroundStyle(GrayScale.icon)
@@ -177,13 +169,6 @@ private struct InquiriesReportsSection: View {
 private struct AccountSection: View {
     
     @Bindable var store: StoreOf<ProfileFeature>
-    
-    @EnvironmentObject private var pathModel: Router
-    @EnvironmentObject private var authViewModel: AuthViewModel
-    @EnvironmentObject private var viewModel: MyPageViewModel
-    
-    @State private var isLogOutAlertPresented = false
-    @State private var isResignAlertPresented = false
     
     var body: some View {
         VStack(alignment: .leading, spacing: 0) {
