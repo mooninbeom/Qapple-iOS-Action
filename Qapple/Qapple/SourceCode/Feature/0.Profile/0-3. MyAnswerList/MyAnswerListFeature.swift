@@ -33,7 +33,7 @@ struct MyAnswerListFeature {
             [AnswerOfProfile],
             QappleAPI.PaginationInfo
         )
-        case seeMoreAction(Answer)
+        case seeMoreAction(AnswerOfProfile)
         case backButtonTapped
         case toggleLoading(Bool)
         case sheet(PresentationAction<Sheet.Action>)
@@ -43,21 +43,14 @@ struct MyAnswerListFeature {
     @Dependency(\.dismiss) var dismiss
     
     var body: some ReducerOf<Self> {
-        Reduce {
-            state,
-            action in
+        Reduce { state, action in
             switch action {
             case .onAppear, .refresh:
                 return .run { send in
                     await send(.toggleLoading(true), animation: .bouncy)
                     do {
                         let response = try await answerRepository.fetchAnswerListOfProfile(nil)
-                        await send(
-                            .answerListResponse(
-                                response.0,
-                                response.1
-                            )
-                        )
+                        await send(.answerListResponse(response.0, response.1))
                     } catch {
                         print(error)
                     }
@@ -78,20 +71,20 @@ struct MyAnswerListFeature {
                 }
                 
             case let .answerListResponse(answerList, paginationInfo):
-                state.myAnswerList = answerList.reversed()
+                state.myAnswerList = answerList
                 state.paginationInfo = paginationInfo
                 return .none
                 
             case let .paginagionResponse(answerList, paginationInfo):
-                state.myAnswerList.insert(contentsOf: answerList.reversed(), at: 0)
+                state.myAnswerList.insert(contentsOf: answerList, at: 0)
                 state.paginationInfo = paginationInfo
                 return .none
                 
             case let .seeMoreAction(answer):
                 state.sheet = .seeMore(
                     .init(
-                        sheetTarget: answer.isMine ? .mine : .others,
-                        sheetData: .answer(answer)
+                        sheetTarget: .mine,
+                        sheetData: .myAnswer(answer)
                     )
                 )
                 return .none

@@ -13,5 +13,5 @@ struct AnswerOfProfile: Identifiable, Equatable {
     let writerId: Int
     let nickname: String
     let content: String
-    let writeAt: String
+    let writeAt: Date
 }

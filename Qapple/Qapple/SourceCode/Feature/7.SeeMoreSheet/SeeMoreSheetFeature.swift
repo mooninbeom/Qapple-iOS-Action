@@ -63,6 +63,7 @@ extension SeeMoreSheetFeature {
     
     /// Sheet가 어떤 Data를 이용하는지
     enum SheetData: Equatable {
+        case myAnswer(AnswerOfProfile)
         case answer(Answer)
         case bulletinBoard
     }

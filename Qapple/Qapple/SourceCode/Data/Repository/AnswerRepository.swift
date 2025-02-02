@@ -73,7 +73,7 @@ extension AnswerRepository: DependencyKey {
                     writerId: i,
                     nickname: "러너 \(i)",
                     content: "테스트 답변 \(i)",
-                    writeAt: "2025-01-23"
+                    writeAt: .init(timeIntervalSinceNow: TimeInterval(i * -5000))
                 )
             }
             return (stubProfiles, .init(threshold: "10", hasNext: false))
