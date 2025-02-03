@@ -90,7 +90,7 @@ struct NotificationFeature {
                     }
                 }
                 
-            case let .evaluateQuestion(isAnswered):
+            case .evaluateQuestion:
                 // TODO: 답변 여부에 따른 네비게이팅 필요
                 return .none
                 

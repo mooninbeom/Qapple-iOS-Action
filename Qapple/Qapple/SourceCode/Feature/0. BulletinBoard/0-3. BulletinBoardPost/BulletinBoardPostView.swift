@@ -23,11 +23,7 @@ struct BulletinBoardPostView: View {
                 Spacer()
                 Footer(store: store)
             }
-            if store.isLoading {
-                ProgressView()
-                    .progressViewStyle(.circular)
-                    .tint(.primary)
-            }
+            .loadingIndicator(isLoading: store.isLoading)
         }
         .background(Background.first)
         .navigationBarBackButtonHidden()
@@ -127,8 +123,9 @@ private struct PostTextField: View {
         .focused(isTextFieldFocused)
         .padding(.horizontal, 24)
         .autocorrectionDisabled()
-        .onChange(of: store.content){ _ in
-            fontSize = store.fontSize}
+        .onChange(of: store.content) { _, _ in
+            fontSize = store.fontSize
+        }
     }
 }
 

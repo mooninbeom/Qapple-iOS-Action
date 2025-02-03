@@ -215,7 +215,7 @@ struct CommentCell: View {
 
 
 #Preview {
-    var store = StoreOf<CommentFeature>(initialState: CommentFeature.State()) {
+    let store = StoreOf<CommentFeature>(initialState: CommentFeature.State()) {
         CommentFeature()
     }
     

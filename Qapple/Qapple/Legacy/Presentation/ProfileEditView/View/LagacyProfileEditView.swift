@@ -7,7 +7,7 @@
 
 import SwiftUI
 
-struct ProfileEditView: View {
+struct LagacyProfileEditView: View {
     
     @EnvironmentObject var pathModel: Router
     @StateObject private var viewModel: ProfileEditViewModel = .init()
@@ -204,5 +204,5 @@ struct ProfileEditView: View {
 }
 
 #Preview {
-    ProfileEditView(nickName: "튼튼한 민톨")
+    LagacyProfileEditView(nickName: "튼튼한 민톨")
 }

@@ -14,6 +14,9 @@ struct MemberRepository {
     var sendCertificationEmail: (_ email: String) async throws -> Bool
     var checkAuthCode: (_ email: String, _ certCode: String) async throws -> Bool
     var checkNicknameDuplicate: (_ nickname: String) async throws -> Bool
+    var fetchMyPage: () async throws -> MyProfile
+    var editMyPage: (_ nickname: String, _ profileImage: String?) async throws -> Void
+    var resign: () async throws -> Bool
 }
 
 // MARK: - DependencyKey
@@ -57,6 +60,53 @@ extension MemberRepository: DependencyKey {
             let url = try QappleAPI.Member.nicknameCheck(nickname: nickname).url()
             let response: BaseResponse<Bool> = try await NetworkService.shared.get(url: url)
             return response.result
+        },
+        fetchMyPage: {
+            let url = try QappleAPI.Member.myPage.url()
+            let response: BaseResponse<MyPageDTO> = try await NetworkService.shared.get(url: url)
+            return response.result.toEntity
+        },
+        editMyPage: { nickname, profileImage in
+            let url = try QappleAPI.Member.myPageEdit.url()
+            let requestBody: EditProfileRequest = EditProfileRequest(nickname: nickname, profileImage: profileImage)
+            let response: BaseResponse<EditProfileDTO> = try await NetworkService.shared.post(url: url, body: requestBody)
+        },
+        resign: {
+            let url = try QappleAPI.Member.resign.url()
+            let response: BaseResponse<Bool> = try await NetworkService.shared.get(url: url)
+            return response.result
+        }
+    )
+    
+    static let previewValue = Self(
+        signIn: { code in
+            print("로그인 요청: code=\(code)")
+            return true
+        },
+        signUp: { email, nickname in
+            print("회원가입 요청: email=\(email), nickname=\(nickname)")
+        },
+        sendCertificationEmail: { email in
+            print("email=\(email)")
+            return true
+        },
+        checkAuthCode: { email, certCode in
+            print("인증 코드 확인: email=\(email), code=\(certCode)")
+            return certCode == "12345"
+        },
+        checkNicknameDuplicate: { nickname in
+            print("닉네임 중복 확인: \(nickname)")
+            return nickname != "이미사용중"
+        },
+        fetchMyPage: {
+            MyProfile(nickname: "프리뷰 유저", profileImage: nil, joinDate: "2025-01-31")
+        },
+        editMyPage: { nickname, profileImage in
+            print("프로필 수정: nickname=\(nickname), profileImage=\(profileImage ?? "없음")")
+        },
+        resign: {
+            print("회원 탈퇴 요청")
+            return true
         }
     )
 }

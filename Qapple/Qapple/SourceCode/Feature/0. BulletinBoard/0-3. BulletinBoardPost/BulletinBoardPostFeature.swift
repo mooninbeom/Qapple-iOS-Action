@@ -29,7 +29,7 @@ struct BulletinBoardPostFeature {
         case setContent(String)
         case postBoardButtonTapped
         case anonymityButtonTapped
-        case stopLoading
+        case toggleLoading(Bool)
         
         enum Alert {
             case confirmCancel
@@ -90,24 +90,24 @@ struct BulletinBoardPostFeature {
                 
                 return .none
             case .postBoardButtonTapped:
-                state.isLoading = true
                 let content = state.content
                 return .run { send in
+                    await send(.toggleLoading(true), animation: .bouncy)
                     do {
-                        let _ = try await bulletinBoardRepository.postBoard(content)
+                        try await bulletinBoardRepository.postBoard(content)
                         // TODO: board reset 필요하면 넣기
                         // TODO: Navigation 처리
                     } catch {
                         print(error)
                     }
-                    await send(.stopLoading)
+                    await send(.toggleLoading(false), animation: .bouncy)
                 }
             case .anonymityButtonTapped:
                 state.sheet = .anonymityButtonTap(AnonymityFeature.State())
                 return .none
                 
-            case .stopLoading:
-                state.isLoading = false
+            case let .toggleLoading(bool):
+                state.isLoading = bool
                 return .none
             }
         }

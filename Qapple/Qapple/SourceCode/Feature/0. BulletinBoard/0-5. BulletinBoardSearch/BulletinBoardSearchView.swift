@@ -28,12 +28,7 @@ struct BulletinBoardSearchView: View {
                         NoResultView()
                     }
                 }
-                
-                if store.isLoading {
-                    ProgressView()
-                        .progressViewStyle(.circular)
-                        .tint(.primary)
-                }
+                .loadingIndicator(isLoading: store.isLoading)
             }
             .background(Background.first)
             .navigationBarBackButtonHidden()
@@ -52,18 +47,13 @@ private struct SearchNavigationBar: View {
     
     var body: some View {
         NavigationBar(
+            title: "검색하기",
             backgroundColor: Background.first,
             leadingView: {
-                CustomNavigationBackButton(buttonType: .arrow) {
+                NavigationButton(buttonType: .xmark) {
                     store.send(.backButtonTapped)
                 }
-            },
-            centerView: {
-                Text("검색하기")
-                    .font(Font.pretendard(.semiBold, size: 17))
-                    .foregroundStyle(TextLabel.main)
-            },
-            trailingView: {})
+            })
     }
 }
 
@@ -98,7 +88,7 @@ private struct SearchListView: View {
     var body: some View {
         ScrollView {
             LazyVStack(spacing: 0) {
-                ForEach(Array(searchBoardList.enumerated()), id: \.offset) { index, board in
+                ForEach(enumerated(searchBoardList), id: \.offset) { index, board in
                     BulletinBoardCell(
                         board: board,
                         ellipsis: {
