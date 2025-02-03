@@ -54,6 +54,10 @@ struct MainFlowFeature {
                 state.path.append(.writeAnswer(.init(question: question)))
                 return .none
                 
+            case .questionTab(.alertButtonTapped):
+                state.path.append(.notificationList(.init()))
+                return .none
+                
             case let .bulletinBoardTab(.boardButtonTapped(board)):
                 state.path.append(.commentView(.init(post: board)))
                 return .none
@@ -93,6 +97,7 @@ extension MainFlowFeature {
     
     @Reducer(state: .equatable)
     enum Path {
+        case notificationList(NotificationFeature)
         case writeAnswer(WriteAnswerFeature)
         case completeAnswer(CompleteAnswerFeature)
         case answerList(AnswerListFeature)

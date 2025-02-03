@@ -31,6 +31,7 @@ struct MainFlowView: View {
             .fixedTabBarBackground(color: .first)
         } destination: { store in
             switch store.case {
+            case let .notificationList(store): NotificationListView(store: store)
             case let .writeAnswer(store): WriteAnswerView(store: store)
             case let .completeAnswer(store): CompleteAnswerView(store: store)
             case let .answerList(store): AnswerListView(store: store)
