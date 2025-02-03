@@ -112,7 +112,7 @@ final class Router: ObservableObject, NavigationRouter {
             case .myPage:
                 MyPageView()
             case .profileEdit(let nickname):
-                ProfileEditView(nickName: nickname)
+                LagacyProfileEditView(nickName: nickname)
             case .writtenAnswer:
                 WrittenAnswerView()
             }

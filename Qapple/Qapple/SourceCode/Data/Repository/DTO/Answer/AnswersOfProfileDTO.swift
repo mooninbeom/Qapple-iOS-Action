@@ -8,7 +8,7 @@
 import Foundation
 
 struct AnswersOfProfileDTO: Codable {
-    let total: Int
+    let total: Int?
     let size: Int
     let content: [Content]
     let numberOfElements: Int
@@ -35,7 +35,7 @@ struct AnswersOfProfileDTO: Codable {
                 writerId: $0.writerId,
                 nickname: $0.nickname,
                 content: $0.content,
-                writeAt: $0.writeAt
+                writeAt: $0.writeAt.ISO8601ToDate
             )
         }
         

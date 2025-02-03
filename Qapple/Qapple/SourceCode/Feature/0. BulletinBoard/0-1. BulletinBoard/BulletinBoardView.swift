@@ -30,19 +30,11 @@ struct BulletinBoardView: View {
                         y: proxy.size.height - 40
                     )
                 )
-                
-                if store.isLoading {
-                    ProgressView()
-                        .progressViewStyle(.circular)
-                        .tint(.primary)
-                }
+                .loadingIndicator(isLoading: store.isLoading)
             }
             .background(Background.first)
         }
         .onAppear{
-//            bulletinBoardUseCase.isClickComment = false
-//            bulletinBoardUseCase.state.searchPosts.removeAll() // 어떻게 처리할 지 고민
-//            bulletinBoardUseCase.searchText = ""
             store.send(.getBulletinBoardList)
             
         }
@@ -60,7 +52,20 @@ private struct BoardView: View {
     
     var body: some View {
         VStack(spacing: 0) {
-            CustomTabBar(store: store)
+            NavigationBar(
+                title: "게시판",
+                trailingView: {
+                    HStack(spacing: 12) {
+                        NavigationButton(buttonType: .image(.noticeIcon)) {
+                            store.send(.notificationButtonTapped)
+                        }
+                        NavigationButton(buttonType: .image(.search)) {
+                            store.send(.searchButtonTapped)
+                        }
+                    }
+                    .padding(.trailing, 8)
+                }
+            )
             
             AcademyPlanDayCounter(
                 academyEvents: store.academyEvents
@@ -77,44 +82,6 @@ private struct BoardView: View {
     }
 }
 
-// MARK: - 커스텀 탭바
-private struct CustomTabBar: View {
-    
-    let store: StoreOf<BulletinBoardFeature>
-    
-    var body: some View {
-        NavigationBar(
-            title: "게시판",
-            trailingView: {
-                HStack(spacing: 12) {
-                    Spacer()
-                    
-                    Button {
-                        store.send(.notificationButtonTapped)
-                    } label: {
-                        Image(.noticeIcon)
-                            .resizable()
-                            .scaledToFill()
-                            .foregroundColor(GrayScale.icon)
-                            .frame(width: 26 , height: 26)
-                    }
-                    
-                    Button {
-                        store.send(.searchButtonTapped)
-                    } label: {
-                        Image(.search)
-                            .resizable()
-                            .scaledToFill()
-                            .foregroundColor(GrayScale.icon)
-                            .frame(width: 26 , height: 26)
-                    }
-                }
-                .padding(.trailing, 8)
-            }
-        )
-    }
-}
-
 // MARK: - PostListView
 
 private struct PostListView: View {
@@ -124,7 +91,7 @@ private struct PostListView: View {
     var body: some View {
         ScrollView {
             LazyVStack(spacing: 0) {
-                ForEach(Array(store.bulletinBoardList.enumerated()), id: \.offset) { index, board in
+                ForEach(enumerated(store.bulletinBoardList), id: \.offset) { index, board in
                     BulletinBoardCell(
                         board: board,
                         ellipsis: {
@@ -166,4 +133,12 @@ private struct PostListView: View {
         }
         .disabled(store.isLoading)
     }
+}
+
+// MARK: - Preview
+
+#Preview {
+    BulletinBoardView(store: Store(initialState: BulletinBoardFeature.State()) {
+        BulletinBoardFeature()
+    })
 }

@@ -23,11 +23,7 @@ struct BulletinBoardPostView: View {
                 Spacer()
                 Footer(store: store)
             }
-            if store.isLoading {
-                ProgressView()
-                    .progressViewStyle(.circular)
-                    .tint(.primary)
-            }
+            .loadingIndicator(isLoading: store.isLoading)
         }
         .background(Background.first)
         .navigationBarBackButtonHidden()

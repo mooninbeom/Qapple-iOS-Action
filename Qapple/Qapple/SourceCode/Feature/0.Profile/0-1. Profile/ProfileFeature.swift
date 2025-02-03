@@ -1,0 +1,198 @@
+//
+//  ProfileFeature.swift
+//  Qapple
+//
+//  Created by Simmons on 1/30/25.
+//
+
+import Foundation
+import ComposableArchitecture
+import MessageUI
+
+@Reducer
+struct ProfileFeature {
+    @ObservableState
+    struct State: Equatable {
+        @Presents var sheet: Sheet.State?
+        @Presents var alert: AlertState<Action.Alert>?
+        var nickname: String = ""
+        var joinDate: String = ""
+        var profileImage: String?
+        var isLoading = false
+    }
+    
+    enum Action {
+        case sheet(PresentationAction<Sheet.Action>)
+        case alert(PresentationAction<Alert>)
+        case delegate(Delegate)
+        
+        case getProfile
+        case fetchProfile(MyProfile)
+        
+        case editProfileButtonTapped
+        case MyAnswerListButtonTapped
+        case inquiryButtonTapped
+        case logOutButtonTapped
+        case resignButtonTapped
+        case toggleLoading(Bool)
+        
+        enum Alert {
+            case confirmEmailDisabled
+            case confirmLogOut
+            case confirmResign
+        }
+        
+        enum Delegate {
+            case confirmEmailDisabled
+            case confirmLogOut
+            case confirmResign
+        }
+    }
+    
+    @Dependency(\.memberRepository) var memberRepository
+    
+    var body: some ReducerOf<Self> {
+        Reduce { state, action in
+            switch action {
+            case .sheet(.presented(.inquiryButtonTap)):
+                return .none
+                
+            case .sheet:
+                return .none
+                
+            case .alert(.presented(.confirmEmailDisabled)):
+                return .run { send in
+                    await send(.delegate(.confirmEmailDisabled))
+                }
+                
+            case .alert(.presented(.confirmLogOut)):
+                return .run { send in
+                    await send(.delegate(.confirmLogOut))
+                    try? KeychainService.shared.createUserID("")
+                    // TODO: Navigation 처리(Root)
+                }
+                
+            case .alert(.presented(.confirmResign)):
+                return .run { send in
+                    await send(.delegate(.confirmResign))
+                    await send(.toggleLoading(true), animation: .bouncy)
+                    do {
+                        let data = try await memberRepository.resign()
+                        try? KeychainService.shared.createUserID("")
+                    } catch {
+                        print(error)
+                    }
+                    await send(.toggleLoading(false), animation: .bouncy)
+                    // TODO: Navigation 처리(Root)
+                }
+                
+            case .alert:
+                return .none
+                
+            case .delegate:
+                return .none
+                
+            case .getProfile:
+                return .run { send in
+                    await send(.toggleLoading(true), animation: .bouncy)
+                    do {
+                        let data = try await memberRepository.fetchMyPage()
+                        await send(.fetchProfile(data))
+                    } catch {
+                        print(error)
+                    }
+                    await send(.toggleLoading(false), animation: .bouncy)
+                }
+                
+            case let .fetchProfile(profile):
+                state.nickname = profile.nickname
+                state.joinDate = profile.joinDate
+                if let profileImage = profile.profileImage {
+                    state.profileImage = profileImage
+                }
+                return .none
+                
+            case .editProfileButtonTapped:
+                // TODO: Navigation 처리
+                return .none
+                
+            case .MyAnswerListButtonTapped:
+                // TODO: Navigation 처리
+                return .none
+                
+            case .inquiryButtonTapped:
+                if !MFMailComposeViewController.canSendMail() {
+                    state.alert = .confirmEmailDisabled
+                } else {
+                    state.sheet = .inquiryButtonTap
+                }
+                return .none
+                
+            case .logOutButtonTapped:
+                state.alert = .confirmLogout
+                return .none
+                
+            case .resignButtonTapped:
+                state.alert = .confirmResign
+                return .none
+                
+            case let .toggleLoading(bool):
+                state.isLoading = bool
+                return .none
+            }
+        }
+        .ifLet(\.$sheet, action: \.sheet)
+        .ifLet(\.$alert, action: \.alert)
+    }
+}
+
+// MARK: - ProfileSheet
+
+extension ProfileFeature {
+    @Reducer
+    enum Sheet {
+        case inquiryButtonTap
+    }
+}
+
+extension ProfileFeature.Sheet.State: Equatable {}
+
+// MARK: - ProfileAlert
+
+extension AlertState where Action == ProfileFeature.Action.Alert {
+    static let confirmEmailDisabled = Self {
+        TextState("메일 앱에 로그인할 수 없어요")
+    } actions: {
+        ButtonState(role: .cancel) {
+            TextState("확인")
+        }
+    } message: {
+        TextState("메일 앱에 로그인하거나\n공식 메일 주소로 문의주세요\n(0.team.capple@gmail.com)")
+    }
+    
+    static let confirmLogout = Self {
+        TextState("로그아웃 할까요?")
+    } actions: {
+        ButtonState(role: .cancel) {
+            TextState("취소")
+        }
+        ButtonState(role: .destructive, action: .confirmLogOut) {
+            TextState("로그아웃")
+        }
+    } message: {
+        TextState("언제든 다시 돌아올 수 있습니다!")
+    }
+    
+    static let confirmResign = Self {
+        TextState("정말 탈퇴하시겠어요?")
+    } actions: {
+        ButtonState(role: .cancel) {
+            TextState("취소")
+        }
+        ButtonState(role: .destructive, action: .confirmResign) {
+            TextState("회원 탈퇴")
+        }
+    } message: {
+        TextState("탈퇴하면 계정은 복구되지 않아요\n단, 이미 작성한 답변은 남아있어요")
+    }
+}

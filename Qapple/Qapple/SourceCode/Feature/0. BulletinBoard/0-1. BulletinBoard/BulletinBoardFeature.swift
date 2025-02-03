@@ -37,7 +37,7 @@ struct BulletinBoardFeature {
         case searchButtonTapped
         case notificationButtonTapped
         case postBoardButtonTapped
-        case stopLoading
+        case toggleLoading(Bool)
         
         enum Alert {
             case confirmReport
@@ -71,37 +71,36 @@ struct BulletinBoardFeature {
                 return .none
                 
             case .getBulletinBoardList:
-                state.isLoading = true
                 let threshold = state.threshold
-                
                 return .run { send in
+                    await send(.toggleLoading(true), animation: .bouncy)
                     do {
                         let data = try await bulletinBoardRepository.fetchBulletinBoardList(threshold)
                         await send(.fetchBulletinBoardList(data))
                     } catch {
                         print(error)
                     }
+                    await send(.toggleLoading(false), animation: .bouncy)
                 }
                 
             case .refreshBulletinBoardList:
-                state.isLoading = true
                 state.bulletinBoardList = []
                 return .run { send in
+                    await send(.toggleLoading(true), animation: .bouncy)
                     do {
                         let data = try await bulletinBoardRepository.fetchBulletinBoardList(nil)
                         await send(.fetchBulletinBoardList(data))
                     } catch {
                         print(error)
                     }
+                    await send(.toggleLoading(false), animation: .bouncy)
                 }
                 
             case let .fetchBulletinBoardList((bulletinBoardList, paginationInfo)):
                 state.bulletinBoardList.append(contentsOf: bulletinBoardList)
                 state.threshold = Int(paginationInfo.threshold)
                 state.hasNext = paginationInfo.hasNext
-                return .run { send in
-                    await send(.stopLoading)
-                }
+                return .none
                 
             case let .boardButtonTapped(board):
                 print("게시판 정보\(board)")
@@ -113,19 +112,18 @@ struct BulletinBoardFeature {
                 return .none
                 
             case let .likeBoardButtonTapped(boardId):
-                state.isLoading = true
                 if let index = state.bulletinBoardList.firstIndex(where: {$0.id == boardId}) {
                     state.bulletinBoardList[index].isLiked.toggle()
                     state.bulletinBoardList[index].heartCount += state.bulletinBoardList[index].isLiked ? 1 : -1
                 }
                 return .run { send in
+                    await send(.toggleLoading(true), animation: .bouncy)
                     do {
                         try await bulletinBoardRepository.likeBoard(boardId)
-                        await send(.stopLoading)
                     } catch {
                         print(error)
                     }
-                    await send(.stopLoading)
+                    await send(.toggleLoading(false), animation: .bouncy)
                 }
                 
             case let .ellipsisButtonTapped(boardId, isMine):
@@ -148,8 +146,8 @@ struct BulletinBoardFeature {
                 // TODO: Navigiation 처리
                 return .none
                 
-            case .stopLoading:
-                state.isLoading = false
+            case let .toggleLoading(bool):
+                state.isLoading = bool
                 return .none
             }
         }
