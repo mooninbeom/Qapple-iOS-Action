@@ -37,15 +37,20 @@ struct NavigationBar<Leading: View, Center: View, Trailing: View>: View {
                 trailingView
             }
             
-            if let title = title {
-                Text(title)
-                    .font(.pretendard(.semiBold, size: 17))
-                    .foregroundStyle(.wh)
-            } else {
-                centerView
+            HStack {
+                Spacer()
+                if let title = title {
+                    Text(title)
+                        .font(.pretendard(.semiBold, size: 17))
+                        .foregroundStyle(.wh)
+                } else {
+                    centerView
+                }
+                Spacer()
             }
         }
         .padding(.horizontal, 16)
+        .frame(maxWidth: .infinity)
         .frame(height: 48)
         .background(backgroundColor)
     }
@@ -54,9 +59,10 @@ struct NavigationBar<Leading: View, Center: View, Trailing: View>: View {
 // MARK: - Preview
 
 #Preview {
-    LegacyNavigationBar(
-        leadingView: { Text("Leading").foregroundColor(.white) },
-        centerView: { Text("Center").foregroundColor(.white) },
-        trailingView: { Text("Trailing").foregroundColor(.text) }
-    )
+    ZStack {
+        Color.first.ignoresSafeArea()
+        NavigationBar(
+            title: "테스트"
+        )
+    }
 }

@@ -14,40 +14,31 @@ struct ProfileView: View {
     let store: StoreOf<ProfileFeature>
     
     var body: some View {
-        ZStack {
-            Color(Background.first)
-                .ignoresSafeArea()
+        VStack(alignment: .leading, spacing: 0) {
+            NavigationBar(
+                title: "프로필",
+                backgroundColor: Background.second
+            )
             
-            VStack(alignment: .leading, spacing: 0) {
-                NavigationBar(
-                    backgroundColor: Background.second,
-                    centerView: {
-                        Text("프로필")
-                            .font(.pretendard(.semiBold, size: 17))
-                            .foregroundStyle(.wh)
-                            .frame(width: UIScreen.main.bounds.width)
-                    }
-                )
-                
-                ProfileSummary(store: store)
-                    .padding(.bottom, 24)
-                
-                ProfileList(store: store)
-                    .padding(.horizontal, 24)
-                
-                BottomSection()
-                    .padding(.top, 24)
-                    .padding(.horizontal, 24)
-                
-                Spacer()
-            }
-            .navigationBarBackButtonHidden()
-            .navigationBarTitleDisplayMode(.inline)
-            .onAppear {
-                store.send(.getProfile)
-            }
-            .loadingIndicator(isLoading: store.isLoading)
+            ProfileSummary(store: store)
+                .padding(.bottom, 24)
+            
+            ProfileList(store: store)
+                .padding(.horizontal, 24)
+            
+            BottomSection()
+                .padding(.top, 24)
+                .padding(.horizontal, 24)
+            
+            Spacer()
         }
+        .background(.first)
+        .navigationBarBackButtonHidden()
+        .navigationBarTitleDisplayMode(.inline)
+        .onAppear {
+            store.send(.getProfile)
+        }
+        .loadingIndicator(isLoading: store.isLoading)
     }
 }
 
@@ -137,8 +128,6 @@ private struct InquiriesReportsSection: View {
     
     @Bindable var store: StoreOf<ProfileFeature>
     
-    @EnvironmentObject private var pathModel: Router
-    
     @State private var mailResult: Result<MFMailComposeResult, Error>?
     @State private var isShowingMailView = false
     @State private var isEmailDisabledAlert = false
@@ -220,4 +209,3 @@ private struct BottomSection: View {
         ProfileFeature()
     })
 }
-

@@ -14,12 +14,14 @@ struct MainFlowFeature {
     struct State: Equatable {
         var questionTab = QuestionTabFeature.State()
         var bulletinBoardTab = BulletinBoardFeature.State()
+        var profileTab = ProfileFeature.State()
         var path = StackState<Path.State>()
     }
     
     enum Action {
         case questionTab(QuestionTabFeature.Action)
         case bulletinBoardTab(BulletinBoardFeature.Action)
+        case profileTab(ProfileFeature.Action)
         case path(StackActionOf<Path>)
     }
     
@@ -29,6 +31,9 @@ struct MainFlowFeature {
         }
         Scope(state: \.bulletinBoardTab, action: \.bulletinBoardTab) {
             BulletinBoardFeature()
+        }
+        Scope(state: \.profileTab, action: \.profileTab) {
+            ProfileFeature()
         }
         Reduce { state, action in
             switch action {

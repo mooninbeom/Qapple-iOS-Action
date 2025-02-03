@@ -26,6 +26,12 @@ struct MainFlowView: View {
                         Image(systemName: "list.clipboard.fill")
                         Text("게시판")
                     }
+                
+                ProfileView(store: store.scope(state: \.profileTab, action: \.profileTab))
+                    .tabItem {
+                        Image(systemName: "person.fill")
+                        Text("내 정보")
+                    }
             }
             .tint(.button)
             .fixedTabBarBackground(color: .first)
