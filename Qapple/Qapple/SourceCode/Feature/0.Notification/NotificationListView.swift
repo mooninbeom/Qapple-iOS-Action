@@ -20,19 +20,13 @@ struct NotificationListView: View {
             Color(Background.first).ignoresSafeArea()
             
             NotificationContentView(store: store)
-            
-            if store.isLoading {
-                ProgressView()
-                    .progressViewStyle(.circular)
-                    .tint(.primary)
-            }
         }
         .navigationBarBackButtonHidden()
+        .loadingIndicator(isLoading: store.isLoading)
+        .alert($store.scope(state: \.alert, action: \.alert))
         .onAppear {
             store.send(.onAppear)
         }
-        .alert($store.scope(state: \.alert, action: \.alert))
-        
     }
 }
 

@@ -110,7 +110,7 @@ private struct PostListView: View {
                     }
                     .onTapGesture {
                         if !board.isReported {
-                            store.send(.boardButtonTapped(board))
+                            store.send(.boardCellTapped(board))
                         } else {
                             HapticService.notification(type: .warning)
                             store.send(.reportButtonTapped)

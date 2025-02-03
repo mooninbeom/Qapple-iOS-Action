@@ -30,7 +30,7 @@ struct BulletinBoardFeature {
         case refreshBulletinBoardList
         case fetchBulletinBoardList(([BulletinBoard], QappleAPI.PaginationInfo))
         
-        case boardButtonTapped(BulletinBoard)
+        case boardCellTapped(BulletinBoard)
         case reportButtonTapped
         case likeBoardButtonTapped(Int)
         case ellipsisButtonTapped(Int, Bool)
@@ -102,7 +102,7 @@ struct BulletinBoardFeature {
                 state.hasNext = paginationInfo.hasNext
                 return .none
                 
-            case let .boardButtonTapped(board):
+            case let .boardCellTapped(board):
                 print("게시판 정보\(board)")
                 // TODO: Navigation 처리
                 return .none

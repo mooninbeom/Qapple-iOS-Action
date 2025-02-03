@@ -54,12 +54,24 @@ struct MainFlowFeature {
                 state.path.append(.writeAnswer(.init(question: question)))
                 return .none
                 
-            case .questionTab(.alertButtonTapped):
+            case .questionTab(.notificationButtonTapped):
                 state.path.append(.notificationList(.init()))
                 return .none
                 
-            case let .bulletinBoardTab(.boardButtonTapped(board)):
-                state.path.append(.commentView(.init(post: board)))
+            case let .bulletinBoardTab(.boardCellTapped(board)):
+                state.path.append(.comment(.init(post: board)))
+                return .none
+                
+            case .bulletinBoardTab(.notificationButtonTapped):
+                state.path.append(.notificationList(.init()))
+                return .none
+                
+            case .bulletinBoardTab(.searchButtonTapped):
+                state.path.append(.bulletinBoardSearch(.init()))
+                return .none
+                
+            case .bulletinBoardTab(.postBoardButtonTapped):
+                state.path.append(.bulletinBoardPost(.init()))
                 return .none
                 
             case let .path(stackAction):
@@ -101,7 +113,9 @@ extension MainFlowFeature {
         case writeAnswer(WriteAnswerFeature)
         case completeAnswer(CompleteAnswerFeature)
         case answerList(AnswerListFeature)
-        case bulletinBoardView(BulletinBoardFeature)
-        case commentView(CommentFeature)
+        case bulletinBoard(BulletinBoardFeature)
+        case bulletinBoardSearch(BulletinBoardSearchFeature)
+        case bulletinBoardPost(BulletinBoardPostFeature)
+        case comment(CommentFeature)
     }
 }

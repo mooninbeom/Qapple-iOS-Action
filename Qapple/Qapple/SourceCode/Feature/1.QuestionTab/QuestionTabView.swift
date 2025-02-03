@@ -66,7 +66,7 @@ private struct HeaderTabBar: View {
             }
             
             Button {
-                store.send(.alertButtonTapped)
+                store.send(.notificationButtonTapped)
             } label: {
                 Image(.noticeIcon)
                     .resizable()
