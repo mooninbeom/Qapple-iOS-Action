@@ -17,7 +17,7 @@ extension NetworkManager {
         let urlString = ApiEndpoints.basicURLString(path: .tagSearch) + "keyword=\(request.keyword)"
         guard let url = URL(string: urlString) else {
             print("Error: cannotCreateURL")
-            throw NetworkError.cannotCreateURL
+            throw LegacyNetworkError.cannotCreateURL
         }
         
         // URLSession 생성
@@ -29,7 +29,7 @@ extension NetworkManager {
         if let response = response as? HTTPURLResponse,
            !(200..<300).contains(response.statusCode) {
             print("Error: badRequest")
-            throw NetworkError.badRequest
+            throw LegacyNetworkError.badRequest
         }
         
         // 디코딩
@@ -46,7 +46,7 @@ extension NetworkManager {
         let urlString = ApiEndpoints.basicURLString(path: .popularTagsInQuestion) + "/\(request.questionId)"
         guard let url = URL(string: urlString) else {
             print("Error: cannotCreateURL")
-            throw NetworkError.cannotCreateURL
+            throw LegacyNetworkError.cannotCreateURL
         }
         
         // URLSession 생성
@@ -58,7 +58,7 @@ extension NetworkManager {
         if let response = response as? HTTPURLResponse,
            !(200..<300).contains(response.statusCode) {
             print("Error: badRequest")
-            throw NetworkError.badRequest
+            throw LegacyNetworkError.badRequest
         }
         
         // 디코딩

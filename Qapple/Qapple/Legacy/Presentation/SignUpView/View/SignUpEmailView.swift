@@ -55,7 +55,7 @@ struct SignUpEmailView: View {
                     ZStack(alignment: .leading) {
                         if authViewModel.email.isEmpty {
                             Text("아이디를 입력해주세요")
-                                .foregroundStyle(TextLabel.placeholder)
+                                .foregroundStyle(TextLabel.ph)
                                 .font(Font.pretendard(.semiBold, size: 20))
                                 .frame(height: 14)
                         }
@@ -69,7 +69,7 @@ struct SignUpEmailView: View {
                             Spacer()
                             
                             Text(authViewModel.academyEmailAddress)
-                                .foregroundStyle(TextLabel.placeholder)
+                                .foregroundStyle(TextLabel.ph)
                                 .font(Font.pretendard(.semiBold, size: 14))
                                 .frame(height: 8)
                         }
@@ -81,7 +81,7 @@ struct SignUpEmailView: View {
                     
                     Rectangle()
                         .frame(height: 2)
-                        .foregroundStyle(isEnableButton ? GrayScale.wh : (authViewModel.email.isEmpty ? TextLabel.placeholder : GrayScale.wh))
+                        .foregroundStyle(isEnableButton ? GrayScale.wh : (authViewModel.email.isEmpty ? TextLabel.ph : GrayScale.wh))
                     
                     Spacer()
                         .frame(height: 18)

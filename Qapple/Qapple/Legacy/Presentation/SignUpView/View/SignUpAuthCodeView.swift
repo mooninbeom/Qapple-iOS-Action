@@ -71,7 +71,7 @@ struct SignUpAuthCodeView: View {
                     ZStack(alignment: .leading) {
                         if authViewModel.certifyCode.isEmpty {
                             Text("인증 코드를 입력해주세요")
-                                .foregroundStyle(TextLabel.placeholder)
+                                .foregroundStyle(TextLabel.ph)
                                 .font(Font.pretendard(.semiBold, size: 20))
                                 .frame(height: 14)
                                 .offset(y: 8)

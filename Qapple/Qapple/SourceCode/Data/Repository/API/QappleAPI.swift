@@ -60,6 +60,7 @@ enum QappleAPI {
         
         case certification(signUpToken: String, email: String)
         case certificationCodeCheck(signUpToken: String, email: String, certCode: String)
+        case check(email: String)
         case myPage
         case myPageEdit
         case nicknameCheck(nickname: String)
@@ -80,6 +81,11 @@ enum QappleAPI {
                     .init(key: "signUpToken", value: signUpToken),
                     .init(key: "email", value: email),
                     .init(key: "certCode", value: certCode),
+                ])
+                
+            case let .check(email):
+                appending(baseString: "email/check", urlQueryItems: [
+                    .init(key: "email", value: email)
                 ])
                 
             case .myPage:

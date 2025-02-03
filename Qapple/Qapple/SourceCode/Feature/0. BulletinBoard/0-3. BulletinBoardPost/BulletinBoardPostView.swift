@@ -96,7 +96,7 @@ private struct Placeholder: View {
                 .font(.pretendard(.medium, size: 16))
                 .lineSpacing(6)
         }
-        .foregroundStyle(TextLabel.placeholder)
+        .foregroundStyle(TextLabel.ph)
         .padding(.horizontal, 24)
     }
 }
@@ -123,8 +123,9 @@ private struct PostTextField: View {
         .focused(isTextFieldFocused)
         .padding(.horizontal, 24)
         .autocorrectionDisabled()
-        .onChange(of: store.content){ _ in
-            fontSize = store.fontSize}
+        .onChange(of: store.content) { _, _ in
+            fontSize = store.fontSize
+        }
     }
 }
 

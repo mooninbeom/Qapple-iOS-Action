@@ -16,13 +16,13 @@ extension NetworkManager {
         let urlString = ApiEndpoints.basicURLString(path: .tokenRefresh)
         guard let url = URL(string: urlString) else {
             print("Error: cannotCreateURL")
-            throw NetworkError.cannotCreateURL
+            throw LegacyNetworkError.cannotCreateURL
         }
         
         // 토큰 추가
         var request = URLRequest(url: url)
         request.httpMethod = "GET"
-        request.setValue("Bearer \(try KeychainService.shared.token(.refresh))", forHTTPHeaderField: "Authorization")
+        request.setValue("Bearer \(try LegacyKeychainService.shared.token(.refresh))", forHTTPHeaderField: "Authorization")
         
         // URLSession 생성
         let (data, response) = try await URLSession.shared.data(for: request)
@@ -31,7 +31,7 @@ extension NetworkManager {
         if let response = response as? HTTPURLResponse,
            !(200..<300).contains(response.statusCode) {
             print("Error: badRequest: \(response.statusCode)")
-            throw NetworkError.badRequest
+            throw LegacyNetworkError.badRequest
         }
         
         // 디코딩

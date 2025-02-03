@@ -73,7 +73,7 @@ struct ProfileEditFeature {
                 return .run { send in
                     await send(.toggleLoading(true), animation: .bouncy)
                     do {
-                        let data = try await memberRepository.nicknameCheck(nickname)
+                        let data = try await memberRepository.checkNicknameDuplicate(nickname)
                         await send(.toggleNicknameCheck(!data))
                         await send(.toggleNicknameChange(false))
                     } catch {

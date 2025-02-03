@@ -2,33 +2,62 @@
 //  MemberRepository.swift
 //  Qapple
 //
-//  Created by Simmons on 1/31/25.
+//  Created by 김민준 on 1/30/25.
 //
 
-import Foundation
 import ComposableArchitecture
+import Foundation
 
 struct MemberRepository {
-    var certification: (_ signUpToken: String, _ email: String) async throws -> Bool
-    var certificationCodeCheck: (_ signUpToken: String, _ email: String, _ certCode: String) async throws -> Bool
+    var signIn: (_ code: String) async throws -> Bool
+    var signUp: (_ email: String, _ nickname: String) async throws -> Void
+    var sendCertificationEmail: (_ email: String) async throws -> Bool
+    var checkAuthCode: (_ email: String, _ certCode: String) async throws -> Bool
+    var checkNicknameDuplicate: (_ nickname: String) async throws -> Bool
     var fetchMyPage: () async throws -> MyProfile
     var editMyPage: (_ nickname: String, _ profileImage: String?) async throws -> Void
-    var nicknameCheck: (_ nickname: String) async throws -> Bool
     var resign: () async throws -> Bool
-    var signIn: (_ code: String, _ diviceToken: String) async throws -> Void
-    var signUp: (_ signUpToken: String, _ email: String, _ nickname: String, _ profileImage: String?, _ deviceToken: String) async throws -> SignUpDTO
 }
+
+// MARK: - DependencyKey
 
 extension MemberRepository: DependencyKey {
     
+    @Dependency(\.keychainService) static var keychainService
+    
     static let liveValue = Self(
-        certification: { signUpToken, email in
-            let url = try QappleAPI.Member.certification(signUpToken: signUpToken, email: email).url()
+        signIn: { code in
+            let deviceToken = try keychainService.fetchData(.deviceToken)
+            let url = try QappleAPI.Member.signIn(code: code, deviceToken: deviceToken).url()
+            let response: BaseResponse<SignInDTO> = try await NetworkService.shared.signIn(url: url)
+            try keychainService.createData(.accessToken, response.result.accessToken ?? "")
+            try keychainService.createData(.refreshToken, response.result.refreshToken ?? "")
+            return response.result.isMember
+        },
+        signUp: { email, nickname in
+            let url = try QappleAPI.Member.signUp.url()
+            let refreshToken = try keychainService.fetchData(.refreshToken)
+            let deviceToken = try keychainService.fetchData(.deviceToken)
+            let requestBody: SignUpRequest = SignUpRequest(signUpToken: refreshToken, email: email, nickname: nickname, deviceToken: deviceToken)
+            let response: BaseResponse<SignUpDTO> = try await NetworkService.shared.post(url: url, body: requestBody)
+            try keychainService.createData(.accessToken, response.result.accessToken ?? "")
+            try keychainService.createData(.refreshToken, response.result.refreshToken ?? "")
+            return ()
+        },
+        sendCertificationEmail: { email in
+            let refreshToken = try keychainService.fetchData(.refreshToken)
+            let url = try QappleAPI.Member.certification(signUpToken: refreshToken, email: email).url()
             let response: BaseResponse<Bool> = try await NetworkService.shared.get(url: url)
             return response.result
         },
-        certificationCodeCheck: { signUpToken, email, certCode in
-            let url = try QappleAPI.Member.certificationCodeCheck(signUpToken: signUpToken, email: email, certCode: certCode).url()
+        checkAuthCode: { email, certCode in
+            let refreshToken = try keychainService.fetchData(.refreshToken)
+            let url = try QappleAPI.Member.certificationCodeCheck(signUpToken: refreshToken, email: email, certCode: certCode).url()
+            let response: BaseResponse<Bool> = try await NetworkService.shared.get(url: url)
+            return response.result
+        },
+        checkNicknameDuplicate: { nickname in
+            let url = try QappleAPI.Member.nicknameCheck(nickname: nickname).url()
             let response: BaseResponse<Bool> = try await NetworkService.shared.get(url: url)
             return response.result
         },
@@ -42,36 +71,32 @@ extension MemberRepository: DependencyKey {
             let requestBody: EditProfileRequest = EditProfileRequest(nickname: nickname, profileImage: profileImage)
             let response: BaseResponse<EditProfileDTO> = try await NetworkService.shared.post(url: url, body: requestBody)
         },
-        nicknameCheck: { nickname in
-            let url = try QappleAPI.Member.nicknameCheck(nickname: nickname).url()
-            let response: BaseResponse<Bool> = try await NetworkService.shared.get(url: url)
-            return response.result
-        },
         resign: {
             let url = try QappleAPI.Member.resign.url()
             let response: BaseResponse<Bool> = try await NetworkService.shared.get(url: url)
-            return response.result
-        },
-        signIn: { code, diviceToken in
-            let url = try QappleAPI.Member.signIn(code: code, deviceToken: diviceToken).url()
-            let response: BaseResponse<SignInDTO> = try await NetworkService.shared.get(url: url)
-        },
-        signUp: { signUpToken, email, nickname, profileImage, deviceToken in
-            let url = try QappleAPI.Member.signUp.url()
-            let requestBody: SignUpRequest = SignUpRequest(signUpToken: signUpToken, email: email, nickname: nickname, profileImage: profileImage, deviceToken: deviceToken)
-            let response: BaseResponse<SignUpDTO> = try await NetworkService.shared.post(url: url, body: requestBody)
             return response.result
         }
     )
     
     static let previewValue = Self(
-        certification: { signUpToken, email in
-            print("인증 요청: token=\(signUpToken), email=\(email)")
+        signIn: { code in
+            print("로그인 요청: code=\(code)")
             return true
         },
-        certificationCodeCheck: { signUpToken, email, certCode in
-            print("인증 코드 확인: token=\(signUpToken), email=\(email), code=\(certCode)")
-            return certCode == "123456"
+        signUp: { email, nickname in
+            print("회원가입 요청: email=\(email), nickname=\(nickname)")
+        },
+        sendCertificationEmail: { email in
+            print("email=\(email)")
+            return true
+        },
+        checkAuthCode: { email, certCode in
+            print("인증 코드 확인: email=\(email), code=\(certCode)")
+            return certCode == "12345"
+        },
+        checkNicknameDuplicate: { nickname in
+            print("닉네임 중복 확인: \(nickname)")
+            return nickname != "이미사용중"
         },
         fetchMyPage: {
             MyProfile(nickname: "프리뷰 유저", profileImage: nil, joinDate: "2025-01-31")
@@ -79,23 +104,14 @@ extension MemberRepository: DependencyKey {
         editMyPage: { nickname, profileImage in
             print("프로필 수정: nickname=\(nickname), profileImage=\(profileImage ?? "없음")")
         },
-        nicknameCheck: { nickname in
-            print("닉네임 중복 확인: \(nickname)")
-            return nickname != "이미사용중"
-        },
         resign: {
             print("회원 탈퇴 요청")
             return true
-        },
-        signIn: { code, deviceToken in
-            print("로그인 요청: code=\(code), deviceToken=\(deviceToken)")
-        },
-        signUp: { signUpToken, email, nickname, profileImage, deviceToken in
-            print("회원가입 요청: token=\(signUpToken), email=\(email), nickname=\(nickname)")
-            return SignUpDTO(accessToken: "dummy_access_token", refreshToken: "dummy_refresh_token")
         }
     )
 }
+
+// MARK: - DependencyValues
 
 extension DependencyValues {
     var memberRepository: MemberRepository {

@@ -88,7 +88,7 @@ private struct WriteNickname: View {
             ZStack(alignment: .leading) {
                 if store.nickname.isEmpty {
                     Text("닉네임을 입력해주세요")
-                        .foregroundStyle(TextLabel.placeholder)
+                        .foregroundStyle(TextLabel.ph)
                         .font(Font.pretendard(.semiBold, size: 20))
                         .frame(height: 14)
                 }
@@ -104,7 +104,7 @@ private struct WriteNickname: View {
                         }
                     
                     Text("\(store.nickname.count)/\(store.textLimit)")
-                        .foregroundStyle(TextLabel.placeholder)
+                        .foregroundStyle(TextLabel.ph)
                         .font(Font.pretendard(.semiBold, size: 14))
                         .frame(height: 8)
                 }

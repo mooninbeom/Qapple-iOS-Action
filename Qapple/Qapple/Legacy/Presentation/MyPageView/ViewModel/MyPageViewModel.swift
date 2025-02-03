@@ -85,7 +85,7 @@ extension MyPageViewModel {
     /// 로그아웃을 진행합니다.
     @MainActor
     func signOut() {
-        try? KeychainService.shared.createUserID("")
+        try? LegacyKeychainService.shared.createUserID("")
     }
     
     /// 회원 탈퇴를 요청합니다.
@@ -93,7 +93,7 @@ extension MyPageViewModel {
     func requestDeleteMember() {
         Task {
             self.isDeletedMember = try await NetworkManager.requestDeleteMember()
-            try? KeychainService.shared.createUserID("")
+            try? LegacyKeychainService.shared.createUserID("")
         }
     }
 }

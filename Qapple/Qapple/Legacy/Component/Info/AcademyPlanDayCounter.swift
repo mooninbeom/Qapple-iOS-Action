@@ -151,7 +151,7 @@ private struct ProgressBar: View {
         GeometryReader { proxy in
             ZStack(alignment: .leading) {
                 RoundedRectangle(cornerRadius: 10)
-                    .foregroundStyle(TextLabel.placeholder)
+                    .foregroundStyle(TextLabel.ph)
                     .frame(width: proxy.size.width)
                     .clipShape(RoundedRectangle(cornerRadius: 10))
                 

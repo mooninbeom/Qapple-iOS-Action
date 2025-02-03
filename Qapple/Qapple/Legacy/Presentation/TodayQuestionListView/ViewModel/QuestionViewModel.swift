@@ -57,7 +57,7 @@ final class QuestionViewModel: ObservableObject {
         
         let urlString = ApiEndpoints.basicURLString(path: .questions)
         guard let url = URL(string: urlString) else {
-            throw NetworkError.cannotCreateURL
+            throw LegacyNetworkError.cannotCreateURL
         }
         
         var urlComponent = URLComponents(url: url, resolvingAgainstBaseURL: true)!
@@ -75,13 +75,13 @@ final class QuestionViewModel: ObservableObject {
         
         guard let url = urlComponent.url else {
             print("Error: cannotCreateURL")
-            throw NetworkError.cannotCreateURL
+            throw LegacyNetworkError.cannotCreateURL
         }
         
         // 토큰 추가
         var request = URLRequest(url: url)
         request.httpMethod = "GET"
-        request.setValue("Bearer \(try KeychainService.shared.token(.access))", forHTTPHeaderField: "Authorization")
+        request.setValue("Bearer \(try LegacyKeychainService.shared.token(.access))", forHTTPHeaderField: "Authorization")
         
         // 네트워크 통신
         
@@ -89,7 +89,7 @@ final class QuestionViewModel: ObservableObject {
         
         if let response = response as? HTTPURLResponse,
            !(200...299).contains(response.statusCode) {
-            throw NetworkError.cannotCreateURL
+            throw LegacyNetworkError.cannotCreateURL
         }
         
         let decoder = JSONDecoder()

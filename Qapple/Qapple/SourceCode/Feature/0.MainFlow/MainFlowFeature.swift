@@ -1,5 +1,5 @@
 //
-//  RootFeature.swift
+//  MainFlowFeature.swift
 //  Qapple
 //
 //  Created by 김민준 on 1/20/25.
@@ -8,7 +8,7 @@
 import ComposableArchitecture
 
 @Reducer
-struct RootFeature {
+struct MainFlowFeature {
     
     @ObservableState
     struct State: Equatable {
@@ -89,7 +89,7 @@ struct RootFeature {
 
 // MARK: - Path
 
-extension RootFeature {
+extension MainFlowFeature {
     
     @Reducer(state: .equatable)
     enum Path {

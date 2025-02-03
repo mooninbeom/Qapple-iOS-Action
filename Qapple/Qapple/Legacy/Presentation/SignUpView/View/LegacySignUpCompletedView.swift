@@ -7,7 +7,7 @@
 
 import SwiftUI
 
-struct SignUpCompletedView: View {
+struct LegacySignUpCompletedView: View {
     
     @EnvironmentObject var pathModel: PathModel
     @EnvironmentObject var authViewModel: AuthViewModel
@@ -73,6 +73,6 @@ struct SignUpCompletedView: View {
 }
 
 #Preview {
-    SignUpCompletedView()
+    LegacySignUpCompletedView()
         .environmentObject(AuthViewModel())
 }

@@ -1,0 +1,68 @@
+//
+//  EmailFormFeature.swift
+//  Qapple
+//
+//  Created by 김민준 on 1/30/25.
+//
+
+import ComposableArchitecture
+
+@Reducer
+struct EmailFormFeature {
+    
+    @ObservableState
+    struct State: Equatable {
+        var emailText = ""
+        var isEmailTextValid = false
+        var isLoading = false
+    }
+    
+    enum Action: BindableAction {
+        case backButtonTapped
+        case sendMailButtonTapped
+        case sendCertificationEmailResponse(String)
+        case toggleLoading(Bool)
+        case binding(BindingAction<State>)
+    }
+    
+    @Dependency(\.memberRepository) var memberRepository
+    @Dependency(\.dismiss) var dismiss
+    
+    var body: some ReducerOf<Self> {
+        BindingReducer()
+        Reduce { state, action in
+            switch action {
+            case .backButtonTapped:
+                return .run { send in
+                    await dismiss()
+                }
+                
+            case .sendMailButtonTapped:
+                return .run { [email = state.emailText + Constant.academyEmail]  send in
+                    await send(.toggleLoading(true), animation: .bouncy)
+                    do {
+                        let _ = try await memberRepository.sendCertificationEmail(email)
+                        await send(.sendCertificationEmailResponse(email))
+                    } catch {
+                        print(error)
+                    }
+                    await send(.toggleLoading(false), animation: .bouncy)
+                }
+                
+            case .sendCertificationEmailResponse:
+                return .none
+                
+            case let .toggleLoading(bool):
+                state.isLoading = bool
+                return .none
+                
+            case .binding(\.emailText):
+                state.isEmailTextValid = !state.emailText.isEmpty
+                return .none
+                
+            case .binding:
+                return .none
+            }
+        }
+    }
+}

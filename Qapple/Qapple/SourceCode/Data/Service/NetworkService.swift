@@ -5,40 +5,23 @@
 //  Created by Simmons on 1/21/25.
 //
 
+import ComposableArchitecture
 import Foundation
-
-protocol HTTPMethod {
-    func signIn<T: Decodable, U: Encodable>(url: URL, body: U) async -> Result<T, Error>
-    func get<T: Decodable>(url: URL) async -> Result<T, Error>
-    func post<T: Decodable, U: Encodable>(url: URL, body: U) async -> Result<T, Error>
-    func patch<T: Decodable, U: Encodable>(url: URL, body: U) async -> Result<T, Error>
-    func delete<T: Decodable>(url: URL) async -> Result<T, Error>
-}
 
 /// 네트워킹을 수행할 클라이언트 객체
 struct NetworkService {
+    
     /// NetworkClient 싱글톤 객체
     static let shared = NetworkService()
-    
     private init() {}
     
-    /// SignIn 요청을 수행합니다.
-    func signIn<T: Decodable, U: Encodable>(url: URL, body: U) async throws -> T {
-        do {
-            
-            // 네트워킹 수행(토큰 X)
-            var request = URLRequest(url: url)
-            request.httpMethod = "POST"
-            request.setValue("application/json", forHTTPHeaderField: "Content-Type")
-            
-            request.httpBody = try JSONEncoder().encode(body)
-            
-            let (data, response) = try await URLSession.shared.data(for: request)
-            
-            return try decodeResponse(data: data, response: response)
-        } catch {
-            throw error
-        }
+    @Dependency(\.keychainService.fetchData) var fetchData
+    
+    func signIn<T: Decodable>(url: URL) async throws -> T {
+        var request = URLRequest(url: url)
+        request.httpMethod = "GET"
+        let (data, response) = try await URLSession.shared.data(for: request)
+        return try decodeResponse(data: data, response: response)
     }
     
     /// GET 요청을 수행합니다.
@@ -47,7 +30,6 @@ struct NetworkService {
             
             // 네트워킹 수행
             let (data, response) = try await request(url: url, method: "GET")
-            
             return try decodeResponse(data: data, response: response)
         } catch {
             throw error
@@ -104,11 +86,10 @@ extension NetworkService {
     /// - 커스텀 에러(NetworkError)를 반환하기 위해, 재사용을 염두에 두고 함수로 감싸주었습니다.
     func request(url: URL, body: Encodable? = nil, method: String) async throws -> (Data, URLResponse) {
         do {
+            let accessToken = "Bearer \(try fetchData(.accessToken))"
             var request = URLRequest(url: url)
             request.httpMethod = method
-            request.setValue(try KeychainService.shared.token(.access),
-                forHTTPHeaderField: "Authorization"
-            )
+            request.setValue(accessToken, forHTTPHeaderField: "Authorization")
             
             // Body가 있는 경우 Content-Type 추가 및 Body 인코딩
             if let body = body {
@@ -118,7 +99,7 @@ extension NetworkService {
             
             return try await URLSession.shared.data(for: request)
         } catch {
-            throw NetworkError2.urlRequestFailure(urlString: url.absoluteString)
+            throw NetworkError.urlRequestFailure(urlString: url.absoluteString)
         }
     }
 }
@@ -139,12 +120,16 @@ extension NetworkService {
     }
     
     /// StatusCode의 상태값이 성공인지 확인합니다.
-    func checkStatusCode(statusCode: Int) throws {
-        
-        // 성공 범위 안에 들지 못하면 에러 던지기
+    func checkStatusCode(response: URLResponse, data: Data) throws {
+        let baseResponse: NetworkError.BaseResponse? = try? decoding(to: data)
+        let statusCode = statusCode(response)
         let successStatusCodeRange = 200...299
         if !successStatusCodeRange.contains(statusCode) {
-            throw NetworkError2.invalidResponse(statusCode: statusCode)
+            throw NetworkError.invalidResponse(
+                urlString: response.url?.absoluteString ?? "",
+                statusCode: statusCode,
+                message: baseResponse?.message
+            )
         }
     }
 }
@@ -161,15 +146,14 @@ extension NetworkService {
             let decodedData = try JSONDecoder().decode(T.self, from: data)
             return decodedData
         } catch {
-            throw NetworkError2.decodingFailure(data: data)
+            throw NetworkError.decodingFailure(type: T.self)
         }
     }
     
     /// 응답을 검증하고 데이터를 디코딩한 결과를 반환합니다.
     func decodeResponse<T: Decodable>(data: Data, response: URLResponse) throws -> T {
         // StatusCode 체크
-        let statusCode = statusCode(response)
-        try checkStatusCode(statusCode: statusCode)
+        try checkStatusCode(response: response, data: data)
         
         // Decoding 및 반환
         return try decoding(to: data)
@@ -179,14 +163,20 @@ extension NetworkService {
 // MARK: - Network Error
 
 /// 네트워킹에서 발생할 수 있는 에러를 정의합니다.
-enum NetworkError2: Error {
+enum NetworkError: Error {
     
     /// URLReuqest 함수 호출에 실패했습니다.
     case urlRequestFailure(urlString: String)
     
     /// 유효하지 않은 Response입니다.
-    case invalidResponse(statusCode: Int)
+    case invalidResponse(urlString: String, statusCode: Int, message: String?)
     
     /// Decoding에 실패했습니다.
-    case decodingFailure(data: Data)
+    case decodingFailure(type: Decodable.Type)
+    
+    struct BaseResponse: Decodable {
+        let timeStamp: String
+        let code: String
+        let message: String
+    }
 }

@@ -53,7 +53,7 @@ struct CommentReportFeature {
                 return .none
                 
             // 두번째 Alert(신고가 완료되었습니다.)
-            case let .alert(.presented(.deleteButtonTapped(index))):
+            case .alert(.presented(.deleteButtonTapped)):
                 // TODO: 삭제 버튼 눌렀을 떄 action
                 state.alert = AlertState {
                     TextState("신고가 완료됐어요")

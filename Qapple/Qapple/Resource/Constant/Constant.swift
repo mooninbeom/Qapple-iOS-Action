@@ -9,4 +9,5 @@ import Foundation
 
 enum Constant {
     static let appleId = "6480340462"
+    static let academyEmail = "@pos.idserve.net"
 }

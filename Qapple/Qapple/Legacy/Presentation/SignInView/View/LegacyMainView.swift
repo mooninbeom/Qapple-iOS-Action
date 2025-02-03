@@ -7,7 +7,7 @@
 
 import SwiftUI
 
-struct MainView: View {
+struct LegacyMainView: View {
     
     @ObservedObject private(set) var authViewModel: AuthViewModel
     @StateObject private var pathModel: PathModel = .init()
@@ -21,12 +21,12 @@ struct MainView: View {
                     .environmentObject(pathModel)
                     .environmentObject(authViewModel)
             } else {
-                SignInView()
+                LegacySignInView()
                     .environmentObject(pathModel)
                     .environmentObject(authViewModel)
                     .onAppear {
                         if authViewModel.isAutoSignInMode {
-                            AppleLoginService.autoLogin { isSingIn in
+                            LegacyAppleLoginService.autoLogin { isSingIn in
                                 if isSingIn {
                                     DispatchQueue.main.async {
                                         authViewModel.isAutoSignInMode = false
@@ -256,7 +256,7 @@ private struct HomeView: View {
 }
 
 // MARK: - 로그인 뷰
-private struct SignInView: View {
+private struct LegacySignInView: View {
     
     @EnvironmentObject var pathModel: PathModel
     @EnvironmentObject var authViewModel: AuthViewModel
@@ -301,7 +301,7 @@ private struct SignInView: View {
                             SignUpServiceTermsView()
                             
                         case .signUpCompleted:
-                            SignUpCompletedView()
+                            LegacySignUpCompletedView()
                             
                         default:
                             EmptyView()
@@ -353,7 +353,7 @@ private struct SignInView: View {
             
             Spacer()
             
-            AppleLoginButton()
+            LegacyAppleLoginButton()
                 .disabled(authViewModel.isSignInLoading)
                 .padding(.bottom, 16)
         }
@@ -421,5 +421,5 @@ private struct CustomTabBar: View {
 }
 
 #Preview {
-    MainView(authViewModel: .init())
+    LegacyMainView(authViewModel: .init())
 }

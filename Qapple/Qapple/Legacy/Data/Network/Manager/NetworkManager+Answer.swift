@@ -15,7 +15,7 @@ extension NetworkManager {
         
         let urlString = ApiEndpoints.basicURLString(path: .answers)
         guard let url = URL(string: urlString) else {
-            throw NetworkError.cannotCreateURL
+            throw LegacyNetworkError.cannotCreateURL
         }
         
         var urlComponent = URLComponents(url: url, resolvingAgainstBaseURL: true)!
@@ -32,7 +32,7 @@ extension NetworkManager {
         
         guard let url = urlComponent.url else {
             print("Error: cannotCreateURL")
-            throw NetworkError.cannotCreateURL
+            throw LegacyNetworkError.cannotCreateURL
         }
         
         print("작성한 답변 조회하기: \(url)\n")
@@ -40,7 +40,7 @@ extension NetworkManager {
         // 토큰 추가
         var request = URLRequest(url: url)
         request.httpMethod = "GET"
-        request.setValue("Bearer \(try KeychainService.shared.token(.access))", forHTTPHeaderField: "Authorization")
+        request.setValue("Bearer \(try LegacyKeychainService.shared.token(.access))", forHTTPHeaderField: "Authorization")
         
         // URLSession 생성
         let (data, response) = try await URLSession.shared.data(for: request)
@@ -49,7 +49,7 @@ extension NetworkManager {
         if let response = response as? HTTPURLResponse,
            !(200..<300).contains(response.statusCode) {
             print("Error: badRequest")
-            throw NetworkError.badRequest
+            throw LegacyNetworkError.badRequest
         }
         
         // 디코딩
@@ -63,7 +63,7 @@ extension NetworkManager {
         
         let urlString = ApiEndpoints.basicURLString(path: .answersOfQuestion) + "/\(request.questionId)?"
         guard let url = URL(string: urlString) else {
-            throw NetworkError.cannotCreateURL
+            throw LegacyNetworkError.cannotCreateURL
         }
         
         var urlComponent = URLComponents(url: url, resolvingAgainstBaseURL: true)!
@@ -80,7 +80,7 @@ extension NetworkManager {
         
         guard let url = urlComponent.url else {
             print("Error: cannotCreateURL")
-            throw NetworkError.cannotCreateURL
+            throw LegacyNetworkError.cannotCreateURL
         }
         
         print("답변 조회하기: \(url)\n")
@@ -88,7 +88,7 @@ extension NetworkManager {
         // 토큰 추가
         var request = URLRequest(url: url)
         request.httpMethod = "GET"
-        request.setValue("Bearer \(try KeychainService.shared.token(.access))", forHTTPHeaderField: "Authorization")
+        request.setValue("Bearer \(try LegacyKeychainService.shared.token(.access))", forHTTPHeaderField: "Authorization")
         
         // URLSession 생성
         let (data, response) = try await URLSession.shared.data(for: request)
@@ -98,7 +98,7 @@ extension NetworkManager {
            !(200..<300).contains(response.statusCode) {
             print(response.statusCode)
             print("Error: badRequest")
-            throw NetworkError.badRequest
+            throw LegacyNetworkError.badRequest
         }
         
         // 디코딩
@@ -113,21 +113,21 @@ extension NetworkManager {
         // JSON Request
         guard let requestData = try? JSONEncoder().encode(request) else {
             print("JSON Request 데이터 생성 실패")
-            throw NetworkError.badRequest
+            throw LegacyNetworkError.badRequest
         }
         
         // URL 객체 생성
         let urlString = ApiEndpoints.basicURLString(path: .answersOfQuestion) + "/\(questionID)"
         guard let url = URL(string: urlString) else {
             print("URL 객체 생성 실패")
-            throw NetworkError.cannotCreateURL
+            throw LegacyNetworkError.cannotCreateURL
         }
         
         // Request 객체 생성
         var request = URLRequest(url: url)
         request.httpMethod = "POST"
         request.setValue("application/json", forHTTPHeaderField: "Content-Type")
-        request.setValue("Bearer \(try KeychainService.shared.token(.access))", forHTTPHeaderField: "Authorization")
+        request.setValue("Bearer \(try LegacyKeychainService.shared.token(.access))", forHTTPHeaderField: "Authorization")
         
         // URLSession 실행
         let (data, response) = try await URLSession.shared.upload(for: request, from: requestData)
@@ -136,7 +136,7 @@ extension NetworkManager {
         // 에러 체크
         if let response = response as? HTTPURLResponse,
            !(200..<300).contains(response.statusCode) {
-            throw NetworkError.badRequest
+            throw LegacyNetworkError.badRequest
         }
         
         // 디코딩
@@ -146,7 +146,7 @@ extension NetworkManager {
             // print("AnswerResponse.RegisterAnswer: \(decodeData.result)")
             return decodeData.result
         } catch {
-            throw NetworkError.decodeFailed
+            throw LegacyNetworkError.decodeFailed
         }
     }
     
@@ -157,14 +157,14 @@ extension NetworkManager {
         let urlString = ApiEndpoints.basicURLString(path: .answers) + "/\(request.answerId)"
         guard let url = URL(string: urlString) else {
             print("Error: cannotCreateURL")
-            throw NetworkError.cannotCreateURL
+            throw LegacyNetworkError.cannotCreateURL
         }
         print(url)
         
         // 토큰 추가
         var request = URLRequest(url: url)
         request.httpMethod = "DELETE"
-        request.setValue("Bearer \(try KeychainService.shared.token(.access))", forHTTPHeaderField: "Authorization")
+        request.setValue("Bearer \(try LegacyKeychainService.shared.token(.access))", forHTTPHeaderField: "Authorization")
         
         // URLSession 생성
         let (data, response) = try await URLSession.shared.data(for: request)
@@ -174,7 +174,7 @@ extension NetworkManager {
         if let response = response as? HTTPURLResponse,
            !(200..<300).contains(response.statusCode) {
             print("Error: badRequest")
-            throw NetworkError.badRequest
+            throw LegacyNetworkError.badRequest
         }
         
         // 디코딩

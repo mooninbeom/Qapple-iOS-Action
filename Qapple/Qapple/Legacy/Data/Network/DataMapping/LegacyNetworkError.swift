@@ -1,5 +1,5 @@
 //
-//  NetworkError.swift
+//  LegacyNetworkError.swift
 //  Capple
 //
 //  Created by 김민준 on 3/6/24.
@@ -7,7 +7,7 @@
 
 import Foundation
 
-enum NetworkError: Error {
+enum LegacyNetworkError: Error {
     case badRequest
     case decodeFailed
     case cannotCreateURL

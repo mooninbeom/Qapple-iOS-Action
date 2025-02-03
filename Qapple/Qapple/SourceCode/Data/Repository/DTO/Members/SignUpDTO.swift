@@ -16,6 +16,5 @@ struct SignUpRequest: Codable {
     let signUpToken: String
     let email: String
     let nickname: String
-    let profileImage: String?
     let deviceToken: String
 }

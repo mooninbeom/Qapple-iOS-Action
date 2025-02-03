@@ -50,6 +50,7 @@ struct ProfileFeature {
     }
     
     @Dependency(\.memberRepository) var memberRepository
+    @Dependency(\.keychainService) var keychainService
     
     var body: some ReducerOf<Self> {
         Reduce { state, action in
@@ -68,7 +69,11 @@ struct ProfileFeature {
             case .alert(.presented(.confirmLogOut)):
                 return .run { send in
                     await send(.delegate(.confirmLogOut))
-                    try? KeychainService.shared.createUserID("")
+                    do {
+                        try keychainService.createData(.userId, "")
+                    } catch {
+                        print(error)
+                    }
                     // TODO: Navigation 처리(Root)
                 }
                 
@@ -77,8 +82,8 @@ struct ProfileFeature {
                     await send(.delegate(.confirmResign))
                     await send(.toggleLoading(true), animation: .bouncy)
                     do {
-                        let data = try await memberRepository.resign()
-                        try? KeychainService.shared.createUserID("")
+                        let _ = try await memberRepository.resign()
+                        try keychainService.createData(.userId, "")
                     } catch {
                         print(error)
                     }

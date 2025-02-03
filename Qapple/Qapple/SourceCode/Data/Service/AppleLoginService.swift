@@ -5,40 +5,85 @@
 //  Created by 김민준 on 8/4/24.
 //
 
+import ComposableArchitecture
 import AuthenticationServices
 
+typealias AuthorizationCode = String
+
 struct AppleLoginService {
-    private init() {}
+    var requestLogin: (_ request: ASAuthorizationAppleIDRequest) -> Void
+    var loginCompletion: (_ result: Result<ASAuthorization, Error>) async throws -> AuthorizationCode
+    var autoLogin: () async throws -> Void
+}
+
+// MARK: - DependencyKey
+
+extension AppleLoginService: DependencyKey {
     
-    static func autoLogin(completion: @escaping (Bool) -> Void) {
-        let appleIDProvider = ASAuthorizationAppleIDProvider()
-        let userID = try? KeychainService.shared.userID()
-        
-        appleIDProvider.getCredentialState(forUserID: userID ?? "") { credentialState, error in
-            switch credentialState {
-            case .authorized:
-                Task {
-                    do {
-                        let response = try await NetworkManager.refreshToken()
-                        try KeychainService.shared.createToken(.access, token: response.accessToken)
-                        try KeychainService.shared.createToken(.refresh, token: response.refreshToken)
-                        
-                        print("✅ [Auto Login Successed]\n")
-                        print("유효한 토큰 확인, 메인 화면으로 이동")
-                        return completion(true)
-                    } catch {
-                        print("유효한 토큰 없음, 로그인 화면으로 이동")
-                        return completion(false)
+    @Dependency(\.keychainService) static var keychainService
+    
+    static let liveValue = Self(
+        requestLogin: { request in
+            request.requestedScopes = [.fullName, .email]
+        },
+        loginCompletion: { result in
+            switch result {
+            case let .success(authResults):
+                switch authResults.credential {
+                case let appleIDCredential as ASAuthorizationAppleIDCredential:
+                    guard let authorizationCode = String(
+                        data: appleIDCredential.authorizationCode ?? Data(),
+                        encoding: .utf8) else {
+                        throw AppleLoginError.failedGenerateAuthCode
                     }
+                    try keychainService.createData(.userId, appleIDCredential.user)
+                    return authorizationCode
+                    
+                default:
+                    throw AppleLoginError.unknownError
                 }
                 
-            case .revoked, .notFound:
-                print("❌ [Auto Login Failed]\n")
-                return completion(false)
+            case let .failure(error):
+                throw error
+            }
+        },
+        autoLogin: {
+            let appleIDProvider = ASAuthorizationAppleIDProvider()
+            let userId = try keychainService.fetchData(.userId)
+            let credentialState = try await appleIDProvider.credentialState(forUserID: userId)
+            switch credentialState {
+            case .authorized:
+                return
                 
-            default:
-                return completion(false)
+            case .revoked:
+                throw AppleLoginError.autoLoginFailed("revoked")
+                
+            case .notFound:
+                throw AppleLoginError.autoLoginFailed("notFound")
+                
+            case .transferred:
+                throw AppleLoginError.autoLoginFailed("transferred")
+                
+            @unknown default:
+                throw AppleLoginError.autoLoginFailed("unknown")
             }
         }
+    )
+}
+
+// MARK: - AppleLoginError
+
+enum AppleLoginError: Error {
+    case failedGenerateAuthCode
+    case autoLoginFailed(String)
+    case unknownError
+}
+
+// MARK: - DependencyValues
+
+extension DependencyValues {
+    var appleLoginService: AppleLoginService {
+        get { self[AppleLoginService.self] }
+        set { self[AppleLoginService.self] = newValue }
     }
 }

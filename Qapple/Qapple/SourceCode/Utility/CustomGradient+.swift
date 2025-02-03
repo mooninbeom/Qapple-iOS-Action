@@ -9,6 +9,18 @@ import SwiftUI
 
 extension LinearGradient {
     
+    /// 배경 그라디언트
+    static var backgroundGradient: LinearGradient {
+        LinearGradient(
+            stops: [
+                Gradient.Stop(color: Color(red: 0.12, green: 0.12, blue: 0.13).opacity(0), location: 0.00),
+                Gradient.Stop(color: Color(red: 0.93, green: 0.26, blue: 0.38).opacity(0.56), location: 1.00),
+            ],
+            startPoint: UnitPoint(x: 0.5, y: 0.55),
+            endPoint: UnitPoint(x: 0.5, y: 2)
+        )
+    }
+    
     /// 타이머 그라디언트
     static var timerGradient: LinearGradient {
         LinearGradient(
