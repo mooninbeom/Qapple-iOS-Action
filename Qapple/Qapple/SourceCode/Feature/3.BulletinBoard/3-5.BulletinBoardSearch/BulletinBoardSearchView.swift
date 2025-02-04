@@ -73,8 +73,12 @@ private struct SearchBar: View {
     
     var body: some View {
         HStack(spacing: 6) {
-            TextField("검색어를 입력해주세요", text: $store.searchText.sending(\.setSearchText))
+            TextField("검색어를 입력해주세요", text: $store.searchText) {}
                 .pretendard(.semiBold, 15)
+                .onChange(of: store.searchText) { searchText in
+                    store.send(.searchTextChanged(searchText))
+                    
+                }
         }
         .padding(14)
         .background(GrayScale.secondaryButton)

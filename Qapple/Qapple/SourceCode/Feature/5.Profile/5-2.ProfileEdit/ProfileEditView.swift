@@ -99,7 +99,7 @@ private struct WriteNickname: View {
                         .font(Font.pretendard(.semiBold, size: 20))
                         .frame(height: 14)
                         .autocorrectionDisabled()
-                        .onChange(of: store.nickname) { _, nickname in
+                        .onChange(of: store.nickname) { nickname in
                             store.send(.nicknameChanged(nickname))
                         }
                     

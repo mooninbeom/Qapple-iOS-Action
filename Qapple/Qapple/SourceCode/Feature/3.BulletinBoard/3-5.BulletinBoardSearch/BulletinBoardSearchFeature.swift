@@ -19,7 +19,7 @@ struct BulletinBoardSearchFeature {
         var isLoading = false
     }
     
-    enum Action {
+    enum Action: BindableAction {
         case onAppear // 검색 문구 변화 시 호출
         case onDisappear
         case refresh
@@ -30,8 +30,8 @@ struct BulletinBoardSearchFeature {
         case likeBoardButtonTapped(BulletinBoard)
         case likeBoard(Int)
         case deleteBoard(Int)
-        case setSearchText(String)
-        case performSearch(String)
+        case searchTextChanged(String)
+        case binding(BindingAction<State>)
         case postBoardButtonTapped
         case seeMoreAction(BulletinBoard)
         case toggleLoading(Bool)
@@ -44,9 +44,8 @@ struct BulletinBoardSearchFeature {
     @Dependency(\.bulletinBoardRepository) var bulletinBoardRepository
     
     var body: some ReducerOf<Self> {
-        Reduce {
-            state,
-            action in
+        BindingReducer()
+        Reduce { state, action in
             switch action {
             case .onAppear,
                     .refresh:
@@ -115,22 +114,20 @@ struct BulletinBoardSearchFeature {
                 }
                 return .none
                 
-            case let .setSearchText(searchText):
-                state.searchText = searchText
+            case .binding(\.searchText):
+                return .none
+                
+            case let .searchTextChanged(searchText):
                 return .concatenate(
                     .cancel(id: "searchDebounce"),
                     .run { send in
                         try await self.clock.sleep(for: .seconds(1))
-                        await send(.performSearch(searchText))
+                        if !searchText.isEmpty {
+                            await send(.onAppear)
+                        }
                     }
                         .cancellable(id: "searchDebounce", cancelInFlight: true)
                 )
-                
-            case let .performSearch(searchText):
-                guard !searchText.isEmpty else { return .none }
-                return .run { send in
-                    await send(.onAppear)
-                }
                 
             case .postBoardButtonTapped:
                 // TODO: Navigiation 처리
@@ -170,6 +167,8 @@ struct BulletinBoardSearchFeature {
                 }
                 
             case .sheet(_):
+                return .none
+            case .binding(_):
                 return .none
             }
         }
