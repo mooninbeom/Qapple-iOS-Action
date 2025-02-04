@@ -30,7 +30,7 @@ struct ProfileFeature {
         case fetchProfile(MyProfile)
         
         case editProfileButtonTapped
-        case MyAnswerListButtonTapped
+        case myAnswerListButtonTapped
         case inquiryButtonTapped
         case peopleWhoMadeQappleButtonTapped
         case logOutButtonTapped
@@ -122,7 +122,7 @@ struct ProfileFeature {
                 // TODO: Navigation 처리
                 return .none
                 
-            case .MyAnswerListButtonTapped:
+            case .myAnswerListButtonTapped:
                 // TODO: Navigation 처리
                 return .none
                 

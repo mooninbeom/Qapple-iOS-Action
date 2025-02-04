@@ -117,7 +117,7 @@ private struct QuestionAnswerSection: View {
                 title: "내 답변",
                 icon: .writeAnswerIcon,
                 tapAction: {
-                    store.send(.MyAnswerListButtonTapped)
+                    store.send(.myAnswerListButtonTapped)
                 }
             )
         }

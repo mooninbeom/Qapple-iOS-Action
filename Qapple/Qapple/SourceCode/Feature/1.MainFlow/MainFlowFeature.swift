@@ -79,6 +79,10 @@ struct MainFlowFeature {
                 state.path.append(.bulletinBoardPost(.init()))
                 return .none
                 
+            case .profileTab(.myAnswerListButtonTapped):
+                state.path.append(.myAnswerList(.init()))
+                return .none
+                
             case .profileTab(.peopleWhoMadeQappleButtonTapped):
                 state.path.append(.peopleWhoMadeQapple)
                 return .none
@@ -126,6 +130,7 @@ extension MainFlowFeature {
         case bulletinBoardPost(BulletinBoardPostFeature)
         case comment(CommentFeature)
         case notificationList(NotificationFeature)
+        case myAnswerList(MyAnswerListFeature)
         case peopleWhoMadeQapple
     }
 }
