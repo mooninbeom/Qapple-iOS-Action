@@ -42,7 +42,7 @@ struct MainFlowView: View {
             case let .completeAnswer(store): CompleteAnswerView(store: store)
             case let .answerList(store): AnswerListView(store: store)
             case let .bulletinBoard(store): BulletinBoardView(store: store)
-            case let .bulletinBoardSearch(store): EmptyView() // TODO: store 분리 필요
+            case let .bulletinBoardSearch(store): BulletinBoardSearchView(store: store)
             case let .bulletinBoardPost(store): BulletinBoardPostView(store: store)
             case let .comment(store): CommentView(store: store)
             }

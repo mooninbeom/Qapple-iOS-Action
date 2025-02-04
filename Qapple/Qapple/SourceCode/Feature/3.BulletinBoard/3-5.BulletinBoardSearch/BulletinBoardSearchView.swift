@@ -11,7 +11,6 @@ import ComposableArchitecture
 struct BulletinBoardSearchView: View {
     
     @Bindable var store: StoreOf<BulletinBoardSearchFeature>
-    let bulletinBoardStore: StoreOf<BulletinBoardFeature>
     
     var body: some View {
         GeometryReader { proxy in
@@ -23,15 +22,24 @@ struct BulletinBoardSearchView: View {
                         .padding(.horizontal, 16)
                     
                     if !store.searchBoardList.isEmpty {
-                        SearchListView(store: store, bulletinBoardStore: bulletinBoardStore)
+                        SearchListView(store: store)
                     } else {
                         NoResultView()
                     }
                 }
-                .loadingIndicator(isLoading: store.isLoading)
             }
             .background(Background.first)
             .navigationBarBackButtonHidden()
+        }
+        .refreshable {
+            store.send(.refresh)
+        }
+        .loadingIndicator(isLoading: store.isLoading)
+        .sheet(item: $store.scope(state: \.sheet, action: \.sheet)
+        ) { store in
+            switch store.case {
+            case let .seeMore(store): SeeMoreSheet(store: store)
+            }
         }
         .onTapGesture {
             hideKeyboard()
@@ -79,7 +87,6 @@ private struct SearchBar: View {
 private struct SearchListView: View {
     
     @Bindable var store: StoreOf<BulletinBoardSearchFeature>
-    @Bindable var bulletinBoardStore: StoreOf<BulletinBoardFeature>
     
     private var searchBoardList: [BulletinBoard] {
         store.searchBoardList.filter { !$0.isReported }
@@ -92,34 +99,27 @@ private struct SearchListView: View {
                     BulletinBoardCell(
                         board: board,
                         ellipsis: {
-                            bulletinBoardStore.send(.seeMoreAction(board))
+                            store.send(.seeMoreAction(board))
                         },
                         like: {
-                            store.send(.likeBoardButtonTapped(board.id))
+                            store.send(.likeBoardButtonTapped(board))
                         }
                     )
-                    .onAppear {
-                        if index == store.searchBoardList.count - 1 && store.hasNext {
-                            print("게시판 검색 페이지네이션")
-                            store.send(.getSearchBoard)
-                        }
-                    }
                     .onTapGesture {
-                        bulletinBoardStore.send(.postBoardButtonTapped)
+                        store.send(.postBoardButtonTapped)
                     }
+                    .configurePagination(
+                        store.searchBoardList,
+                        currentIndex: index,
+                        hasNext: store.paginationInfo.hasNext,
+                        pagination: {
+                            store.send(.pagination)
+                        }
+                    )
                 }
             }
         }
         .scrollDismissesKeyboard(.immediately)
-        .refreshable {
-            store.send(.refreshSearBoard)
-        }
-//        .sheet(item: $bulletinBoardStore.scope(state: \.sheet?.ellipsisButtonTap, action: \.sheet.ellipsisButtonTap)
-//        ) { ellipsisStore in
-//            BulletinBoardEllipsisView(store: ellipsisStore)
-//                .presentationDetents([.height(84)])
-//                .presentationDragIndicator(.visible)
-//        }
     }
 }
 
@@ -141,7 +141,5 @@ private struct NoResultView: View {
 #Preview {
     BulletinBoardSearchView(store: Store(initialState: BulletinBoardSearchFeature.State()){
         BulletinBoardSearchFeature()
-    }, bulletinBoardStore: Store(initialState: BulletinBoardFeature.State()){
-        BulletinBoardFeature()
     })
 }

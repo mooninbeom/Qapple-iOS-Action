@@ -12,23 +12,31 @@ import ComposableArchitecture
 struct BulletinBoardSearchFeature {
     @ObservableState
     struct State: Equatable {
+        @Presents var sheet: Sheet.State?
         var searchBoardList: [BulletinBoard] = []
+        var paginationInfo = QappleAPI.PaginationInfo(threshold: "", hasNext: false)
         var searchText: String = ""
         var isLoading = false
-        var threshold: Int?
-        var hasNext: Bool = false
     }
     
     enum Action {
-        case getSearchBoard
-        case refreshSearBoard
-        case fetchSearchBoard(([BulletinBoard], QappleAPI.PaginationInfo))
+        case onAppear // 검색 문구 변화 시 호출
+        case onDisappear
+        case refresh
+        case pagination
+        case searchBoardListResponse([BulletinBoard], QappleAPI.PaginationInfo)
         
         case backButtonTapped
-        case likeBoardButtonTapped(Int)
+        case likeBoardButtonTapped(BulletinBoard)
+        case likeBoard(Int)
+        case deleteBoard(Int)
         case setSearchText(String)
         case performSearch(String)
+        case postBoardButtonTapped
+        case seeMoreAction(BulletinBoard)
         case toggleLoading(Bool)
+        
+        case sheet(PresentationAction<Sheet.Action>)
     }
     
     @Dependency(\.dismiss) var dismiss
@@ -36,40 +44,45 @@ struct BulletinBoardSearchFeature {
     @Dependency(\.bulletinBoardRepository) var bulletinBoardRepository
     
     var body: some ReducerOf<Self> {
-        Reduce { state, action in
+        Reduce {
+            state,
+            action in
             switch action {
-            case .getSearchBoard:
-                let searchText = state.searchText
-                let threshold = state.threshold
-                return .run { send in
-                    await send(.toggleLoading(true), animation: .bouncy)
-                    do {
-                        let data = try await bulletinBoardRepository.searchBoard(searchText, threshold)
-                        await send(.fetchSearchBoard(data))
-                    } catch {
-                        print(error)
-                    }
-                    await send(.toggleLoading(false), animation: .bouncy)
-                }
-                
-            case .refreshSearBoard:
+            case .onAppear,
+                    .refresh:
                 state.searchBoardList = []
-                let searchText = state.searchText
-                return .run { send in
+                return .run { [searchText = state.searchText] send in
                     await send(.toggleLoading(true), animation: .bouncy)
                     do {
-                        let data = try await bulletinBoardRepository.searchBoard(searchText, nil)
-                        await send(.fetchSearchBoard(data))
+                        let response = try await bulletinBoardRepository.searchBoard(searchText, nil)
+                        await send(.searchBoardListResponse(response.0, response.1))
                     } catch {
                         print(error)
                     }
                     await send(.toggleLoading(false), animation: .bouncy)
                 }
                 
-            case let .fetchSearchBoard((searchBoardList, paginationInfo)):
-                state.searchBoardList.append(contentsOf: searchBoardList)
-                state.threshold = Int(paginationInfo.threshold)
-                state.hasNext = paginationInfo.hasNext
+            case .onDisappear:
+                return .none
+                
+            case .pagination:
+                return .run { [
+                    threshold = Int(state.paginationInfo.threshold),
+                    searchText = state.searchText
+                ] send in
+                    await send(.toggleLoading(true), animation: .bouncy)
+                    do {
+                        let response = try await bulletinBoardRepository.searchBoard(searchText, threshold)
+                        await send(.searchBoardListResponse(response.0, response.1))
+                    } catch {
+                        print(error)
+                    }
+                    await send(.toggleLoading(false), animation: .bouncy)
+                }
+                
+            case let .searchBoardListResponse(searchBoardList, paginationInfo):
+                state.searchBoardList += searchBoardList
+                state.paginationInfo = paginationInfo
                 return .none
                 
             case .backButtonTapped:
@@ -77,26 +90,33 @@ struct BulletinBoardSearchFeature {
                     await self.dismiss()
                 }
                 
-            case let .likeBoardButtonTapped(boardId):
-                if let index = state.searchBoardList.firstIndex(where: {$0.id == boardId}) {
-                    state.searchBoardList[index].isLiked.toggle()
-                    state.searchBoardList[index].heartCount += state.searchBoardList[index].isLiked ? 1 : -1
-                }
+            case let .likeBoardButtonTapped(board):
                 return .run { send in
                     await send(.toggleLoading(true), animation: .bouncy)
                     do {
-                        try await bulletinBoardRepository.likeBoard(boardId)
+                        try await bulletinBoardRepository.likeBoard(board.id)
+                        await send(.likeBoard(board.id))
                     } catch {
                         print(error)
                     }
                     await send(.toggleLoading(false), animation: .bouncy)
                 }
                 
+            case let .likeBoard(boardId):
+                if let index = state.searchBoardList.firstIndex(where: {$0.id == boardId}) {
+                    state.searchBoardList[index].isLiked.toggle()
+                    state.searchBoardList[index].heartCount += state.searchBoardList[index].isLiked ? 1 : -1
+                }
+                return .none
+                
+            case let .deleteBoard(boardId):
+                if let index = state.searchBoardList.firstIndex(where: {$0.id == boardId}) {
+                    state.searchBoardList.remove(at: index)
+                }
+                return .none
+                
             case let .setSearchText(searchText):
                 state.searchText = searchText
-                state.searchBoardList = []
-                state.threshold = nil
-                
                 return .concatenate(
                     .cancel(id: "searchDebounce"),
                     .run { send in
@@ -109,13 +129,59 @@ struct BulletinBoardSearchFeature {
             case let .performSearch(searchText):
                 guard !searchText.isEmpty else { return .none }
                 return .run { send in
-                    await send(.getSearchBoard)
+                    await send(.onAppear)
                 }
+                
+            case .postBoardButtonTapped:
+                // TODO: Navigiation 처리
+                return .none
+                
+            case let .seeMoreAction(board):
+                state.sheet = .seeMore(
+                    .init(
+                        sheetTarget: board.isMine ? .mine : .others,
+                        sheetData: .bulletinBoard(board)
+                    )
+                )
+                return .none
                 
             case let .toggleLoading(bool):
                 state.isLoading = bool
                 return .none
+                
+            case let .sheet(.presented(.seeMore(.alert(.presented(.confirmDeletion(sheetData)))))):
+                guard case let .bulletinBoard(board) = sheetData else { return .none }
+                return .run { send in
+                    await send(.toggleLoading(true), animation: .bouncy)
+                    do {
+                        try await bulletinBoardRepository.deleteBoard(board.id)
+                        await send(.deleteBoard(board.id))
+                        await send(.sheet(.presented(.seeMore(.completionDeletion))))
+                    } catch {
+                        print(error)
+                    }
+                    await send(.toggleLoading(false), animation: .bouncy)
+                }
+                
+            case .sheet(.presented(.seeMore(.alert(.presented(.confirmCompletion))))):
+                state.sheet = nil
+                return .run { send in
+                    await send(.onDisappear)
+                }
+                
+            case .sheet(_):
+                return .none
             }
         }
+        .ifLet(\.$sheet, action: \.sheet)
+    }
+}
+
+// MARK: - BulletinBoardSearchSheet
+
+extension BulletinBoardSearchFeature {
+    @Reducer(state: .equatable)
+    enum Sheet {
+        case seeMore(SeeMoreSheetFeature)
     }
 }
