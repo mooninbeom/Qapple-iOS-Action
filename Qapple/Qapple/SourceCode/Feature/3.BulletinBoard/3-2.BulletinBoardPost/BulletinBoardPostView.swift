@@ -23,16 +23,20 @@ struct BulletinBoardPostView: View {
                 Spacer()
                 Footer(store: store)
             }
-            .loadingIndicator(isLoading: store.isLoading)
         }
-        .background(Background.first)
+        .background(.first)
         .navigationBarBackButtonHidden()
         .popGestureDisabled()
         .onTapGesture {
             isTextFieldFocused.toggle()
         }
+        .loadingIndicator(isLoading: store.isLoading)
         .disabled(store.isLoading)
         .alert($store.scope(state: \.alert, action: \.alert))
+        .sheet(item: $store.scope(state: \.sheet?.anonymityNotice, action: \.sheet.anonymityNotice)
+        ) { _ in
+            AnonymityNoticeSheet()
+        }
     }
 }
 
@@ -118,9 +122,6 @@ private struct PostTextField: View {
             .focused(isTextFieldFocused)
             .padding(.horizontal, 24)
             .autocorrectionDisabled()
-            .onChange(of: store.content) { _, _ in
-                fontSize = store.fontSize
-            }
     }
 }
 
@@ -133,16 +134,11 @@ private struct Footer: View {
     var body: some View {
         HStack {
             Button {
-                store.send(.anonymityButtonTapped)
+                store.send(.anonymityNoticeButtonTapped)
             } label: {
                 Text("익명이 보장되나요?")
                     .font(.pretendard(.semiBold, size: 12))
                     .foregroundStyle(BrandPink.text)
-            }
-            .sheet(item: $store.scope(state: \.sheet?.anonymityButtonTap, action: \.sheet.anonymityButtonTap)
-            ) { anonymityStore in
-                AnonymityView(store: anonymityStore)
-                    .presentationDetents([.height(560)])
             }
             
             Spacer()

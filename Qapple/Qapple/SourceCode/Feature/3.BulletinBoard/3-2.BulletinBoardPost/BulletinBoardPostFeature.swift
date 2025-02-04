@@ -24,7 +24,7 @@ struct BulletinBoardPostFeature {
         case cancelButtonTapped
         case contentChanged
         case postBoardButtonTapped
-        case anonymityButtonTapped
+        case anonymityNoticeButtonTapped
         case toggleLoading(Bool)
         case binding(BindingAction<State>)
         
@@ -75,8 +75,9 @@ struct BulletinBoardPostFeature {
                     }
                     await send(.toggleLoading(false), animation: .bouncy)
                 }
-            case .anonymityButtonTapped:
-                state.sheet = .anonymityButtonTap(AnonymityFeature.State())
+                
+            case .anonymityNoticeButtonTapped:
+                state.sheet = .anonymityNotice
                 return .none
                 
             case let .toggleLoading(bool):
@@ -87,9 +88,6 @@ struct BulletinBoardPostFeature {
                 return .run { send in
                     await send(.contentChanged)
                 }
-                
-            case .sheet(.presented(.anonymityButtonTap(.confirmButtonTapped))):
-                return .none
                 
             case .alert(.presented(.confirmCancel)):
                 return .run { send in
@@ -108,13 +106,12 @@ struct BulletinBoardPostFeature {
 // MARK: - BulletinBoardSheet
 
 extension BulletinBoardPostFeature {
-    @Reducer
+    
+    @Reducer(state: .equatable)
     enum Sheet {
-        case anonymityButtonTap(AnonymityFeature)
+        case anonymityNotice
     }
 }
-
-extension BulletinBoardPostFeature.Sheet.State: Equatable {}
 
 // MARK: - BulletinBoardPostAlert
 
