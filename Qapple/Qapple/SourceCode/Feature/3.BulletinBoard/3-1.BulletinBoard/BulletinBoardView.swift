@@ -12,7 +12,7 @@ import ComposableArchitecture
 
 struct BulletinBoardView: View {
     
-    let store: StoreOf<BulletinBoardFeature>
+    @Bindable var store: StoreOf<BulletinBoardFeature>
     
     var body: some View {
         GeometryReader { proxy in
@@ -31,13 +31,23 @@ struct BulletinBoardView: View {
                         y: proxy.size.height - 40
                     )
                 )
-                .loadingIndicator(isLoading: store.isLoading)
             }
             .background(Background.first)
         }
         .onAppear{
             store.send(.onAppear)
         }
+        .refreshable {
+            store.send(.refresh)
+        }
+        .loadingIndicator(isLoading: store.isLoading)
+        .sheet(item: $store.scope(state: \.sheet, action: \.sheet)
+        ) { store in
+            switch store.case {
+            case let .seeMore(store): SeeMoreSheet(store: store)
+            }
+        }
+        .alert($store.scope(state: \.alert, action: \.alert))
     }
 }
 
@@ -83,7 +93,7 @@ private struct BoardView: View {
 
 private struct PostListView: View {
     
-    @Bindable var store: StoreOf<BulletinBoardFeature>
+    let store: StoreOf<BulletinBoardFeature>
     
     var body: some View {
         ScrollView {
@@ -92,10 +102,10 @@ private struct PostListView: View {
                     BulletinBoardCell(
                         board: board,
                         ellipsis: {
-                            store.send(.ellipsisButtonTapped(board.id, board.isMine))
+                            store.send(.seeMoreAction(board))
                         },
                         like: {
-                            store.send(.likeBoardButtonTapped(board.id))
+                            store.send(.likeBoardButtonTapped(board))
                         }
                     )
                     .onTapGesture {
@@ -119,15 +129,6 @@ private struct PostListView: View {
                     }
                 }
             }
-        }
-        .sheet(item: $store.scope(state: \.sheet?.ellipsisButtonTap, action: \.sheet.ellipsisButtonTap)
-        ) { ellipsisStore in
-            BulletinBoardEllipsisView(store: ellipsisStore)
-                .presentationDetents([.height(84)])
-        }
-        .alert($store.scope(state: \.alert, action: \.alert))
-        .refreshable {
-            store.send(.refresh)
         }
         .disabled(store.isLoading)
     }

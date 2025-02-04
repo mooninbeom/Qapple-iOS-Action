@@ -22,17 +22,20 @@ struct BulletinBoardFeature {
     
     enum Action {
         case onAppear
+        case onDisappear
         case refresh
         case pagination
         case bulletinBoardListResponse([BulletinBoard], QappleAPI.PaginationInfo)
         
         case boardCellTapped(BulletinBoard)
         case reportButtonTapped
-        case likeBoardButtonTapped(Int)
-        case ellipsisButtonTapped(Int, Bool)
+        case likeBoardButtonTapped(BulletinBoard)
+        case likeBoard(Int)
+        case deleteBoard(Int)
         case searchButtonTapped
         case notificationButtonTapped
         case postBoardButtonTapped
+        case seeMoreAction(BulletinBoard)
         case toggleLoading(Bool)
         
         case sheet(PresentationAction<Sheet.Action>)
@@ -51,9 +54,12 @@ struct BulletinBoardFeature {
     @Dependency(\.bulletinBoardRepository) var bulletinBoardRepository
     
     var body: some ReducerOf<Self> {
-        Reduce { state, action in
+        Reduce {
+            state,
+            action in
             switch action {
-            case .onAppear, .refresh:
+            case .onAppear,
+                    .refresh:
                 state.bulletinBoardList = []
                 return .run { send in
                     await send(.toggleLoading(true), animation: .bouncy)
@@ -65,6 +71,9 @@ struct BulletinBoardFeature {
                     }
                     await send(.toggleLoading(false), animation: .bouncy)
                 }
+                
+            case .onDisappear:
+                return .none
                 
             case .pagination:
                 return .run { [threshold = Int(state.paginationInfo.threshold)] send in
@@ -92,27 +101,29 @@ struct BulletinBoardFeature {
                 state.alert = .confirmReport
                 return .none
                 
-            case let .likeBoardButtonTapped(boardId):
-                if let index = state.bulletinBoardList.firstIndex(where: {$0.id == boardId}) {
-                    state.bulletinBoardList[index].isLiked.toggle()
-                    state.bulletinBoardList[index].heartCount += state.bulletinBoardList[index].isLiked ? 1 : -1
-                }
+            case let .likeBoardButtonTapped(board):
                 return .run { send in
                     await send(.toggleLoading(true), animation: .bouncy)
                     do {
-                        try await bulletinBoardRepository.likeBoard(boardId)
+                        try await bulletinBoardRepository.likeBoard(board.id)
+                        await send(.likeBoard(board.id))
                     } catch {
                         print(error)
                     }
                     await send(.toggleLoading(false), animation: .bouncy)
                 }
                 
-            case let .ellipsisButtonTapped(boardId, isMine):
-                state.sheet = .ellipsisButtonTap(
-                    BulletinBoardEllipsisFeature.State(
-                        boardId: boardId, isMine: isMine
-                    )
-                )
+            case let .likeBoard(boardId):
+                if let index = state.bulletinBoardList.firstIndex(where: {$0.id == boardId}) {
+                    state.bulletinBoardList[index].isLiked.toggle()
+                    state.bulletinBoardList[index].heartCount += state.bulletinBoardList[index].isLiked ? 1 : -1
+                }
+                return .none
+                
+            case let .deleteBoard(boardId):
+                if let index = state.bulletinBoardList.firstIndex(where: {$0.id == boardId}) {
+                    state.bulletinBoardList.remove(at: index)
+                }
                 return .none
                 
             case .searchButtonTapped:
@@ -127,12 +138,38 @@ struct BulletinBoardFeature {
                 // TODO: Navigiation 처리
                 return .none
                 
+            case let .seeMoreAction(board):
+                state.sheet = .seeMore(
+                    .init(
+                        sheetTarget: board.isMine ? .mine : .others,
+                        sheetData: .bulletinBoard(board)
+                    )
+                )
+                return .none
+                
             case let .toggleLoading(bool):
                 state.isLoading = bool
                 return .none
                 
-            case .sheet(.presented(.ellipsisButtonTap(.delegate(.confirmDelete)))):
-                return .none
+            case let .sheet(.presented(.seeMore(.alert(.presented(.confirmDeletion(sheetData)))))):
+                guard case let .bulletinBoard(board) = sheetData else { return .none }
+                return .run { send in
+                    await send(.toggleLoading(true), animation: .bouncy)
+                    do {
+                        try await bulletinBoardRepository.deleteBoard(board.id)
+                        await send(.deleteBoard(board.id))
+                        await send(.sheet(.presented(.seeMore(.completionDeletion))))
+                    } catch {
+                        print(error)
+                    }
+                    await send(.toggleLoading(false), animation: .bouncy)
+                }
+                
+            case .sheet(.presented(.seeMore(.alert(.presented(.confirmCompletion))))):
+                state.sheet = nil
+                return .run { send in
+                    await send(.onDisappear)
+                }
                 
             case .alert(.presented(.confirmReport)):
                 return .run { send in
@@ -153,7 +190,7 @@ struct BulletinBoardFeature {
 extension BulletinBoardFeature {
     @Reducer(state: .equatable)
     enum Sheet {
-        case ellipsisButtonTap(BulletinBoardEllipsisFeature)
+        case seeMore(SeeMoreSheetFeature)
     }
 }
 

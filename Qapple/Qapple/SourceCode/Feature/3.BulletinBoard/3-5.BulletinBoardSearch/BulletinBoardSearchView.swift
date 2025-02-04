@@ -92,7 +92,7 @@ private struct SearchListView: View {
                     BulletinBoardCell(
                         board: board,
                         ellipsis: {
-                            bulletinBoardStore.send(.ellipsisButtonTapped(board.id, board.isMine))
+                            bulletinBoardStore.send(.seeMoreAction(board))
                         },
                         like: {
                             store.send(.likeBoardButtonTapped(board.id))
@@ -114,12 +114,12 @@ private struct SearchListView: View {
         .refreshable {
             store.send(.refreshSearBoard)
         }
-        .sheet(item: $bulletinBoardStore.scope(state: \.sheet?.ellipsisButtonTap, action: \.sheet.ellipsisButtonTap)
-        ) { ellipsisStore in
-            BulletinBoardEllipsisView(store: ellipsisStore)
-                .presentationDetents([.height(84)])
-                .presentationDragIndicator(.visible)
-        }
+//        .sheet(item: $bulletinBoardStore.scope(state: \.sheet?.ellipsisButtonTap, action: \.sheet.ellipsisButtonTap)
+//        ) { ellipsisStore in
+//            BulletinBoardEllipsisView(store: ellipsisStore)
+//                .presentationDetents([.height(84)])
+//                .presentationDragIndicator(.visible)
+//        }
     }
 }
 

@@ -65,7 +65,7 @@ extension SeeMoreSheetFeature {
     enum SheetData: Equatable {
         case myAnswer(AnswerOfProfile)
         case answer(Answer)
-        case bulletinBoard
+        case bulletinBoard(BulletinBoard)
     }
 }
 
@@ -75,7 +75,7 @@ extension AlertState where Action == SeeMoreSheetFeature.Action.Alert {
     
     /// 삭제 확인
     static func deletionCheck(from sheetData: SeeMoreSheetFeature.SheetData) -> Self {
-        let targetText = sheetData == .bulletinBoard ? "게시글" : "답변"
+        let targetText = if case .bulletinBoard = sheetData { "게시글" } else { "답변" }
         return Self {
             TextState("\(targetText)을 삭제하시겠어요?")
         } actions: {
@@ -92,7 +92,7 @@ extension AlertState where Action == SeeMoreSheetFeature.Action.Alert {
     
     /// 삭제 완료
     static func deletionComplete(from sheetData: SeeMoreSheetFeature.SheetData) -> Self {
-        let targetText = sheetData == .bulletinBoard ? "게시글" : "답변"
+        let targetText = if case .bulletinBoard = sheetData { "게시글" } else { "답변" }
         return Self {
             TextState("\(targetText)이 삭제되었어요")
         } actions: {
