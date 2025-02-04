@@ -15,8 +15,8 @@ struct BulletinBoardPostFeature {
         @Presents var sheet: Sheet.State?
         @Presents var alert: AlertState<Action.Alert>?
         var isLoading = false
-        var content: String = ""
-        var fontSize: CGFloat = 48
+        var boardText: String = ""
+        var boardTextFontSize: CGFloat = 48
         var textCountLimit = 150
     }
     
@@ -48,7 +48,7 @@ struct BulletinBoardPostFeature {
         Reduce { state, action in
             switch action {
             case .cancelButtonTapped:
-                if state.content.isEmpty {
+                if state.boardText.isEmpty {
                     // TODO: Navigation 처리
                 } else {
                     state.alert = .confirmCancel
@@ -56,19 +56,18 @@ struct BulletinBoardPostFeature {
                 return .none
                 
             case .contentChanged:
-                state.fontSize = adaptiveFontSize(from: state.content)
-                if state.content.count > state.textCountLimit {
-                    state.content = String(state.content.prefix(state.textCountLimit))
+                state.boardTextFontSize = adaptiveFontSize(from: state.boardText)
+                if state.boardText.count > state.textCountLimit {
+                    state.boardText = String(state.boardText.prefix(state.textCountLimit))
                 }
                 return .none
                 
             case .postBoardButtonTapped:
-                let content = state.content
+                let boardText = state.boardText
                 return .run { send in
                     await send(.toggleLoading(true), animation: .bouncy)
                     do {
-                        try await bulletinBoardRepository.postBoard(content)
-                        // TODO: board reset 필요하면 넣기
+                        try await bulletinBoardRepository.postBoard(boardText)
                         // TODO: Navigation 처리
                     } catch {
                         print(error)
@@ -84,7 +83,7 @@ struct BulletinBoardPostFeature {
                 state.isLoading = bool
                 return .none
                 
-            case .binding(\.content):
+            case .binding(\.boardText):
                 return .run { send in
                     await send(.contentChanged)
                 }

@@ -11,7 +11,6 @@ import ComposableArchitecture
 struct BulletinBoardPostView: View {
     
     @Bindable var store: StoreOf<BulletinBoardPostFeature>
-
     @FocusState private var isTextFieldFocused: Bool
 
     var body: some View {
@@ -19,7 +18,7 @@ struct BulletinBoardPostView: View {
             VStack(spacing: 0) {
                 BulletinBoardPostNavigationBar(store: store)
                 Spacer()
-                WritingView(store: store, isTextFieldFocused: $isTextFieldFocused)
+                BoardTextField(store: store, isTextFieldFocused: $isTextFieldFocused)
                 Spacer()
                 Footer(store: store)
             }
@@ -55,13 +54,13 @@ private struct BulletinBoardPostNavigationBar: View {
                 }
             },
             trailingView: {
-                NavigationButton(buttonType: .text("완료", store.content.isEmpty ? .disable : .button)) {
-                    if !store.content.isEmpty {
+                NavigationButton(buttonType: .text("완료", store.boardText.isEmpty ? .disable : .button)) {
+                    if !store.boardText.isEmpty {
                         HapticService.notification(type: .success)
                         store.send(.postBoardButtonTapped)
                     }
                 }
-                .disabled(store.content.isEmpty)
+                .disabled(store.boardText.isEmpty)
             }
         )
     }
@@ -69,59 +68,43 @@ private struct BulletinBoardPostNavigationBar: View {
 
 // MARK: - WritingView
 
-private struct WritingView: View {
+private struct BoardTextField: View {
     
     @Bindable var store: StoreOf<BulletinBoardPostFeature>
-
-    var isTextFieldFocused: FocusState<Bool>.Binding
+    @FocusState.Binding var isTextFieldFocused: Bool
 
     var body: some View {
         ZStack {
-            if store.content.isEmpty {
+            if store.boardText.isEmpty {
                 Placeholder()
             }
 
-            PostTextField(store: store, isTextFieldFocused: isTextFieldFocused)
+            TextField(text: $store.boardText, axis: .vertical) {}
+                .font(.pretendard(.semiBold, size: store.boardTextFontSize))
+                .foregroundStyle(.wh)
+                .focused($isTextFieldFocused)
+                .padding(.horizontal, 24)
+                .autocorrectionDisabled()
+                .multilineTextAlignment(.center)
         }
-        .multilineTextAlignment(.center)
+        .onTapGesture {
+            isTextFieldFocused = true
+        }
     }
-}
-
-// MARK: - Placeholder
-
-private struct Placeholder: View {
-
-    var body: some View {
+    
+    /// 답변 작성 전 플레이스홀더
+    private func Placeholder() -> some View {
         VStack(spacing: 16) {
             Text("자유롭게 생각을\n작성해주세요")
                 .font(.pretendard(.semiBold, size: 48))
-
-            Text("* 논란을 만들 질문들은 지양해주세요")
+            
+            Text("* 부적절하거나 불쾌감을 줄 수 있는\n콘텐츠는 제재를 받을 수 있어요")
                 .font(.pretendard(.medium, size: 16))
-                .lineSpacing(6)
         }
         .foregroundStyle(TextLabel.ph)
         .padding(.horizontal, 24)
-    }
-}
-
-// MARK: - PostTextField
-
-private struct PostTextField: View {
-    
-    @Bindable var store: StoreOf<BulletinBoardPostFeature>
-    
-    @State var fontSize: CGFloat = 48
-
-    var isTextFieldFocused: FocusState<Bool>.Binding
-
-    var body: some View {
-        TextField(text: $store.content, axis: .vertical) {}
-            .font(.pretendard(.semiBold, size: store.fontSize))
-            .foregroundStyle(.wh)
-            .focused(isTextFieldFocused)
-            .padding(.horizontal, 24)
-            .autocorrectionDisabled()
+        .multilineTextAlignment(.center)
+        .lineSpacing(6)
     }
 }
 
@@ -129,7 +112,7 @@ private struct PostTextField: View {
 
 private struct Footer: View {
     
-    @Bindable var store: StoreOf<BulletinBoardPostFeature>
+    let store: StoreOf<BulletinBoardPostFeature>
     
     var body: some View {
         HStack {
@@ -143,7 +126,7 @@ private struct Footer: View {
             
             Spacer()
 
-            Text("\(store.content.count)/\(store.textCountLimit)")
+            Text("\(store.boardText.count)/\(store.textCountLimit)")
                 .font(.pretendard(.medium, size: 14))
                 .foregroundStyle(TextLabel.sub3)
         }

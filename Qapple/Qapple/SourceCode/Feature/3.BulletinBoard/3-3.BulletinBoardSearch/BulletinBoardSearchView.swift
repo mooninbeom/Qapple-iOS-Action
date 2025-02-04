@@ -75,9 +75,8 @@ private struct SearchBar: View {
         HStack(spacing: 6) {
             TextField("검색어를 입력해주세요", text: $store.searchText) {}
                 .pretendard(.semiBold, 15)
-                .onChange(of: store.searchText) { searchText in
-                    store.send(.searchTextChanged(searchText))
-                    
+                .onChange(of: store.searchText) { _ in
+                    store.send(.searchTextChanged)
                 }
         }
         .padding(14)
@@ -90,7 +89,7 @@ private struct SearchBar: View {
 
 private struct SearchListView: View {
     
-    @Bindable var store: StoreOf<BulletinBoardSearchFeature>
+   let store: StoreOf<BulletinBoardSearchFeature>
     
     private var searchBoardList: [BulletinBoard] {
         store.searchBoardList.filter { !$0.isReported }
@@ -102,7 +101,7 @@ private struct SearchListView: View {
                 ForEach(enumerated(searchBoardList), id: \.offset) { index, board in
                     BulletinBoardCell(
                         board: board,
-                        ellipsis: {
+                        seeMore: {
                             store.send(.seeMoreAction(board))
                         },
                         like: {

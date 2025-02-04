@@ -22,7 +22,7 @@ struct CommentView: View {
             
             BulletinBoardCell(
                 board: store.post,
-                ellipsis: {
+                seeMore: {
                     // TODO: Post Ellipsis 버튼 action
                 },
                 like: {

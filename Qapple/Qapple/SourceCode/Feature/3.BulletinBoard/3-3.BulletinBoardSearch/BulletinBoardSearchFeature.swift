@@ -30,7 +30,7 @@ struct BulletinBoardSearchFeature {
         case likeBoardButtonTapped(BulletinBoard)
         case likeBoard(Int)
         case deleteBoard(Int)
-        case searchTextChanged(String)
+        case searchTextChanged
         case binding(BindingAction<State>)
         case postBoardButtonTapped
         case seeMoreAction(BulletinBoard)
@@ -117,10 +117,10 @@ struct BulletinBoardSearchFeature {
             case .binding(\.searchText):
                 return .none
                 
-            case let .searchTextChanged(searchText):
+            case .searchTextChanged:
                 return .concatenate(
                     .cancel(id: "searchDebounce"),
-                    .run { send in
+                    .run { [searchText = state.searchText] send in
                         try await self.clock.sleep(for: .seconds(1))
                         if !searchText.isEmpty {
                             await send(.onAppear)
