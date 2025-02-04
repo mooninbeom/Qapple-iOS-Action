@@ -11,7 +11,8 @@ import ComposableArchitecture
 // MARK: - BulletinBoardView
 
 struct BulletinBoardView: View {
-    @Bindable var store: StoreOf<BulletinBoardFeature>
+    
+    let store: StoreOf<BulletinBoardFeature>
     
     var body: some View {
         GeometryReader { proxy in
@@ -35,11 +36,7 @@ struct BulletinBoardView: View {
             .background(Background.first)
         }
         .onAppear{
-            store.send(.getBulletinBoardList)
-            
-        }
-        .onReceive(NotificationCenter.default.publisher(for: .updateViewNotification)) { _ in
-            store.send(.refreshBulletinBoardList)
+            store.send(.onAppear)
         }
     }
 }
@@ -48,7 +45,7 @@ struct BulletinBoardView: View {
 
 private struct BoardView: View {
     
-    @Bindable var store: StoreOf<BulletinBoardFeature>
+    let store: StoreOf<BulletinBoardFeature>
     
     var body: some View {
         VStack(spacing: 0) {
@@ -101,13 +98,6 @@ private struct PostListView: View {
                             store.send(.likeBoardButtonTapped(board.id))
                         }
                     )
-                    .onAppear {
-                        if index == store.bulletinBoardList.count - 1
-                            && store.hasNext {
-                            print("게시판 페이지네이션")
-                            store.send(.getBulletinBoardList)
-                        }
-                    }
                     .onTapGesture {
                         if !board.isReported {
                             store.send(.boardCellTapped(board))
@@ -116,6 +106,14 @@ private struct PostListView: View {
                             store.send(.reportButtonTapped)
                         }
                     }
+                    .configurePagination(
+                        store.bulletinBoardList,
+                        currentIndex: index,
+                        hasNext: store.paginationInfo.hasNext,
+                        pagination: {
+                            store.send(.pagination)
+                        }
+                    )
                     if index != store.bulletinBoardList.endIndex - 1 {
                         QappleDivider()
                     }
@@ -129,7 +127,7 @@ private struct PostListView: View {
         }
         .alert($store.scope(state: \.alert, action: \.alert))
         .refreshable {
-            store.send(.refreshBulletinBoardList)
+            store.send(.refresh)
         }
         .disabled(store.isLoading)
     }

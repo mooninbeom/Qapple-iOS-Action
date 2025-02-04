@@ -16,19 +16,15 @@ struct BulletinBoardFeature {
         @Presents var alert: AlertState<Action.Alert>?
         var bulletinBoardList: [BulletinBoard] = []
         var academyEvents: [AcademyEvent] = [.macro, .epilogue]
+        var paginationInfo = QappleAPI.PaginationInfo(threshold: "", hasNext: false)
         var isLoading: Bool = false
-        var threshold: Int?
-        var hasNext: Bool = false
     }
     
     enum Action {
-        case sheet(PresentationAction<Sheet.Action>)
-        case alert(PresentationAction<Alert>)
-        case delegate(Delegate)
-        
-        case getBulletinBoardList
-        case refreshBulletinBoardList
-        case fetchBulletinBoardList(([BulletinBoard], QappleAPI.PaginationInfo))
+        case onAppear
+        case refresh
+        case pagination
+        case bulletinBoardListResponse([BulletinBoard], QappleAPI.PaginationInfo)
         
         case boardCellTapped(BulletinBoard)
         case reportButtonTapped
@@ -38,6 +34,10 @@ struct BulletinBoardFeature {
         case notificationButtonTapped
         case postBoardButtonTapped
         case toggleLoading(Bool)
+        
+        case sheet(PresentationAction<Sheet.Action>)
+        case alert(PresentationAction<Alert>)
+        case delegate(Delegate)
         
         enum Alert {
             case confirmReport
@@ -53,53 +53,34 @@ struct BulletinBoardFeature {
     var body: some ReducerOf<Self> {
         Reduce { state, action in
             switch action {
-            case .sheet(.presented(.ellipsisButtonTap(.delegate(.confirmDelete)))):
-                return .none
-                
-            case .sheet:
-                return .none
-                
-            case .alert(.presented(.confirmReport)):
-                return .run { send in
-                    await send(.delegate(.confirmReport))
-                }
-                
-            case .alert:
-                return .none
-                
-            case .delegate:
-                return .none
-                
-            case .getBulletinBoardList:
-                let threshold = state.threshold
-                return .run { send in
-                    await send(.toggleLoading(true), animation: .bouncy)
-                    do {
-                        let data = try await bulletinBoardRepository.fetchBulletinBoardList(threshold)
-                        await send(.fetchBulletinBoardList(data))
-                    } catch {
-                        print(error)
-                    }
-                    await send(.toggleLoading(false), animation: .bouncy)
-                }
-                
-            case .refreshBulletinBoardList:
+            case .onAppear, .refresh:
                 state.bulletinBoardList = []
                 return .run { send in
                     await send(.toggleLoading(true), animation: .bouncy)
                     do {
-                        let data = try await bulletinBoardRepository.fetchBulletinBoardList(nil)
-                        await send(.fetchBulletinBoardList(data))
+                        let response = try await bulletinBoardRepository.fetchBulletinBoardList(nil)
+                        await send(.bulletinBoardListResponse(response.0, response.1))
                     } catch {
                         print(error)
                     }
                     await send(.toggleLoading(false), animation: .bouncy)
                 }
                 
-            case let .fetchBulletinBoardList((bulletinBoardList, paginationInfo)):
-                state.bulletinBoardList.append(contentsOf: bulletinBoardList)
-                state.threshold = Int(paginationInfo.threshold)
-                state.hasNext = paginationInfo.hasNext
+            case .pagination:
+                return .run { [threshold = Int(state.paginationInfo.threshold)] send in
+                    await send(.toggleLoading(true), animation: .bouncy)
+                    do {
+                        let response = try await bulletinBoardRepository.fetchBulletinBoardList(threshold)
+                        await send(.bulletinBoardListResponse(response.0, response.1))
+                    } catch {
+                        print(error)
+                    }
+                    await send(.toggleLoading(false), animation: .bouncy)
+                }
+                
+            case let .bulletinBoardListResponse(bulletinBoardList, paginationInfo):
+                state.bulletinBoardList += bulletinBoardList
+                state.paginationInfo = paginationInfo
                 return .none
                 
             case let .boardCellTapped(board):
@@ -149,6 +130,17 @@ struct BulletinBoardFeature {
             case let .toggleLoading(bool):
                 state.isLoading = bool
                 return .none
+                
+            case .sheet(.presented(.ellipsisButtonTap(.delegate(.confirmDelete)))):
+                return .none
+                
+            case .alert(.presented(.confirmReport)):
+                return .run { send in
+                    await send(.delegate(.confirmReport))
+                }
+                
+            case .sheet, .alert, .delegate:
+                return .none
             }
         }
         .ifLet(\.$sheet, action: \.sheet)
@@ -159,13 +151,11 @@ struct BulletinBoardFeature {
 // MARK: - BulletinBoardSheet
 
 extension BulletinBoardFeature {
-    @Reducer
+    @Reducer(state: .equatable)
     enum Sheet {
         case ellipsisButtonTap(BulletinBoardEllipsisFeature)
     }
 }
-
-extension BulletinBoardFeature.Sheet.State: Equatable {}
 
 // MARK: - BulletinBoardAlert
 
