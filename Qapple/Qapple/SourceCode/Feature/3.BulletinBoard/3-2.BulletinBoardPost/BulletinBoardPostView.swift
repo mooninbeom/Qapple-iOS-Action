@@ -44,14 +44,14 @@ private struct BulletinBoardPostNavigationBar: View {
 
     var body: some View {
         NavigationBar(
-            title: "게시판",
+            title: "게시글 작성",
             leadingView: {
                 NavigationButton(buttonType: .text("취소", .icon)) {
                     store.send(.cancelButtonTapped)
                 }
             },
             trailingView: {
-                NavigationButton(buttonType: .text("올리기", store.content.isEmpty ? .disable : .button)) {
+                NavigationButton(buttonType: .text("완료", store.content.isEmpty ? .disable : .button)) {
                     if !store.content.isEmpty {
                         HapticService.notification(type: .success)
                         store.send(.postBoardButtonTapped)
