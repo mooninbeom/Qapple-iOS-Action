@@ -33,7 +33,7 @@ struct ProfileEditFeature {
         case toggleNicknameCheck(Bool)
         case toggleNicknameChange(Bool)
         case binding(BindingAction<State>)
-        case nicknameChanged(String)
+        case nicknameChanged
         case toggleLoading(Bool)
         
         enum Alert {
@@ -47,9 +47,6 @@ struct ProfileEditFeature {
         BindingReducer()
         Reduce { state, action in
             switch action {
-            case .alert, .binding:
-                return .none
-                
             case .backButtonTapped:
                 // TODO: Navigation 처리
                 return .none
@@ -95,37 +92,38 @@ struct ProfileEditFeature {
                 return .none
                 
             case .binding(\.nickname):
-                return .none
-                
-            case let .nicknameChanged(nickname):
-                let defaultNickname = state.defaultNickname
-                
-                state.nickname = nickname.trimmingCharacters(in: .whitespacesAndNewlines)
-                
-                if nickname.count > state.textLimit {
-                    state.nickname = String(state.nickname.prefix(state.textLimit))
-                }
-                
-                if let regex = try? NSRegularExpression(pattern: state.pattern, options: .caseInsensitive) {
-                    let range = NSRange(location: 0, length: nickname.utf16.count)
-                    if regex.firstMatch(in: nickname, options: [], range: range) != nil {
-                        state.nicknameFieldAvailable = true
-                    } else {
-                        state.nicknameFieldAvailable = false
-                    }
-                }
-                
-                return .run { send in
-                    if defaultNickname == nickname {
+                return .run { [state = state] send in
+                    if state.defaultNickname == state.nickname {
                         await send(.toggleNicknameCheck(true))
                         await send(.toggleNicknameChange(false))
                     } else {
                         await send(.toggleNicknameChange(true))
                     }
+                    await send(.nicknameChanged)
                 }
+                
+            case .nicknameChanged:
+                state.nickname = state.nickname.trimmingCharacters(in: .whitespacesAndNewlines)
+                
+                if state.nickname.count > state.textLimit {
+                    state.nickname = String(state.nickname.prefix(state.textLimit))
+                }
+                
+                if let regex = try? NSRegularExpression(pattern: state.pattern, options: .caseInsensitive) {
+                    let range = NSRange(location: 0, length: state.nickname.utf16.count)
+                    if regex.firstMatch(in: state.nickname, options: [], range: range) != nil {
+                        state.nicknameFieldAvailable = true
+                    } else {
+                        state.nicknameFieldAvailable = false
+                    }
+                }
+                return .none
                 
             case let .toggleLoading(bool):
                 state.isLoading = bool
+                return .none
+                
+            case .alert, .binding:
                 return .none
             }
         }

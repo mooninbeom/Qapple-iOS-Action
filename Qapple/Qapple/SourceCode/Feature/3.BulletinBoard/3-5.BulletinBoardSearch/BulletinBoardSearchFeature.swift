@@ -166,9 +166,7 @@ struct BulletinBoardSearchFeature {
                     await send(.onDisappear)
                 }
                 
-            case .sheet(_):
-                return .none
-            case .binding(_):
+            case .sheet, .binding:
                 return .none
             }
         }
