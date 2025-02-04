@@ -20,16 +20,17 @@ struct BulletinBoardPostFeature {
         var textCountLimit = 150
     }
     
-    enum Action {
-        case sheet(PresentationAction<Sheet.Action>)
-        case alert(PresentationAction<Alert>)
-        case delegate(Delegate)
-        
+    enum Action: BindableAction {
         case cancelButtonTapped
-        case setContent(String)
+        case contentChanged
         case postBoardButtonTapped
         case anonymityButtonTapped
         case toggleLoading(Bool)
+        case binding(BindingAction<State>)
+        
+        case sheet(PresentationAction<Sheet.Action>)
+        case alert(PresentationAction<Alert>)
+        case delegate(Delegate)
         
         enum Alert {
             case confirmCancel
@@ -43,25 +44,9 @@ struct BulletinBoardPostFeature {
     @Dependency(\.bulletinBoardRepository) var bulletinBoardRepository
     
     var body: some ReducerOf<Self> {
+        BindingReducer()
         Reduce { state, action in
             switch action {
-            case .sheet(.presented(.anonymityButtonTap(.confirmButtonTapped))):
-                return .none
-                
-            case .sheet:
-                return .none
-                
-            case .alert(.presented(.confirmCancel)):
-                return .run { send in
-                    await send(.delegate(.confirmCancel))
-                }
-                
-            case .alert:
-                return .none
-                
-            case .delegate:
-                return .none
-                
             case .cancelButtonTapped:
                 if state.content.isEmpty {
                     // TODO: Navigation 처리
@@ -70,25 +55,13 @@ struct BulletinBoardPostFeature {
                 }
                 return .none
                 
-            case let .setContent(content):
-                state.content = content
-                
-                if content.count > state.textCountLimit {
-                    state.content = String(content.prefix(state.textCountLimit))
-                } else {
-                    state.content = content
+            case .contentChanged:
+                state.fontSize = adaptiveFontSize(from: state.content)
+                if state.content.count > state.textCountLimit {
+                    state.content = String(state.content.prefix(state.textCountLimit))
                 }
-                
-                switch state.content.count {
-                case 0..<20: state.fontSize = 48
-                case 20..<32: state.fontSize = 40
-                case 32..<60: state.fontSize = 32
-                case 60...100: state.fontSize = 24
-                case 100...: state.fontSize = 17
-                default: break
-                }
-                
                 return .none
+                
             case .postBoardButtonTapped:
                 let content = state.content
                 return .run { send in
@@ -108,6 +81,22 @@ struct BulletinBoardPostFeature {
                 
             case let .toggleLoading(bool):
                 state.isLoading = bool
+                return .none
+                
+            case .binding(\.content):
+                return .run { send in
+                    await send(.contentChanged)
+                }
+                
+            case .sheet(.presented(.anonymityButtonTap(.confirmButtonTapped))):
+                return .none
+                
+            case .alert(.presented(.confirmCancel)):
+                return .run { send in
+                    await send(.delegate(.confirmCancel))
+                }
+                
+            case .binding, .sheet, .alert, .delegate:
                 return .none
             }
         }

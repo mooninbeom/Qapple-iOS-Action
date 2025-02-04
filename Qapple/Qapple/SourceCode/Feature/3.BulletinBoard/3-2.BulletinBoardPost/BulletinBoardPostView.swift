@@ -112,20 +112,15 @@ private struct PostTextField: View {
     var isTextFieldFocused: FocusState<Bool>.Binding
 
     var body: some View {
-        TextField(
-            text: $store.content.sending(\.setContent),
-            axis: .vertical
-        ) {
-            Color.clear
-        }
-        .font(.pretendard(.semiBold, size: fontSize))
-        .foregroundStyle(.wh)
-        .focused(isTextFieldFocused)
-        .padding(.horizontal, 24)
-        .autocorrectionDisabled()
-        .onChange(of: store.content) { _, _ in
-            fontSize = store.fontSize
-        }
+        TextField(text: $store.content, axis: .vertical) {}
+            .font(.pretendard(.semiBold, size: store.fontSize))
+            .foregroundStyle(.wh)
+            .focused(isTextFieldFocused)
+            .padding(.horizontal, 24)
+            .autocorrectionDisabled()
+            .onChange(of: store.content) { _, _ in
+                fontSize = store.fontSize
+            }
     }
 }
 
