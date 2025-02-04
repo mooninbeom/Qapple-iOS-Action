@@ -79,6 +79,10 @@ struct MainFlowFeature {
                 state.path.append(.bulletinBoardPost(.init()))
                 return .none
                 
+            case .profileTab(.peopleWhoMadeQappleButtonTapped):
+                state.path.append(.peopleWhoMadeQapple)
+                return .none
+                
             case let .path(stackAction):
                 switch stackAction {
                 case let .element(id: _, action: .writeAnswer(.postAnswerResponse(question))):
@@ -114,7 +118,6 @@ extension MainFlowFeature {
     
     @Reducer(state: .equatable)
     enum Path {
-        case notificationList(NotificationFeature)
         case writeAnswer(WriteAnswerFeature)
         case completeAnswer(CompleteAnswerFeature)
         case answerList(AnswerListFeature)
@@ -122,5 +125,7 @@ extension MainFlowFeature {
         case bulletinBoardSearch(BulletinBoardSearchFeature)
         case bulletinBoardPost(BulletinBoardPostFeature)
         case comment(CommentFeature)
+        case notificationList(NotificationFeature)
+        case peopleWhoMadeQapple
     }
 }

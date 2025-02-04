@@ -7,7 +7,7 @@
 
 import SwiftUI
 
-struct ProfileCell: View {
+struct PeopleWhoMadeQappleCell: View {
     let avatar: ImageResource
     let backgroundColor: Color
     let nicknameKor: String
@@ -18,7 +18,7 @@ struct ProfileCell: View {
     let linkedinLink: String?
     
     var body: some View {
-        HStack {
+        HStack(spacing: 0) {
             Image(avatar)
                 .resizable()
                 .scaledToFit()
@@ -29,12 +29,17 @@ struct ProfileCell: View {
                         .frame(width: 76, height: 76)
                         .foregroundColor(backgroundColor)
                 }
+            
             VStack(alignment: .leading, spacing: 2) {
-                HStack(spacing: 3) {
-                    Text("\(nicknameKor)")
+                HStack(spacing: 6) {
+                    Text(nicknameKor)
                         .foregroundStyle(.text)
                     
-                    Text(" | \(nicknameEng)")
+                    Rectangle()
+                        .frame(width: 1, height: 12)
+                        .foregroundStyle(.sub2)
+                    
+                    Text(nicknameEng)
                         .foregroundStyle(.sub2)
                 }
                 .font(.pretendard(.bold, size: 16))
@@ -43,7 +48,8 @@ struct ProfileCell: View {
                     .font(.pretendard(.regular, size: 14))
                     .foregroundStyle(.sub3)
             }
-            .padding(.leading, 8)
+            .padding(.leading, 12)
+            
             Spacer()
             
             if let githubLink = githubLink {
@@ -68,7 +74,7 @@ struct ProfileCell: View {
             }
         }
         .frame(height: 76)
-        .padding(EdgeInsets(top: 8, leading: 0, bottom: 8, trailing: 0))
+        .padding(.horizontal, 20)
     }
     
     private func openURL(_ urlString: String) {
@@ -79,6 +85,17 @@ struct ProfileCell: View {
     }
 }
 
+// MARK: - Preview
+
 #Preview {
-    ProfileCell(avatar: .liver, backgroundColor: .liver, nicknameKor: "리버", nicknameEng: "Liver", position: "Back-end Developer", description: "리버풀 광팬", githubLink: "https://github.com/kyxxgsoo", linkedinLink: nil)
+    PeopleWhoMadeQappleCell(
+        avatar: .liver,
+        backgroundColor: .liver,
+        nicknameKor: "리버",
+        nicknameEng: "Liver",
+        position: "Back-end Developer",
+        description: "리버풀 광팬",
+        githubLink: "https://github.com/kyxxgsoo",
+        linkedinLink: nil
+    )
 }

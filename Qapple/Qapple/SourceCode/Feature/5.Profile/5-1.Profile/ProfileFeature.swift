@@ -32,6 +32,7 @@ struct ProfileFeature {
         case editProfileButtonTapped
         case MyAnswerListButtonTapped
         case inquiryButtonTapped
+        case peopleWhoMadeQappleButtonTapped
         case logOutButtonTapped
         case resignButtonTapped
         case toggleLoading(Bool)
@@ -131,6 +132,9 @@ struct ProfileFeature {
                 } else {
                     state.sheet = .inquiryButtonTap
                 }
+                return .none
+                
+            case .peopleWhoMadeQappleButtonTapped:
                 return .none
                 
             case .logOutButtonTapped:
