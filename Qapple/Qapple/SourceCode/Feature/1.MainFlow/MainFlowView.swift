@@ -26,16 +26,25 @@ struct MainFlowView: View {
                         Image(systemName: "list.clipboard.fill")
                         Text("게시판")
                     }
+                
+                ProfileView(store: store.scope(state: \.profileTab, action: \.profileTab))
+                    .tabItem {
+                        Image(systemName: "person.fill")
+                        Text("내 정보")
+                    }
             }
             .tint(.button)
             .fixedTabBarBackground(color: .first)
         } destination: { store in
             switch store.case {
+            case let .notificationList(store): NotificationListView(store: store)
             case let .writeAnswer(store): WriteAnswerView(store: store)
             case let .completeAnswer(store): CompleteAnswerView(store: store)
             case let .answerList(store): AnswerListView(store: store)
-            case let .bulletinBoardView(store): BulletinBoardView(store: store)
-            case let .commentView(store): CommentView(store: store)
+            case let .bulletinBoard(store): BulletinBoardView(store: store)
+            case let .bulletinBoardSearch(store): EmptyView() // TODO: store 분리 필요
+            case let .bulletinBoardPost(store): BulletinBoardPostView(store: store)
+            case let .comment(store): CommentView(store: store)
             }
         }
     }

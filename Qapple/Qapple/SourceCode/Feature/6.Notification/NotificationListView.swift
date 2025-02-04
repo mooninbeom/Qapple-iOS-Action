@@ -13,30 +13,20 @@ import ComposableArchitecture
  Notification 뷰(푸쉬 알림 뷰)
  */
 struct NotificationListView: View {
-    @Bindable var store: StoreOf<NotificationFeature> = .init(
-        initialState: NotificationFeature.State()
-    ) {
-        NotificationFeature()
-    }
+    @Bindable var store: StoreOf<NotificationFeature>
     
     var body: some View {
         ZStack {
             Color(Background.first).ignoresSafeArea()
             
             NotificationContentView(store: store)
-            
-            if store.isLoading {
-                ProgressView()
-                    .progressViewStyle(.circular)
-                    .tint(.primary)
-            }
         }
         .navigationBarBackButtonHidden()
+        .loadingIndicator(isLoading: store.isLoading)
+        .alert($store.scope(state: \.alert, action: \.alert))
         .onAppear {
             store.send(.onAppear)
         }
-        .alert($store.scope(state: \.alert, action: \.alert))
-        
     }
 }
 
@@ -51,7 +41,7 @@ private struct NotificationContentView: View {
                 title: "알림",
                 leadingView: {
                     NavigationButton(buttonType: .back) {
-                        // TODO: Navigation 적용
+                        store.send(.backButtonTapped)
                     }
                 }
             )
@@ -84,5 +74,7 @@ private struct NotificationContentView: View {
 
 
 #Preview {
-    NotificationListView()
+    NotificationListView(store: Store(initialState: .init()) {
+        NotificationFeature()
+    })
 }

@@ -21,7 +21,7 @@ struct QuestionTabFeature {
         case switchTab(QuestionTab)
         case todayQuestionTabButtonTapped
         case questionListTabButtonTapped
-        case alertButtonTapped
+        case notificationButtonTapped
         case todayQuestion(TodayQuestionFeature.Action)
         case questionList(QuestionListFeature.Action)
     }
@@ -47,7 +47,7 @@ struct QuestionTabFeature {
                 state.questionTab = .questionList
                 return .none
                 
-            case .alertButtonTapped:
+            case .notificationButtonTapped:
                 return .none
                 
             default:

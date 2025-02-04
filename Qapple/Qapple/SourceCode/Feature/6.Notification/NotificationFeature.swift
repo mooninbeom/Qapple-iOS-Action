@@ -29,6 +29,7 @@ struct NotificationFeature {
         case onPagenationCellAppear(Int)
         case notificationCellTapped(Int)
         case reportedNotificationCellTapped
+        case backButtonTapped
         
         case fetchNotifications([QappleNotification], QappleAPI.PaginationInfo)
         case evaluateQuestion(Bool)
@@ -39,6 +40,7 @@ struct NotificationFeature {
     }
     
     @Dependency(\.notificationRepository) var notificationRepository
+    @Dependency(\.dismiss) var dismiss
     
     var body: some ReducerOf<Self> {
         Reduce { state, action in
@@ -104,6 +106,11 @@ struct NotificationFeature {
                     TextState("신고된 게시글은 열람할 수 없습니다.")
                 }
                 return .none
+                
+            case .backButtonTapped:
+                return .run { send in
+                    await dismiss()
+                }
                 
             case .alert:
                 return .none
