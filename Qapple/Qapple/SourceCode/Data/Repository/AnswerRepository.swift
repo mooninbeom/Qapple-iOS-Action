@@ -9,7 +9,7 @@ import ComposableArchitecture
 import Foundation
 
 struct AnswerRepository {
-    var fetchAnswerListOfProfile: (_ threshold: Int?) async throws -> ([AnswerOfProfile], QappleAPI.PaginationInfo)
+    var fetchAnswerListOfProfile: (_ threshold: Int?) async throws -> ([Answer], QappleAPI.PaginationInfo)
     var fetchAnswerPreviewList: (_ questionId: Int) async throws -> [Answer]
     var fetchAnswerListOfQuestion: (_ questionId: Int, _ threshold: String?) async throws -> (
         [Answer],
@@ -67,13 +67,14 @@ extension AnswerRepository: DependencyKey {
     static let previewValue = Self(
         fetchAnswerListOfProfile: { _ in
             let stubProfiles = (0..<10).map { i in
-                AnswerOfProfile(
+                Answer(
                     id: i,
-                    answerId: i,
-                    writerId: i,
-                    nickname: "러너 \(i)",
                     content: "테스트 답변 \(i)",
-                    writeAt: .init(timeIntervalSinceNow: TimeInterval(i * -5000))
+                    authorNickname: "시몬스",
+                    publishedDate: .init(timeIntervalSinceNow: TimeInterval(i * -5000)),
+                    isReported: false,
+                    isMine: true,
+                    isResignMember: false
                 )
             }
             return (stubProfiles, .init(threshold: "10", hasNext: false))

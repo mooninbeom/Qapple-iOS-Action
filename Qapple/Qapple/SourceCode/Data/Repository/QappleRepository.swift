@@ -13,9 +13,9 @@ struct QappleRepository {
     
     // MARK: - Answer
     
-    var fetchAnswerListOfProfile: (_ threshold: Int?) async throws -> ([AnswerOfProfile], QappleAPI.PaginationInfo)
+    var fetchAnswerListOfProfile: (_ threshold: Int?) async throws -> ([Answer], QappleAPI.PaginationInfo)
     var deleteAnswer: (_ answerId: Int) async throws -> DeleteAnswerDTO
-    var fetchAnswerListOfQuestion: (_ questionId: Int, _ threshold: Int?) async throws -> ([AnswerOfQuestion], QappleAPI.PaginationInfo)
+    var fetchAnswerListOfQuestion: (_ questionId: Int, _ threshold: Int?) async throws -> ([Answer], QappleAPI.PaginationInfo)
     var postAnswer: (_ questionId: Int, _ answer: String) async throws -> PostAnswerDTO
     
     // MARK: - Member

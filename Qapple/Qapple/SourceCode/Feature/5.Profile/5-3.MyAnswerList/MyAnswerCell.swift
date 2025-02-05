@@ -9,7 +9,7 @@ import SwiftUI
 
 struct MyAnswerCell: View {
     
-    let myAnswer: AnswerOfProfile
+    let myAnswer: Answer
     let index: Int
     let seeMoreAction: () -> Void
     
@@ -26,7 +26,7 @@ struct MyAnswerCell: View {
 
 private struct NormalCell: View {
     
-    let myAnswer: AnswerOfProfile
+    let myAnswer: Answer
     let index: Int
     let seeMoreAction: () -> Void
     
@@ -53,12 +53,12 @@ private struct NormalCell: View {
                 .resizable()
                 .frame(width: 28, height: 28)
             
-            Text(myAnswer.nickname)
+            Text(myAnswer.authorNickname)
                 .pretendard(.semiBold, 14)
                 .foregroundStyle(GrayScale.icon)
                 .padding(.leading, 8)
             
-            Text(myAnswer.writeAt.timeAgo)
+            Text(myAnswer.publishedDate.timeAgo)
                 .pretendard(.regular, 14)
                 .foregroundStyle(.sub4)
                 .padding(.leading, 6)
@@ -95,13 +95,14 @@ private struct NormalCell: View {
 
 #Preview {
     MyAnswerCell(
-        myAnswer: AnswerOfProfile(
+        myAnswer: Answer(
             id: 0,
-            answerId: 1,
-            writerId: 2,
-            nickname: "simmons",
             content: "test1",
-            writeAt: .now
+            authorNickname: "simmons",
+            publishedDate: .now,
+            isReported: false,
+            isMine: true,
+            isResignMember: false
         ),
         index: 1
     ){}

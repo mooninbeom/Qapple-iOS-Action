@@ -27,15 +27,16 @@ struct AnswersOfProfileDTO: Codable {
         let isLiked: Bool
     }
     
-    var toEntityWithThreshold: ([AnswerOfProfile], QappleAPI.PaginationInfo) {
+    var toEntityWithThreshold: ([Answer], QappleAPI.PaginationInfo) {
         let answerListOfProfile = self.content.map {
-            AnswerOfProfile(
-                id: $0.questionId,
-                answerId: $0.answerId,
-                writerId: $0.writerId,
-                nickname: $0.nickname,
+            Answer(
+                id: $0.answerId,
                 content: $0.content,
-                writeAt: $0.writeAt.ISO8601ToDate
+                authorNickname: $0.nickname,
+                publishedDate: $0.writeAt.ISO8601ToDate,
+                isReported: false,
+                isMine: true,
+                isResignMember: false
             )
         }
         

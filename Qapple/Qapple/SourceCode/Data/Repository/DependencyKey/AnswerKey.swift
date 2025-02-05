@@ -10,7 +10,7 @@ import Foundation
 extension QappleRepository {
     
     /// (자신의) 작성한 답변 조회
-    static func makeFetchAnswerListOfProfile() -> (_ threshold: Int?) async throws -> ([AnswerOfProfile], QappleAPI.PaginationInfo) {
+    static func makeFetchAnswerListOfProfile() -> (_ threshold: Int?) async throws -> ([Answer], QappleAPI.PaginationInfo) {
         return { threshold in
             let url = try QappleAPI.Answer.listOfProfile(threshold: threshold, pageSize: 25).url()
             let response: BaseResponse<AnswersOfProfileDTO> = try await NetworkService.shared.get(url: url)
@@ -28,7 +28,7 @@ extension QappleRepository {
     }
     
     /// 질문에 대한 답변 조회
-    static func makeFetchAnswerListOfQuestion() -> (_ questionId: Int, _ threshold: Int?) async throws -> ([AnswerOfQuestion], QappleAPI.PaginationInfo) {
+    static func makeFetchAnswerListOfQuestion() -> (_ questionId: Int, _ threshold: Int?) async throws -> ([Answer], QappleAPI.PaginationInfo) {
         return { questionId, threshold in
             let url = try QappleAPI.Answer.listOfQuestion(questionId: Int(questionId), threshold: String(threshold ?? 0), pageSize: 25).url()
             let _: BaseResponse<AnswersOfQuestionDTO> = try await NetworkService.shared.get(url: url)
