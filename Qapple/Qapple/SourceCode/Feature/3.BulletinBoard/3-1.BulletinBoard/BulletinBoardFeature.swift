@@ -54,12 +54,9 @@ struct BulletinBoardFeature {
     @Dependency(\.bulletinBoardRepository) var bulletinBoardRepository
     
     var body: some ReducerOf<Self> {
-        Reduce {
-            state,
-            action in
+        Reduce { state,action in
             switch action {
-            case .onAppear,
-                    .refresh:
+            case .onAppear, .refresh:
                 state.bulletinBoardList = []
                 return .run { send in
                     await send(.toggleLoading(true), animation: .bouncy)

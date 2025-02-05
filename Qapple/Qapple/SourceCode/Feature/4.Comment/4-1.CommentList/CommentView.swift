@@ -10,9 +10,7 @@ import ComposableArchitecture
 
 struct CommentView: View {
     //TODO: 추후 외부 주입으로 수정
-    @Bindable var store: StoreOf<CommentFeature> = .init(initialState: CommentFeature.State()) {
-        CommentFeature()
-    }
+    @Bindable var store: StoreOf<CommentFeature>
     
     private let screenWidth: CGFloat = UIScreen.main.bounds.width
     
@@ -21,9 +19,9 @@ struct CommentView: View {
             HeaderView()
             
             BulletinBoardCell(
-                board: store.post,
+                board: store.board,
                 seeMore: {
-                    // TODO: Post Ellipsis 버튼 action
+                    store.send(.seeMoreAction)
                 },
                 like: {
                     // TODO: Post Like 버튼 action
@@ -179,6 +177,8 @@ private struct AddCommentView: View {
     // TODO: - 추후 usecase 제거 시 수정
     let usecase = BulletinBoardUseCase()
     
-    CommentView()
+    CommentView(store: Store(initialState: CommentFeature.State()){
+        CommentFeature()
+    })
         .environmentObject(usecase)
 }
