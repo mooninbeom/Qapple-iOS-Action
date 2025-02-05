@@ -15,7 +15,7 @@ import ComposableArchitecture
 struct CommentFeature {
     @ObservableState
     struct State: Equatable {
-        var board: BulletinBoard = samplePost
+        var board: BulletinBoard
         
         var text: String = ""
         
@@ -51,6 +51,8 @@ struct CommentFeature {
         case refreshCommentList
         
         case commentTextChanged(text: String)
+        case likeBoardButtonTapped
+        case likeBoard
         case seeMoreAction
         case toggleLoading(Bool)
         
@@ -257,6 +259,27 @@ struct CommentFeature {
                 
                 return .send(.fetchCommentData(result))
                 
+            case .likeBoardButtonTapped:
+                return .run { [board = state.board] send in
+                    await send(.toggleLoading(true), animation: .bouncy)
+                    do {
+                        try await bulletinBoardRepository.likeBoard(board.id)
+                        await send(.likeBoard)
+                    } catch {
+                        print(error)
+                    }
+                    await send(.toggleLoading(false), animation: .bouncy)
+                }
+                
+            case .likeBoard:
+                if state.board.isLiked {
+                    state.board.heartCount -= 1
+                } else {
+                    state.board.heartCount += 1
+                }
+                state.board.isLiked.toggle()
+                return .none
+                
             case .seeMoreAction:
                 state.sheet = .seeMore(
                     .init(
@@ -276,8 +299,8 @@ struct CommentFeature {
                     await send(.toggleLoading(true), animation: .bouncy)
                     do {
                         try await bulletinBoardRepository.deleteBoard(board.id)
-//                        await send(.deleteBoard(board.id))
                         await send(.sheet(.presented(.seeMore(.completionDeletion))))
+                        // TODO: Navigaition 뒤로가기
                     } catch {
                         print(error)
                     }

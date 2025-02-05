@@ -9,7 +9,6 @@ import SwiftUI
 import ComposableArchitecture
 
 struct CommentView: View {
-    //TODO: 추후 외부 주입으로 수정
     @Bindable var store: StoreOf<CommentFeature>
     
     private let screenWidth: CGFloat = UIScreen.main.bounds.width
@@ -24,7 +23,7 @@ struct CommentView: View {
                     store.send(.seeMoreAction)
                 },
                 like: {
-                    // TODO: Post Like 버튼 action
+                    store.send(.likeBoardButtonTapped)
                 }
             )
             .frame(width: UIScreen.main.bounds.width)
@@ -48,16 +47,12 @@ struct CommentView: View {
             store.send(.commentViewAppeared)
         }
         .alert($store.scope(state: \.alert, action: \.alert))
-        // TODO: - Post ellipsis 버튼 대응
-//        .sheet(item: $selectedPost) { post in
-//            BulletinBoardSeeMoreSheetView(
-//                sheetType: post.isMine ? .mine : .others,
-//                post: post,
-//                isComment: true
-//            )
-//            .presentationDetents([.height(84)])
-//            .presentationDragIndicator(.visible)
-//        }
+        .sheet(item: $store.scope(state: \.sheet, action: \.sheet)
+        ) { store in
+            switch store.case {
+            case let .seeMore(store): SeeMoreSheet(store: store)
+            }
+        }
         .onReceive(NotificationCenter.default.publisher(for: .updateViewNotification)) { _ in
             store.send(.refreshCommentList)
         }
@@ -174,11 +169,23 @@ private struct AddCommentView: View {
 
 
 #Preview {
-    // TODO: - 추후 usecase 제거 시 수정
-    let usecase = BulletinBoardUseCase()
-    
-    CommentView(store: Store(initialState: CommentFeature.State()){
+    CommentView(
+        store: Store(
+            initialState: CommentFeature.State(
+                board: BulletinBoard(
+                    id: 1,
+                    writerId: 1,
+                    writerNickname: "이호창",
+                    content: "특전사",
+                    heartCount: 10,
+                    commentCount: 13,
+                    createAt: .init(),
+                    isMine: false,
+                    isReported: false,
+                    isLiked: true
+                )
+            )
+        ){
         CommentFeature()
     })
-        .environmentObject(usecase)
 }
