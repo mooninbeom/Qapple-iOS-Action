@@ -63,10 +63,11 @@ private struct MyAnswerList: View {
                 LazyVStack(spacing: 0) {
                     ForEach(enumerated(store.myAnswerList), id: \.element.id) {
                         index, answer in
-                        MyAnswerCell(
-                            myAnswer: answer,
+                        AnswerCell(
+                            answer: answer,
                             index: index,
-                            seeMoreAction: {
+                            state: .written,
+                            seeMoreAction:{
                                 store.send(.seeMoreAction(answer))
                             }
                         )
