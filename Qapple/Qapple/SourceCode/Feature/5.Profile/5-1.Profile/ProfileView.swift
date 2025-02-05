@@ -66,7 +66,7 @@ private struct ProfileSummary: View {
                         .frame(height: 14)
                     
                     Button {
-                        store.send(.editProfileButtonTapped)
+                        store.send(.editProfileButtonTapped(nickname: store.nickname))
                     } label: {
                         Image(systemName: "gearshape.fill")
                             .foregroundStyle(.icon)

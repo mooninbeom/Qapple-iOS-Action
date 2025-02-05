@@ -79,6 +79,10 @@ struct MainFlowFeature {
                 state.path.append(.bulletinBoardPost(.init()))
                 return .none
                 
+            case let .profileTab(.editProfileButtonTapped(nickname)):
+                state.path.append(.profileEdit(.init(nickname: nickname, defaultNickname: nickname)))
+                return .none
+                
             case .profileTab(.myAnswerListButtonTapped):
                 state.path.append(.myAnswerList(.init()))
                 return .none
@@ -130,6 +134,7 @@ extension MainFlowFeature {
         case bulletinBoardPost(BulletinBoardPostFeature)
         case comment(CommentFeature)
         case notificationList(NotificationFeature)
+        case profileEdit(ProfileEditFeature)
         case myAnswerList(MyAnswerListFeature)
         case peopleWhoMadeQapple
     }
