@@ -12,7 +12,7 @@ struct SignUpFlowFeature {
     
     @ObservableState
     struct State: Equatable {
-        var isSignIn = false
+        @Shared(.inMemory(Constant.isSignIn)) var isSignIn = false
         var socialLogin = SocialLoginFeature.State()
         var path = StackState<Path.State>()
     }
@@ -43,12 +43,12 @@ struct SignUpFlowFeature {
                 }
                 
             case .autoLoginResponse:
-                state.isSignIn = true
+                state.$isSignIn.withLock { $0 = true }
                 return .none
                 
             case let .socialLogin(.delegate(.signInResponse(isSignUp))):
                 if isSignUp {
-                    state.isSignIn = true
+                    state.$isSignIn.withLock { $0 = true }
                 } else {
                     state.path.append(.emailForm(.init()))
                 }
@@ -73,7 +73,8 @@ struct SignUpFlowFeature {
                     return .none
                     
                 case .element(id: _, action: .signUpComplete(.startButtonTapped)):
-                    state.isSignIn = true
+                    state.$isSignIn.withLock { $0 = true }
+                    state.path.removeAll()
                     return .none
                     
                 default:

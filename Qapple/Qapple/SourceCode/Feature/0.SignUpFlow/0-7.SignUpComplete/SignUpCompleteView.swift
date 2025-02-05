@@ -33,6 +33,7 @@ struct SignUpCompleteView: View {
         }
         .background(.first)
         .navigationBarBackButtonHidden()
+        .popGestureDisabled()
     }
 }
 

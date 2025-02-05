@@ -13,6 +13,7 @@ import MessageUI
 struct ProfileFeature {
     @ObservableState
     struct State: Equatable {
+        @Shared(.inMemory(Constant.isSignIn)) var isSignIn = false
         @Presents var sheet: Sheet.State?
         @Presents var alert: AlertState<Action.Alert>?
         var nickname: String = ""
@@ -68,28 +69,26 @@ struct ProfileFeature {
                 }
                 
             case .alert(.presented(.confirmLogOut)):
-                return .run { send in
-                    await send(.delegate(.confirmLogOut))
+                return .run { [isSignIn = state.$isSignIn] send in
                     do {
+                        isSignIn.withLock { $0 = false }
                         try keychainService.createData(.userId, "")
                     } catch {
                         print(error)
                     }
-                    // TODO: Navigation 처리(Root)
                 }
                 
             case .alert(.presented(.confirmResign)):
-                return .run { send in
-                    await send(.delegate(.confirmResign))
+                return .run { [isSignIn = state.$isSignIn] send in
                     await send(.toggleLoading(true), animation: .bouncy)
                     do {
-                        let _ = try await memberRepository.resign()
+                        try await memberRepository.resign()
+                        isSignIn.withLock { $0 = false }
                         try keychainService.createData(.userId, "")
                     } catch {
                         print(error)
                     }
                     await send(.toggleLoading(false), animation: .bouncy)
-                    // TODO: Navigation 처리(Root)
                 }
                 
             case .alert:

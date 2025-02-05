@@ -13,11 +13,11 @@ struct QappleApp: App {
     
     @UIApplicationDelegateAdaptor private var appDelegate: AppDelegate
     
-    private let mainFlowStore = Store(initialState: MainFlowFeature.State()) {
+    private let mainFlowStore = Store(initialState: .init()) {
         MainFlowFeature()
     }
     
-    private let signUpFlowStore = Store(initialState: SignUpFlowFeature.State()) {
+    private let signUpFlowStore = Store(initialState: .init()) {
         SignUpFlowFeature()
     }
     

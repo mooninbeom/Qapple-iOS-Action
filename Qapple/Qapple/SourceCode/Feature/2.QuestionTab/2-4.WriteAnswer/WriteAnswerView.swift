@@ -36,11 +36,12 @@ struct WriteAnswerView: View {
         }
         .background(.first)
         .navigationBarBackButtonHidden()
+        .popGestureDisabled()
+        .loadingIndicator(isLoading: store.isLoading)
+        .alert($store.scope(state: \.alert, action: \.alert))
         .onTapGesture {
             isTextFieldFocused.toggle()
         }
-        .loadingIndicator(isLoading: store.isLoading)
-        .alert($store.scope(state: \.alert, action: \.alert))
         .sheet(item: $store.scope(
             state: \.sheet?.anonymityNotice,
             action: \.sheet.anonymityNotice
