@@ -123,7 +123,7 @@ struct CommentCell: View {
                     }
                     
                     // 댓글 timestamp
-                    Text(comment.createdAt.ISO8601ToDate.timeAgo)
+                    Text(comment.createdAt.timeAgo)
                         .font(.pretendard(.light, size: 12))
                         .foregroundStyle(.disable)
                 }
@@ -242,7 +242,7 @@ struct CommentCell: View {
         isLiked: true,
         isMine: false,
         isReport: false,
-        createdAt: "2025-01-01T00:00:00Z",
+        createdAt: .now,
         anonymityId: 2
     )
     

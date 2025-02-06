@@ -28,7 +28,7 @@ struct CommentRepository {
             isLiked: false,
             isMine: false,
             isReport: false,
-            createdAt: Date().timeAgo,
+            createdAt: .now,
             anonymityId: -2
         ),
         .init(
@@ -39,7 +39,7 @@ struct CommentRepository {
             isLiked: true,
             isMine: true,
             isReport: false,
-            createdAt: Date().addingTimeInterval(-30).timeAgo,
+            createdAt: Date().addingTimeInterval(-30),
             anonymityId: -2
         ),
         .init(
@@ -50,7 +50,7 @@ struct CommentRepository {
             isLiked: false,
             isMine: false,
             isReport: true,
-            createdAt: Date().addingTimeInterval(-60*20).timeAgo,
+            createdAt: Date().addingTimeInterval(-60*20),
             anonymityId: -2
         ),
         .init(
@@ -61,7 +61,7 @@ struct CommentRepository {
             isLiked: true,
             isMine: true,
             isReport: false,
-            createdAt: Date().addingTimeInterval(-60*60*2).timeAgo,
+            createdAt: Date().addingTimeInterval(-60*60*2),
             anonymityId: -2
         ),
         .init(
@@ -72,7 +72,7 @@ struct CommentRepository {
             isLiked: true,
             isMine: true,
             isReport: false,
-            createdAt: Date().addingTimeInterval(-60*60*2).timeAgo,
+            createdAt: Date().addingTimeInterval(-60*60*2),
             anonymityId: -2
         ),
         .init(
@@ -83,7 +83,7 @@ struct CommentRepository {
             isLiked: true,
             isMine: true,
             isReport: false,
-            createdAt: Date().addingTimeInterval(-60*60*2).timeAgo,
+            createdAt: Date().addingTimeInterval(-60*60*2),
             anonymityId: -2
         ),
     ]

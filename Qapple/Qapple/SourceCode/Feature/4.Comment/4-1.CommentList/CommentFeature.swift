@@ -19,36 +19,28 @@ struct CommentFeature {
         
         var text: String = ""
         
-        var comments: [BoardComment] = []
+        var commentList: [BoardComment] = []
+        var paginationInfo = QappleAPI.PaginationInfo(threshold: "", hasNext: false)
         
         // MARK: 추후 자동 스크롤 연결 예정
         var scrollIndex: Int?
         var isLoading: Bool = false
-        
-        var threshold: Int?
-        var hasNext: Bool = false
-        
-        // 익명화 관련 프로퍼티
-        var anonymousArray: [Int:Int] = [:]
-        var anonymousIndex: Int = 0
         
         @Presents var sheet: Sheet.State?
         @Presents var alert: AlertState<Action.Alert>?
     }
     
     enum Action {
+        case onAppear
         case onDisappear
-        case commentViewAppeared
-        case paginationCellAppeared
-        case fetchCommentData([BoardComment])
-        case anonymizeComments([BoardComment], String, Bool)
+        case refresh
+        case pagination
+        case commentListResponse([BoardComment], QappleAPI.PaginationInfo)
         
         case likeButtonTapped(id: Int)
         case uploadButtonTapped
         case deleteButtonTapped(id: Int)
         case reportButtonTapped(id: Int)
-        
-        case refreshCommentList
         
         case commentTextChanged(text: String)
         case likeBoardButtonTapped
@@ -73,56 +65,54 @@ struct CommentFeature {
     var body: some ReducerOf<Self> {
         Reduce { state, action in
             switch action {
-            case .onDisappear:
-                return .none
-            // MARK: - 데이터 fetch 관련 액션
-            case .commentViewAppeared, .refreshCommentList:
-                
-                state.comments.removeAll()
-                state.threshold = nil
-                state.hasNext = false
+            case .onAppear, .refresh:
+                state.commentList = []
                 return .run { [boardId = state.board.id] send in
                     await send(.toggleLoading(true), animation: .bouncy)
                     do {
-                        let result = try await commentRepository.fetchBoardCommentList(boardId, nil)
-                        await send(.anonymizeComments(result.0, result.1.threshold, result.1.hasNext))
+                        let response = try await commentRepository.fetchBoardCommentList(boardId, nil)
+                        await send(.commentListResponse(response.0, response.1))
                     } catch {
+                        print(error)
                         await send(.networkErrorAlert)
                     }
                     await send(.toggleLoading(false), animation: .bouncy)
                 }
                 
-            case .paginationCellAppeared:
-                guard state.hasNext else { return .none }
+            case .onDisappear:
+                return .none
+                
+            case .pagination:
                 return .run { [
                     boardId = state.board.id,
-                    threshold = state.threshold
+                    threshold = Int(state.paginationInfo.threshold)
                 ] send in
                     await send(.toggleLoading(true), animation: .bouncy)
                     do {
-                        let result = try await commentRepository.fetchBoardCommentList(boardId, threshold)
-                        await send(.anonymizeComments(result.0, result.1.threshold, result.1.hasNext))
+                        let response = try await commentRepository.fetchBoardCommentList(boardId, threshold)
+                        await send(.commentListResponse(response.0, response.1))
                     } catch {
                         await send(.networkErrorAlert)
                     }
                     await send(.toggleLoading(false), animation: .bouncy)
                 }
                 
-            case let .fetchCommentData(comments):
-                state.comments.append(contentsOf: comments)
+            case let .commentListResponse(commentList, paginationInfo):
+                state.commentList += anonymizeCommentList(state.board.writerId, commentList)
+                state.paginationInfo = paginationInfo
                 return .none
                 
-            // MARK: - 버튼 액션 관련(업로드, 좋아요, 삭제, 신고)
+                // MARK: - 버튼 액션 관련(업로드, 좋아요, 삭제, 신고)
             case let .likeButtonTapped(id: id):
                 
-                let index = state.comments.firstIndex{ $0.id == id }!
-                let isLiked = state.comments[index].isLiked
-                state.comments[index].isLiked.toggle()
+                let index = state.commentList.firstIndex{ $0.id == id }!
+                let isLiked = state.commentList[index].isLiked
+                state.commentList[index].isLiked.toggle()
                 
                 if isLiked {
-                    state.comments[index].heartCount -= 1
+                    state.commentList[index].heartCount -= 1
                 } else {
-                    state.comments[index].heartCount += 1
+                    state.commentList[index].heartCount += 1
                 }
                 
                 return .run { send in
@@ -147,14 +137,14 @@ struct CommentFeature {
                     await send(.toggleLoading(true), animation: .bouncy)
                     do {
                         let _ = try await commentRepository.postBoardComment(boardId, text)
-                        await send(.refreshCommentList)
+                        await send(.refresh)
                         // TODO: - 댓글 업로드 후 액션 추가
                     } catch {
                         await send(.networkErrorAlert)
                     }
                     await send(.toggleLoading(false), animation: .bouncy)
                 }
-            
+                
             case .reportButtonTapped(id: _):
                 // TODO: CommentReportView로 navigating
                 return .none
@@ -168,8 +158,8 @@ struct CommentFeature {
                 }
                 return .none
                 
-            // MARK: - Alert 관련 액션
-            /// Delete 버튼 alert
+                // MARK: - Alert 관련 액션
+                /// Delete 버튼 alert
             case let .alert(.presented(.deleteComment(id))):
                 // TODO: 댓글 삭제 구현
                 print("댓글 아이디: \(id) 삭제")
@@ -183,14 +173,14 @@ struct CommentFeature {
                     await send(.toggleLoading(true), animation: .bouncy)
                     do {
                         let _ = try await commentRepository.deleteBoardComment(id)
-                        await send(.refreshCommentList)
+                        await send(.refresh)
                     } catch {
                         await send(.networkErrorAlert)
                     }
-                    await send(.toggleLoading(true), animation: .bouncy)
+                    await send(.toggleLoading(false), animation: .bouncy)
                 }
                 
-            /// 네트워크 오류 대응 alert
+                /// 네트워크 오류 대응 alert
             case .networkErrorAlert:
                 state.alert = AlertState {
                     TextState("알 수 없는 오류가 발생했습니다.")
@@ -200,64 +190,6 @@ struct CommentFeature {
                     TextState("잠시후 다시 시도해주세요.")
                 }
                 return .none
-                
-            case .alert:
-                return .none
-                
-            // MARK: 여러가지 메소드들
-            /// BoardComment 익명화 메소드
-            case let .anonymizeComments(comments, threshold, hasNext):
-                state.threshold = Int(threshold)
-                state.hasNext = hasNext
-                
-                let writerId = state.board.writerId
-                let result = comments.map { comment in
-                    // 한번이라도 나온 writer인지 여부 판단
-                    let isContainName = state.anonymousArray.values.contains {
-                        $0 == comment.writeId
-                    }
-                    
-                    if !isContainName { // 처음 나오는 writer일 경우
-                        state.anonymousIndex += 1
-                        
-                        if comment.writeId == writerId {
-                            state.anonymousArray.updateValue(comment.writeId, forKey: -1)
-                        } else {
-                            state.anonymousArray.updateValue(comment.writeId, forKey: state.anonymousIndex)
-                        }
-                        
-                        return BoardComment(
-                            id: comment.id,
-                            writeId: comment.writeId,
-                            content: comment.content,
-                            heartCount: comment.heartCount,
-                            isLiked: comment.isLiked,
-                            isMine: comment.isMine,
-                            isReport: comment.isReport,
-                            createdAt: comment.createdAt,
-                            anonymityId: (comment.writeId == writerId) ? -1 : state.anonymousIndex
-                        )
-                    } else { // 한번 이상 나온 writer일 경우
-                        // 해당 value의 key 값을 찾아 name의 index로 제공
-                        let currentIndex = state.anonymousArray
-                            .filter { $0.value == comment.writeId }
-                            .first!.key
-                        
-                        return BoardComment(
-                            id: comment.id,
-                            writeId: currentIndex,
-                            content: comment.content,
-                            heartCount: comment.heartCount,
-                            isLiked: comment.isLiked,
-                            isMine: comment.isMine,
-                            isReport: comment.isReport,
-                            createdAt: comment.createdAt,
-                            anonymityId: currentIndex
-                        )
-                    }
-                }
-                
-                return .send(.fetchCommentData(result))
                 
             case .likeBoardButtonTapped:
                 return .run { [board = state.board] send in
@@ -313,7 +245,7 @@ struct CommentFeature {
                     await send(.onDisappear)
                 }
                 
-            case .sheet:
+            case .sheet, .alert:
                 return .none
             }
         }
@@ -333,56 +265,47 @@ extension CommentFeature {
 
 extension CommentFeature {
     // 이름을 익명화 해주는 method
-    private func anonymizeComment(id: Int, comments: [CommentEntity]) -> [CommentEntity] {
+    private func anonymizeCommentList(_ BoardWriterId: Int, _ commentList: [BoardComment]) -> [BoardComment] {
         var anonymousArray: [Int: Int] = [:]
         var anonymousIndex: Int = 0
         
-        let result = comments.map { comment in
+        return commentList.map { comment in
+            let isContainName = anonymousArray.values.contains { $0 == comment.writeId }
             
-            // 한번이라도 나온 writer인지 여부 판단
-            let isContainName = anonymousArray.values.contains {
-                $0 == comment.writerId
-            }
-            
-            if !isContainName { // 처음 나오는 writer일 경우
+            if !isContainName {
                 anonymousIndex += 1
                 
-                if comment.writerId == id {
-                    anonymousArray.updateValue(comment.writerId, forKey: -1)
-                } else {
-                    anonymousArray.updateValue(comment.writerId, forKey: anonymousIndex)
-                }
+                let anonymityId = (comment.writeId == BoardWriterId) ? -1 : anonymousIndex
                 
-                return CommentEntity(
+                anonymousArray.updateValue(comment.writeId, forKey: anonymityId)
+                
+                return BoardComment(
                     id: comment.id,
-                    writerId: (comment.writerId == id) ? -1 : anonymousIndex,
+                    writeId: comment.writeId,
                     content: comment.content,
-                    createdAt: comment.createdAt,
                     heartCount: comment.heartCount,
                     isLiked: comment.isLiked,
                     isMine: comment.isMine,
-                    isReport: comment.isReport
+                    isReport: comment.isReport,
+                    createdAt: comment.createdAt,
+                    anonymityId: (comment.writeId == BoardWriterId) ? -1 : anonymousIndex
                 )
-            } else { // 한번 이상 나온 writer일 경우
-                // 해당 value의 key 값을 찾아 name의 index로 제공
-                let currentIndex = anonymousArray
-                    .filter { $0.value == comment.writerId }
-                    .first!.key
+            } else {
+                let currentIndex = anonymousArray.first(where: { $0.value == comment.writeId })?.key ?? 0
                 
-                return CommentEntity(
+                return BoardComment(
                     id: comment.id,
-                    writerId: currentIndex,
+                    writeId: currentIndex,
                     content: comment.content,
-                    createdAt: comment.createdAt,
                     heartCount: comment.heartCount,
                     isLiked: comment.isLiked,
                     isMine: comment.isMine,
-                    isReport: comment.isReport
+                    isReport: comment.isReport,
+                    createdAt: comment.createdAt,
+                    anonymityId: currentIndex
                 )
             }
         }
-        
-        return result
     }
 }
 

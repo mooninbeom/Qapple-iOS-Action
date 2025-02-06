@@ -43,19 +43,24 @@ struct CommentView: View {
             hideKeyboard()
         }
         .navigationBarBackButtonHidden()
-        .task {
-            store.send(.commentViewAppeared)
+        .onAppear {
+            store.send(.onAppear)
         }
-        .alert($store.scope(state: \.alert, action: \.alert))
+        .refreshable {
+            store.send(.refresh)
+        }
+        .onReceive(NotificationCenter.default.publisher(for: .updateViewNotification)) { _ in
+            store.send(.refresh)
+        }
+        .loadingIndicator(isLoading: store.isLoading)
         .sheet(item: $store.scope(state: \.sheet, action: \.sheet)
         ) { store in
             switch store.case {
             case let .seeMore(store): SeeMoreSheet(store: store)
             }
         }
-        .onReceive(NotificationCenter.default.publisher(for: .updateViewNotification)) { _ in
-            store.send(.refreshCommentList)
-        }
+        .alert($store.scope(state: \.alert, action: \.alert))
+        
     }
     
     private var seperator: some View {
@@ -92,30 +97,27 @@ private struct CommentListView: View {
             ScrollView {
                 LazyVStack(spacing: 0) {
                     // 데이터 연결
-                    ForEach(Array(self.store.comments.enumerated()), id: \.offset) { index, comment in
+                    ForEach(Array(self.store.commentList.enumerated()), id: \.offset) { index, comment in
                         CommentCell(
                             store: self.store,
                             comment: comment,
                             cellIndex: index
                         )
-                        .onAppear {
-                            store.send(.paginationCellAppeared)
-                        }
+                        .configurePagination(
+                            store.commentList,
+                            currentIndex: index,
+                            hasNext: store.paginationInfo.hasNext,
+                            pagination: {
+                                store.send(.pagination)
+                            }
+                        )
                     }
                 }
             }
             .scrollDismissesKeyboard(.immediately)
             .background(Color.bk)
-            .refreshable {
-                store.send(.refreshCommentList)
-            }
             
-            if store.isLoading {
-                ProgressView()
-                    .progressViewStyle(.circular)
-            }
-            
-            if store.comments.isEmpty && !store.isLoading {
+            if store.commentList.isEmpty && !store.isLoading {
                 VStack {
                     Text("아직 작성된 댓글이 없습니다")
                         .font(.pretendard(.medium, size: 14))
