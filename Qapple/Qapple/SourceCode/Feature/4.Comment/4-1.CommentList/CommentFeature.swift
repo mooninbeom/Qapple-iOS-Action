@@ -30,6 +30,7 @@ struct CommentFeature {
         case pagination
         case commentListResponse([BoardComment], QappleAPI.PaginationInfo)
         
+        case backButtonTapped
         case likeCommentButtonTapped(BoardComment)
         case likeComment(Int)
         case uploadCommentButtonTapped
@@ -97,6 +98,10 @@ struct CommentFeature {
             case let .commentListResponse(commentList, paginationInfo):
                 state.commentList += anonymizeCommentList(state.board.writerId, commentList)
                 state.paginationInfo = paginationInfo
+                return .none
+                
+            case .backButtonTapped:
+                // TODO: 네비게이션 수정
                 return .none
                 
             case let .likeCommentButtonTapped(boardComment):

@@ -15,7 +15,14 @@ struct CommentView: View {
     
     var body: some View {
         VStack(spacing: 0) {
-            HeaderView()
+            NavigationBar(
+                title: "댓글",
+                leadingView: {
+                    NavigationButton(buttonType: .back) {
+                        store.send(.backButtonTapped)
+                    }
+                }
+            )
             
             BulletinBoardCell(
                 board: store.board,
@@ -67,21 +74,6 @@ struct CommentView: View {
         Rectangle()
             .foregroundStyle(Color.placeholder)
             .frame(height: 1)
-    }
-}
-
-// MARK: - HeadView
-
-private struct HeaderView: View {
-    var body: some View {
-        NavigationBar(
-            title: "댓글",
-            leadingView: {
-                NavigationButton(buttonType: .back) {
-                    // TODO: 네비게이션 수정 필요
-                }
-            }
-        )
     }
 }
 
