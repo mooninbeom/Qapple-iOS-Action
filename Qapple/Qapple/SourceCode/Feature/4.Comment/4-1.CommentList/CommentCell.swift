@@ -144,7 +144,7 @@ struct CommentCell: View {
                 Button {
                     if !comment.isReport {
                         HapticService.impact(style: .light)
-                        store.send(.likeButtonTapped(id: comment.id))
+                        store.send(.likeCommentButtonTapped(comment))
                     } else {
                         self.isReportedComment.toggle()
                     }

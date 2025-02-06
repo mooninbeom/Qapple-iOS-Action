@@ -16,7 +16,7 @@ struct CommentRepository {
     var fetchBoardCommentList: (_ boardId: Int, _ threshold: Int?) async throws -> ([BoardComment], QappleAPI.PaginationInfo)
     var deleteBoardComment: (_ boardCommentId: Int) async throws -> DeleteBoardCommentsDTO
     var postBoardComment: (_ boardId: Int, _ content: String) async throws -> PostBoardCommentsDTO
-    var likeBoardComment: (_ boardCommentId: Int) async throws -> LikeBoardCommentsDTO
+    var likeBoardComment: (_ boardCommentId: Int) async throws -> Void
     
     
     private static let testComments: [BoardComment] = [
@@ -112,8 +112,7 @@ extension CommentRepository: DependencyKey {
         likeBoardComment: { boardCommentId in
             let url = try QappleAPI.BoardComment.like(commentId: boardCommentId).url()
             let requestBody: LikeBoardCommentsRequest = LikeBoardCommentsRequest(commentId: boardCommentId)
-            let response: BaseResponse<LikeBoardCommentsDTO> = try await NetworkService.shared.fetch(url: url, body: requestBody)
-            return response.result
+            let response: BaseResponse<LikeBoardCommentsDTO> = try await NetworkService.shared.patch(url: url, body: requestBody)
         }
     )
     
@@ -127,8 +126,8 @@ extension CommentRepository: DependencyKey {
         postBoardComment: { _, _ in
                 .init(boardCommentId: 0)
         },
-        likeBoardComment: { _ in
-                .init(boardCommentId: 0, isLike: true)
+        likeBoardComment: { commentId in
+            print("게시글에 좋아요를 눌렀습니다: \(commentId)")
         }
     )
 }

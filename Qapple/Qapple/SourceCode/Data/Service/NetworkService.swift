@@ -49,12 +49,12 @@ struct NetworkService {
         }
     }
     
-    /// FETCH 요청을 수행합니다.
-    func fetch<T: Decodable, U: Encodable>(url: URL, body: U) async throws -> T {
+    /// PATCH 요청을 수행합니다.
+    func patch<T: Decodable, U: Encodable>(url: URL, body: U) async throws -> T {
         do {
             
             // 네트워킹 수행
-            let (data, response) = try await request(url: url, body: body, method: "FETCH")
+            let (data, response) = try await request(url: url, body: body, method: "PATCH")
             
             return try decodeResponse(data: data, response: response)
         } catch {

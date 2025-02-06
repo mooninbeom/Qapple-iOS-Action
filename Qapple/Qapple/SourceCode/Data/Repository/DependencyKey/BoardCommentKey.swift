@@ -42,7 +42,7 @@ extension QappleRepository {
         return { commentId in
             let url = try QappleAPI.BoardComment.like(commentId: commentId).url()
             let requestBody: LikeBoardCommentsRequest = LikeBoardCommentsRequest(commentId: commentId)
-            let response: BaseResponse<LikeBoardCommentsDTO> = try await NetworkService.shared.fetch(url: url, body: requestBody)
+            let response: BaseResponse<LikeBoardCommentsDTO> = try await NetworkService.shared.patch(url: url, body: requestBody)
             return response.result
         }
     }

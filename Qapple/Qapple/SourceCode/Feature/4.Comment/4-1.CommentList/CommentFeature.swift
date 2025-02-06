@@ -37,7 +37,8 @@ struct CommentFeature {
         case pagination
         case commentListResponse([BoardComment], QappleAPI.PaginationInfo)
         
-        case likeButtonTapped(id: Int)
+        case likeCommentButtonTapped(BoardComment)
+        case likeComment(Int)
         case uploadButtonTapped
         case deleteButtonTapped(id: Int)
         case reportButtonTapped(id: Int)
@@ -73,7 +74,6 @@ struct CommentFeature {
                         let response = try await commentRepository.fetchBoardCommentList(boardId, nil)
                         await send(.commentListResponse(response.0, response.1))
                     } catch {
-                        print(error)
                         await send(.networkErrorAlert)
                     }
                     await send(.toggleLoading(false), animation: .bouncy)
@@ -103,27 +103,26 @@ struct CommentFeature {
                 return .none
                 
                 // MARK: - 버튼 액션 관련(업로드, 좋아요, 삭제, 신고)
-            case let .likeButtonTapped(id: id):
-                
-                let index = state.commentList.firstIndex{ $0.id == id }!
-                let isLiked = state.commentList[index].isLiked
-                state.commentList[index].isLiked.toggle()
-                
-                if isLiked {
-                    state.commentList[index].heartCount -= 1
-                } else {
-                    state.commentList[index].heartCount += 1
-                }
-                
+            case let .likeCommentButtonTapped(boardComment):
+                print(boardComment.id)
                 return .run { send in
                     await send(.toggleLoading(true), animation: .bouncy)
                     do {
-                        let _ = try await commentRepository.likeBoardComment(id)
+                        try await commentRepository.likeBoardComment(boardComment.id)
+                        await send(.likeComment(boardComment.id))
                     } catch {
+                        print(error)
                         await send(.networkErrorAlert)
                     }
                     await send(.toggleLoading(false), animation: .bouncy)
                 }
+                
+            case let .likeComment(boardCommentId):
+                if let index = state.commentList.firstIndex(where: { $0.id == boardCommentId }) {
+                    state.commentList[index].isLiked.toggle()
+                    state.commentList[index].heartCount += state.commentList[index].isLiked ? 1 : -1
+                }
+                return .none
                 
             case let .commentTextChanged(text: text):
                 state.text = text
