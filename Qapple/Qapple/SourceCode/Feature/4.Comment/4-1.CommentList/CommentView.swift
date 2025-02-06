@@ -142,7 +142,7 @@ private struct AddCommentView: View {
     
     var body: some View {
         HStack(alignment: .bottom) {
-            TextField("댓글 추가", text: $store.text.sending(\.commentTextChanged), axis: .vertical)
+            TextField("댓글 추가", text: $store.commentText, axis: .vertical)
                 .font(.pretendard(.regular, size: 17))
                 .lineLimit(...3)
                 .padding(.horizontal)
@@ -158,7 +158,7 @@ private struct AddCommentView: View {
             .tint(Color.wh)
             .padding(.trailing, 12)
             .padding(.bottom, 12)
-            .disabled(store.text.isEmpty || store.isLoading )
+            .disabled(store.commentText.isEmpty || store.isLoading )
         }
         .background {
             RoundedRectangle(cornerRadius: 11)

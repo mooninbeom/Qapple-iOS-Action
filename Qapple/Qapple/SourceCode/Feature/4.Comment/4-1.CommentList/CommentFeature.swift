@@ -17,7 +17,7 @@ struct CommentFeature {
     struct State: Equatable {
         var board: BulletinBoard
         
-        var text: String = ""
+        var commentText: String = ""
         
         var commentList: [BoardComment] = []
         var paginationInfo = QappleAPI.PaginationInfo(threshold: "", hasNext: false)
@@ -30,7 +30,7 @@ struct CommentFeature {
         @Presents var alert: AlertState<Action.Alert>?
     }
     
-    enum Action {
+    enum Action: BindableAction {
         case onAppear
         case onDisappear
         case refresh
@@ -43,11 +43,11 @@ struct CommentFeature {
         case deleteButtonTapped(id: Int)
         case reportButtonTapped(id: Int)
         
-        case commentTextChanged(text: String)
         case likeBoardButtonTapped
         case likeBoard
         case seeMoreAction
         case toggleLoading(Bool)
+        case binding(BindingAction<State>)
         
         case sheet(PresentationAction<Sheet.Action>)
         case alert(PresentationAction<Alert>)
@@ -64,6 +64,7 @@ struct CommentFeature {
     @Dependency(\.bulletinBoardRepository) var bulletinBoardRepository
     
     var body: some ReducerOf<Self> {
+        BindingReducer()
         Reduce { state, action in
             switch action {
             case .onAppear, .refresh:
@@ -124,13 +125,9 @@ struct CommentFeature {
                 }
                 return .none
                 
-            case let .commentTextChanged(text: text):
-                state.text = text
-                return .none
-                
             case .uploadButtonTapped:
                 return .run { [
-                    text = state.text,
+                    text = state.commentText,
                     boardId = state.board.id
                 ] send in
                     await send(.toggleLoading(true), animation: .bouncy)
@@ -224,6 +221,9 @@ struct CommentFeature {
                 state.isLoading = bool
                 return .none
                 
+            case .binding(\.commentText):
+                return .none
+                
             case let .sheet(.presented(.seeMore(.alert(.presented(.confirmDeletion(sheetData)))))):
                 guard case let .bulletinBoard(board) = sheetData else { return .none }
                 return .run { send in
@@ -244,7 +244,7 @@ struct CommentFeature {
                     await send(.onDisappear)
                 }
                 
-            case .sheet, .alert:
+            case .sheet, .alert, .binding:
                 return .none
             }
         }
