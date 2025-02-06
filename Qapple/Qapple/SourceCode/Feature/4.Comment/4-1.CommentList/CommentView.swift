@@ -150,7 +150,7 @@ private struct AddCommentView: View {
             
             Button {
                     HapticService.notification(type: .success)
-                    store.send(.uploadButtonTapped)
+                    store.send(.uploadCommentButtonTapped)
             } label: {
                 Image(systemName: "paperplane")
                     .font(.system(size: 20))

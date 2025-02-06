@@ -39,7 +39,8 @@ struct CommentFeature {
         
         case likeCommentButtonTapped(BoardComment)
         case likeComment(Int)
-        case uploadButtonTapped
+        case uploadCommentButtonTapped
+        case commentTextReset
         case deleteButtonTapped(id: Int)
         case reportButtonTapped(id: Int)
         
@@ -125,21 +126,25 @@ struct CommentFeature {
                 }
                 return .none
                 
-            case .uploadButtonTapped:
+            case .uploadCommentButtonTapped:
                 return .run { [
                     text = state.commentText,
                     boardId = state.board.id
                 ] send in
                     await send(.toggleLoading(true), animation: .bouncy)
                     do {
-                        let _ = try await commentRepository.postBoardComment(boardId, text)
+                        try await commentRepository.postBoardComment(boardId, text)
                         await send(.refresh)
-                        // TODO: - 댓글 업로드 후 액션 추가
+                        await send(.commentTextReset)
                     } catch {
                         await send(.networkErrorAlert)
                     }
                     await send(.toggleLoading(false), animation: .bouncy)
                 }
+                
+            case .commentTextReset:
+                state.commentText = ""
+                return .none
                 
             case .reportButtonTapped(id: _):
                 // TODO: CommentReportView로 navigating
