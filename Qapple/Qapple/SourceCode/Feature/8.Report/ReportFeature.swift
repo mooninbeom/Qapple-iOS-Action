@@ -12,7 +12,7 @@ struct ReportFeature {
     
     @ObservableState
     struct State: Equatable {
-        var reportData: ReportData
+        var dataType: DataType
         var isLoading = false
         @Presents var alert: AlertState<Action.Alert>?
     }
@@ -25,11 +25,12 @@ struct ReportFeature {
         case alert(PresentationAction<Alert>)
         
         enum Alert: Equatable {
-            case confirmReport(ReportData, ReportType)
+            case confirmReport(ReportType)
             case confirmCompletion
         }
     }
     
+    @Dependency(\.reportRepository) var reportRepository
     @Dependency(\.dismiss) var dismiss
     
     var body: some ReducerOf<Self> {
@@ -39,12 +40,38 @@ struct ReportFeature {
                 return .run { send in await dismiss() }
                 
             case let .reportCellTapped(reportType):
-                state.alert = .reportCheck(from: state.reportData, type: reportType)
+                state.alert = .reportCheck(from: state.dataType, type: reportType)
                 return .none
                 
+            case let .alert(.presented(.confirmReport(reportType))):
+                return .run { [dataType = state.dataType] send in
+                    await send(.toggleLoading(true), animation: .bouncy)
+                    do {
+                        switch dataType {
+                        case let .myAnswer(answer):
+                            break
+                            
+                        case let .answer(answer):
+                            try await reportRepository.reportAnswer(answer.id, reportType)
+                            
+                        case let .bulletinBoard(bulletinBoard):
+                            break
+                        }
+                        await send(.completionReport)
+                    } catch {
+                        print(error)
+                    }
+                    await send(.toggleLoading(false), animation: .bouncy)
+                }
+                
             case .completionReport:
-                state.alert = .reportComplete(from: state.reportData)
+                state.alert = .reportComplete(from: state.dataType)
                 return .none
+                
+            case .alert(.presented(.confirmCompletion)):
+                return .run { send in
+                    await dismiss()
+                }
                 
             case let .toggleLoading(bool):
                 state.isLoading = bool
@@ -54,18 +81,13 @@ struct ReportFeature {
                 return .none
             }
         }
+        .ifLet(\.$alert, action: \.alert)
     }
 }
 
 // MARK: - Report Type
 
 extension ReportFeature {
-    
-    /// 어떤 Data를 신고하는지
-    enum ReportData: Equatable {
-        case answer(Answer)
-        case bulletinBoard(BulletinBoard)
-    }
     
     /// 신고 유형
     enum ReportType: String, CaseIterable {
@@ -96,9 +118,9 @@ extension ReportFeature {
 extension AlertState where Action == ReportFeature.Action.Alert {
     
     /// 신고 확인
-    static func reportCheck(from reportData: ReportFeature.ReportData, type: ReportFeature.ReportType) -> Self {
-        let targetText = switch reportData {
-        case .answer: "답변"
+    static func reportCheck(from dataType: DataType, type: ReportFeature.ReportType) -> Self {
+        let targetText = switch dataType {
+        case .answer, .myAnswer: "답변"
         case .bulletinBoard: "게시글"
         }
         return Self {
@@ -107,16 +129,16 @@ extension AlertState where Action == ReportFeature.Action.Alert {
             ButtonState(role: .cancel) {
                 TextState("취소")
             }
-            ButtonState(role: .destructive, action: .confirmReport(reportData, type)) {
+            ButtonState(role: .destructive, action: .confirmReport(type)) {
                 TextState("신고하기")
             }
         }
     }
     
     /// 신고 완료
-    static func reportComplete(from reportData: ReportFeature.ReportData) -> Self {
-        let targetText = switch reportData {
-        case .answer: "답변"
+    static func reportComplete(from dataType: DataType) -> Self {
+        let targetText = switch dataType {
+        case .answer, .myAnswer: "답변"
         case .bulletinBoard: "게시글"
         }
         return Self {

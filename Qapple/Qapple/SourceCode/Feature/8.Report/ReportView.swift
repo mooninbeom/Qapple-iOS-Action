@@ -69,7 +69,7 @@ private struct ReportList: View {
 // MARK: - Preview
 
 #Preview {
-    ReportView(store: Store(initialState: .init(reportData: .answer(.initialState))) {
+    ReportView(store: Store(initialState: .init(dataType: .answer(.initialState))) {
         ReportFeature()
     })
 }

@@ -98,7 +98,7 @@ struct TodayQuestionFeature {
                 state.sheet = .seeMore(
                     .init(
                         sheetTarget: answer.isMine ? .mine : .others,
-                        sheetData: .answer(answer)
+                        dataType: .answer(answer)
                     )
                 )
                 return .none
@@ -135,6 +135,10 @@ struct TodayQuestionFeature {
                 return .run { send in
                     await send(.refresh)
                 }
+                
+            case .sheet(.presented(.seeMore(.reportButtonTapped))):
+                state.sheet = nil
+                return .none
                 
             case let .toggleLoading(bool):
                 state.isLoading = bool

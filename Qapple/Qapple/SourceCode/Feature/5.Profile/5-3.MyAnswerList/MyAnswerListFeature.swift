@@ -84,7 +84,7 @@ struct MyAnswerListFeature {
                 state.sheet = .seeMore(
                     .init(
                         sheetTarget: .mine,
-                        sheetData: .myAnswer(answer)
+                        dataType: .myAnswer(answer)
                     )
                 )
                 return .none

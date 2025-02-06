@@ -63,6 +63,10 @@ struct MainFlowFeature {
                 state.path.append(.notificationList(.init()))
                 return .none
                 
+            case let .questionTab(.todayQuestion(.sheet(.presented(.seeMore(.reportButtonTapped(dataType)))))):
+                state.path.append(.report(.init(dataType: dataType)))
+                return .none
+                
             case let .bulletinBoardTab(.boardCellTapped(board)):
                 state.path.append(.comment(.init(post: board)))
                 return .none
@@ -101,6 +105,10 @@ struct MainFlowFeature {
                     state.path.append(.answerList(.init(question: question)))
                     return .none
                     
+                case let .element(id: _, action: .answerList(.sheet(.presented(.seeMore(.reportButtonTapped(dataType)))))):
+                    state.path.append(.report(.init(dataType: dataType)))
+                    return .none
+                    
                 case .element(id: _, action: .answerList(.backButtonTapped)):
                     state.path.removeAll()
                     return .none
@@ -133,9 +141,10 @@ extension MainFlowFeature {
         case bulletinBoardSearch(BulletinBoardSearchFeature)
         case bulletinBoardPost(BulletinBoardPostFeature)
         case comment(CommentFeature)
-        case notificationList(NotificationFeature)
         case profileEdit(ProfileEditFeature)
         case myAnswerList(MyAnswerListFeature)
         case peopleWhoMadeQapple
+        case notificationList(NotificationFeature)
+        case report(ReportFeature)
     }
 }

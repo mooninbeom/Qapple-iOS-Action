@@ -13,18 +13,18 @@ struct SeeMoreSheetFeature {
     @ObservableState
     struct State: Equatable {
         var sheetTarget: SheetTarget
-        var sheetData: SheetData
+        var dataType: DataType
         @Presents var alert: AlertState<Action.Alert>?
     }
     
     enum Action {
         case deleteButtonTapped
-        case reportButtonTapped
+        case reportButtonTapped(DataType)
         case completionDeletion
         case alert(PresentationAction<Alert>)
         
         enum Alert: Equatable {
-            case confirmDeletion(SheetData)
+            case confirmDeletion(DataType)
             case confirmCompletion
         }
     }
@@ -33,14 +33,14 @@ struct SeeMoreSheetFeature {
         Reduce { state, action in
             switch action {
             case .deleteButtonTapped:
-                state.alert = .deletionCheck(from: state.sheetData)
+                state.alert = .deletionCheck(from: state.dataType)
                 return .none
                 
             case .reportButtonTapped:
                 return .none
                 
             case .completionDeletion:
-                state.alert = .deletionComplete(from: state.sheetData)
+                state.alert = .deletionComplete(from: state.dataType)
                 return .none
                 
             case .alert:
@@ -74,8 +74,8 @@ extension SeeMoreSheetFeature {
 extension AlertState where Action == SeeMoreSheetFeature.Action.Alert {
     
     /// 삭제 확인
-    static func deletionCheck(from sheetData: SeeMoreSheetFeature.SheetData) -> Self {
-        let targetText = switch sheetData {
+    static func deletionCheck(from dataType: DataType) -> Self {
+        let targetText = switch dataType {
         case .answer, .myAnswer: "답변"
         case .bulletinBoard: "게시글"
         }
@@ -85,7 +85,7 @@ extension AlertState where Action == SeeMoreSheetFeature.Action.Alert {
             ButtonState(role: .cancel) {
                 TextState("취소")
             }
-            ButtonState(role: .destructive, action: .confirmDeletion(sheetData)) {
+            ButtonState(role: .destructive, action: .confirmDeletion(dataType)) {
                 TextState("삭제하기")
             }
         } message: {
@@ -94,8 +94,8 @@ extension AlertState where Action == SeeMoreSheetFeature.Action.Alert {
     }
     
     /// 삭제 완료
-    static func deletionComplete(from sheetData: SeeMoreSheetFeature.SheetData) -> Self {
-        let targetText = switch sheetData {
+    static func deletionComplete(from dataType: DataType) -> Self {
+        let targetText = switch dataType {
         case .answer, .myAnswer: "답변"
         case .bulletinBoard: "게시글"
         }

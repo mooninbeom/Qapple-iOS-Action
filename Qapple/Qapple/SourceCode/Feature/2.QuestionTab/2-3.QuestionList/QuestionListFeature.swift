@@ -80,7 +80,6 @@ struct QuestionListFeature {
                 return .none
                 
             case let .answerButtonTapped(question):
-                print(question)
                 return .none
                 
             case let .toggleLoading(bool):
