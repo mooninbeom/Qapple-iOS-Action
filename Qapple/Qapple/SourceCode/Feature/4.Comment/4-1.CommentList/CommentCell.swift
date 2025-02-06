@@ -10,11 +10,12 @@ import ComposableArchitecture
 
 
 struct CommentCell: View {
-    @Bindable var store: StoreOf<CommentFeature>
-    
     // TODO: 추후 property 정리 필요
     let comment: BoardComment
     let cellIndex: Int
+    let like: () -> Void
+    let delete: () -> Void
+    let report: () -> Void
     
     let screenWidth: CGFloat = UIScreen.main.bounds.width
     let anchorWidth: CGFloat = 73
@@ -37,9 +38,9 @@ struct CommentCell: View {
                         .frame(width: screenWidth)
                     
                     if comment.isMine {
-                        deleteBtn
+                        CommentDeleteButton(delete: delete)
                     } else {
-                        reportBtn
+                        CommentReportButton(report: report)
                     }
                 }
                 .offset(x: hOffset)
@@ -144,7 +145,7 @@ struct CommentCell: View {
                 Button {
                     if !comment.isReport {
                         HapticService.impact(style: .light)
-                        store.send(.likeCommentButtonTapped(comment))
+                        like()
                     } else {
                         self.isReportedComment.toggle()
                     }
@@ -177,10 +178,17 @@ struct CommentCell: View {
         .background(Color.bk)
         .gesture(drag, isEnabled: !comment.isReport)
     }
+}
+
+// MARK: - CommentDeleteButton
+
+private struct CommentDeleteButton: View {
     
-    private var deleteBtn: some View {
+    let delete: () -> Void
+    
+    var body: some View {
         Button {
-            store.send(.deleteButtonTapped(comment))
+            delete()
             HapticService.notification(type: .error)
         } label: {
             ZStack {
@@ -195,11 +203,18 @@ struct CommentCell: View {
         }
         .frame(width: 73)
     }
+}
+
+// MARK: - CommentReportButton
+
+private struct CommentReportButton: View {
     
-    private var reportBtn: some View {
+    let report: () -> Void
+    
+    var body: some View {
         Button {
             // TODO: 네비게이션 연결 필요
-            store.send(.reportButtonTapped(id: self.comment.id))
+            report()
         } label: {
             ZStack {
                 Color.report
@@ -246,5 +261,10 @@ struct CommentCell: View {
         anonymityId: 2
     )
     
-    CommentCell(store: store, comment: comment, cellIndex: 1)
+    CommentCell(
+        comment: comment,
+        cellIndex: 1,
+        like: {},
+        delete: {},
+        report: {})
 }

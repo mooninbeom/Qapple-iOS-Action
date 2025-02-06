@@ -70,9 +70,8 @@ struct CommentView: View {
     }
 }
 
-/**
- 상단 네비게이션 View
- */
+// MARK: - HeadView
+
 private struct HeaderView: View {
     var body: some View {
         NavigationBar(
@@ -86,11 +85,10 @@ private struct HeaderView: View {
     }
 }
 
-/**
- 댓글 리스트 View
- */
+// MARK: - CommentListView
+
 private struct CommentListView: View {
-    @Bindable var store: StoreOf<CommentFeature>
+    let store: StoreOf<CommentFeature>
     
     var body: some View {
         ZStack {
@@ -99,9 +97,17 @@ private struct CommentListView: View {
                     // 데이터 연결
                     ForEach(Array(self.store.commentList.enumerated()), id: \.offset) { index, comment in
                         CommentCell(
-                            store: self.store,
                             comment: comment,
-                            cellIndex: index
+                            cellIndex: index,
+                            like: {
+                                store.send(.likeCommentButtonTapped(comment))
+                            },
+                            delete: {
+                                store.send(.deleteCommentButtonTapped(comment))
+                            },
+                            report: {
+                                store.send(.reportButtonTapped)
+                            }
                         )
                         .configurePagination(
                             store.commentList,
@@ -132,11 +138,8 @@ private struct CommentListView: View {
     }
 }
 
+// MARK: - AddCommentView
 
-
-/**
- 댓글 작성 View
- */
 private struct AddCommentView: View {
     @Bindable var store: StoreOf<CommentFeature>
     
@@ -169,6 +172,7 @@ private struct AddCommentView: View {
     }
 }
 
+// MARK: - Preview
 
 #Preview {
     CommentView(

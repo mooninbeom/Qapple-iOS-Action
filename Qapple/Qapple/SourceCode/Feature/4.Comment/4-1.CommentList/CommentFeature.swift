@@ -8,24 +8,17 @@
 import Foundation
 import ComposableArchitecture
 
-/**
- 게시판 댓글(CommentView) Reducer
- */
 @Reducer
 struct CommentFeature {
     @ObservableState
     struct State: Equatable {
         var board: BulletinBoard
-        
         var commentText: String = ""
-        
         var commentList: [BoardComment] = []
         var paginationInfo = QappleAPI.PaginationInfo(threshold: "", hasNext: false)
-        
         // MARK: 추후 자동 스크롤 연결 예정
         var scrollIndex: Int?
         var isLoading: Bool = false
-        
         @Presents var sheet: Sheet.State?
         @Presents var alert: AlertState<Action.Alert>?
     }
@@ -41,9 +34,9 @@ struct CommentFeature {
         case likeComment(Int)
         case uploadCommentButtonTapped
         case commentTextReset
-        case deleteButtonTapped(BoardComment)
+        case reportButtonTapped
+        case deleteCommentButtonTapped(BoardComment)
         case successDeletion
-        case reportButtonTapped(id: Int)
         
         case likeBoardButtonTapped
         case likeBoard
@@ -51,9 +44,10 @@ struct CommentFeature {
         case toggleLoading(Bool)
         case binding(BindingAction<State>)
         
+        case networkErrorAlert
         case sheet(PresentationAction<Sheet.Action>)
         case alert(PresentationAction<Alert>)
-        case networkErrorAlert
+        
         
         enum Alert: Equatable {
             case networkError
@@ -105,7 +99,6 @@ struct CommentFeature {
                 state.paginationInfo = paginationInfo
                 return .none
                 
-                // MARK: - 버튼 액션 관련(업로드, 좋아요, 삭제, 신고)
             case let .likeCommentButtonTapped(boardComment):
                 print(boardComment.id)
                 return .run { send in
@@ -147,37 +140,16 @@ struct CommentFeature {
                 state.commentText = ""
                 return .none
                 
-            case .reportButtonTapped(id: _):
+            case .reportButtonTapped:
                 // TODO: CommentReportView로 navigating
                 return .none
                 
-            case let .deleteButtonTapped(boardComment):
+            case let .deleteCommentButtonTapped(boardComment):
                 state.alert = .confirmDeletion(boardComment.id)
                 return .none
                 
             case .successDeletion:
                 state.alert = .successDeletion
-                return .none
-                
-                // MARK: - Alert 관련 액션
-                /// Delete 버튼 alert
-            case let .alert(.presented(.confirmDeletion(boardCommentId))):
-                return .run { send in
-                    await send(.toggleLoading(true), animation: .bouncy)
-                    do {
-                        try await commentRepository.deleteBoardComment(boardCommentId)
-                        await send(.refresh)
-                        await send(.successDeletion)
-                        // TODO: 삭제 후 슬라이드 이동
-                    } catch {
-                        await send(.networkErrorAlert)
-                    }
-                    await send(.toggleLoading(false), animation: .bouncy)
-                }
-                
-                /// 네트워크 오류 대응 alert
-            case .networkErrorAlert:
-                state.alert = .networkError
                 return .none
                 
             case .likeBoardButtonTapped:
@@ -217,6 +189,10 @@ struct CommentFeature {
             case .binding(\.commentText):
                 return .none
                 
+            case .networkErrorAlert:
+                state.alert = .networkError
+                return .none
+                
             case let .sheet(.presented(.seeMore(.alert(.presented(.confirmDeletion(sheetData)))))):
                 guard case let .bulletinBoard(board) = sheetData else { return .none }
                 return .run { send in
@@ -237,7 +213,21 @@ struct CommentFeature {
                     await send(.onDisappear)
                 }
                 
-            case .sheet, .alert, .binding:
+            case let .alert(.presented(.confirmDeletion(boardCommentId))):
+                return .run { send in
+                    await send(.toggleLoading(true), animation: .bouncy)
+                    do {
+                        try await commentRepository.deleteBoardComment(boardCommentId)
+                        await send(.refresh)
+                        await send(.successDeletion)
+                        // TODO: 삭제 후 슬라이드 이동
+                    } catch {
+                        await send(.networkErrorAlert)
+                    }
+                    await send(.toggleLoading(false), animation: .bouncy)
+                }
+                
+            case .binding, .sheet, .alert:
                 return .none
             }
         }
@@ -335,18 +325,3 @@ extension CommentFeature {
         }
     }
 }
-
-
-
-private let samplePost = BulletinBoard(
-    id: 1,
-    writerId: 1,
-    writerNickname: "이호창",
-    content: "특전사",
-    heartCount: 10,
-    commentCount: 13,
-    createAt: .init(),
-    isMine: false,
-    isReported: false,
-    isLiked: true
-)
