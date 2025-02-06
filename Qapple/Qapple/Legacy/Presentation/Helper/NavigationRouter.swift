@@ -74,7 +74,7 @@ final class Router: ObservableObject, NavigationRouter {
             case .comment(post: let post):
                 LegacyCommentView(post: post)
             case .report(answerId: let answerId, isComment: let isComment):
-                ReportView(answerId: answerId, boardId: -1, isComment: isComment)
+                LegacyReportView(answerId: answerId, boardId: -1, isComment: isComment)
             }
         } else if pathType == .bulletinBoard {
             let view = view as! BulletinBoardPathType
@@ -93,7 +93,7 @@ final class Router: ObservableObject, NavigationRouter {
             case .commentReport(comment: let comment):
                 LegacyCommentReportView(comment: comment)
             case .report(boardId: let boardId, isComment: let isComment):
-                ReportView(answerId: -1, boardId: boardId, isComment: isComment)
+                LegacyReportView(answerId: -1, boardId: boardId, isComment: isComment)
             case .answer(let questionId, let questionContent):
                 AnswerView(
                     viewModel: answerViewModel!,

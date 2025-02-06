@@ -7,7 +7,7 @@
 
 import Foundation
 
-enum ReportType: String, CaseIterable {
+enum LegacyReportType: String, CaseIterable {
     
     /// 불법촬영물 등의 유통
     case DISTRIBUTION_OF_ILLEGAL_PHOTOGRAPHS = "DISTRIBUTION_OF_ILLEGAL_PHOTOGRAPHS"
