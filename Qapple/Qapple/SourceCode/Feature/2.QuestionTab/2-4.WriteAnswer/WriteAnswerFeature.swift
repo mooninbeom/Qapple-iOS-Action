@@ -23,7 +23,6 @@ struct WriteAnswerFeature {
     }
     
     enum Action: BindableAction {
-        case typeAnswerText
         case anonymityNoticeButtonTapped
         case dismissButtonTapped
         case completeButtonTapped
@@ -45,13 +44,6 @@ struct WriteAnswerFeature {
         BindingReducer()
         Reduce { state, action in
             switch action {
-            case .typeAnswerText:
-                state.answerTextFontSize = adaptiveFontSize(from: state.answerText)
-                if state.answerText.count > state.textLimit {
-                    state.answerText = String(state.answerText.prefix(state.textLimit))
-                }
-                return .none
-                
             case .anonymityNoticeButtonTapped:
                 state.sheet = .anonymityNotice
                 return .none
@@ -92,9 +84,7 @@ struct WriteAnswerFeature {
                 return .none
                 
             case .binding(\.answerText):
-                return .run { send in
-                    await send(.typeAnswerText)
-                }
+                return .none
                 
             case .sheet, .alert, .binding:
                 return .none
@@ -129,22 +119,5 @@ extension AlertState where Action == WriteAnswerFeature.Action.Alert {
         }
     } message: {
         TextState("지금까지 작성한 답변이 사라져요")
-    }
-}
-
-// MARK: - Helper
-
-extension WriteAnswerFeature {
-    
-    /// 답변 글자 수에 따른 적응형 폰트 사이즈를 반환합니다.
-    private func adaptiveFontSize(from answerText: String) -> CGFloat {
-        switch answerText.count {
-        case 0..<20: 48
-        case 20..<32: 40
-        case 32..<60: 32
-        case 60...100: 24
-        case 100...: 17
-        default: 48
-        }
     }
 }

@@ -37,7 +37,6 @@ struct MainFlowView: View {
             .fixedTabBarBackground(color: .first)
         } destination: { store in
             switch store.case {
-            case let .notificationList(store): NotificationListView(store: store)
             case let .writeAnswer(store): WriteAnswerView(store: store)
             case let .completeAnswer(store): CompleteAnswerView(store: store)
             case let .answerList(store): AnswerListView(store: store)
@@ -45,6 +44,11 @@ struct MainFlowView: View {
             case let .bulletinBoardSearch(store): EmptyView() // TODO: store 분리 필요
             case let .bulletinBoardPost(store): BulletinBoardPostView(store: store)
             case let .comment(store): CommentView(store: store)
+            case let .profileEdit(store): ProfileEditView(store: store)
+            case let .myAnswerList(store): MyAnswerListView(store: store)
+            case .peopleWhoMadeQapple: PeopleWhoMadeQappleView()
+            case let .notificationList(store): NotificationListView(store: store)
+            case let .report(store): ReportView(store: store)
             }
         }
     }

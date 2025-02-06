@@ -1,5 +1,5 @@
 //
-//  MyPageSectionCell.swift
+//  ProfileListCell.swift
 //  Qapple
 //
 //  Created by 김민준 on 9/28/24.
@@ -7,7 +7,7 @@
 
 import SwiftUI
 
-struct MyPageSectionCell: View {
+struct ProfileListCell: View {
     
     let title: String
     let icon: ImageResource
@@ -53,7 +53,7 @@ struct MyPageSectionCell: View {
 }
 
 #Preview {
-    MyPageSectionCell(
+    ProfileListCell(
         title: "좋아요 한 답변 확인",
         icon: .likeAnswerIcon,
         tapAction: {}

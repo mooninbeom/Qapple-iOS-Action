@@ -97,7 +97,7 @@ struct AnswerListFeature {
                 state.sheet = .seeMore(
                     .init(
                         sheetTarget: answer.isMine ? .mine : .others,
-                        sheetData: .answer(answer)
+                        dataType: .answer(answer)
                     )
                 )
                 return .none
@@ -120,6 +120,10 @@ struct AnswerListFeature {
                 return .run { send in
                     await send(.onDisappear)
                 }
+                
+            case .sheet(.presented(.seeMore(.reportButtonTapped))):
+                state.sheet = nil
+                return .none
                 
             case let .toggleLoading(bool):
                 state.isLoading = bool

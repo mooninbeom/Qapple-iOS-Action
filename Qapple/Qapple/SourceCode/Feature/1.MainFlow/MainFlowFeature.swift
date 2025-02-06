@@ -63,6 +63,10 @@ struct MainFlowFeature {
                 state.path.append(.notificationList(.init()))
                 return .none
                 
+            case let .questionTab(.todayQuestion(.sheet(.presented(.seeMore(.reportButtonTapped(dataType)))))):
+                state.path.append(.report(.init(dataType: dataType)))
+                return .none
+                
             case let .bulletinBoardTab(.boardCellTapped(board)):
                 state.path.append(.comment(.init(post: board)))
                 return .none
@@ -79,6 +83,18 @@ struct MainFlowFeature {
                 state.path.append(.bulletinBoardPost(.init()))
                 return .none
                 
+            case let .profileTab(.editProfileButtonTapped(nickname)):
+                state.path.append(.profileEdit(.init(nickname: nickname, defaultNickname: nickname)))
+                return .none
+                
+            case .profileTab(.myAnswerListButtonTapped):
+                state.path.append(.myAnswerList(.init()))
+                return .none
+                
+            case .profileTab(.peopleWhoMadeQappleButtonTapped):
+                state.path.append(.peopleWhoMadeQapple)
+                return .none
+                
             case let .path(stackAction):
                 switch stackAction {
                 case let .element(id: _, action: .writeAnswer(.postAnswerResponse(question))):
@@ -87,6 +103,10 @@ struct MainFlowFeature {
                     
                 case let .element(id: _, action: .completeAnswer(.confirmButtonTapped(question))):
                     state.path.append(.answerList(.init(question: question)))
+                    return .none
+                    
+                case let .element(id: _, action: .answerList(.sheet(.presented(.seeMore(.reportButtonTapped(dataType)))))):
+                    state.path.append(.report(.init(dataType: dataType)))
                     return .none
                     
                 case .element(id: _, action: .answerList(.backButtonTapped)):
@@ -114,7 +134,6 @@ extension MainFlowFeature {
     
     @Reducer(state: .equatable)
     enum Path {
-        case notificationList(NotificationFeature)
         case writeAnswer(WriteAnswerFeature)
         case completeAnswer(CompleteAnswerFeature)
         case answerList(AnswerListFeature)
@@ -122,5 +141,10 @@ extension MainFlowFeature {
         case bulletinBoardSearch(BulletinBoardSearchFeature)
         case bulletinBoardPost(BulletinBoardPostFeature)
         case comment(CommentFeature)
+        case profileEdit(ProfileEditFeature)
+        case myAnswerList(MyAnswerListFeature)
+        case peopleWhoMadeQapple
+        case notificationList(NotificationFeature)
+        case report(ReportFeature)
     }
 }

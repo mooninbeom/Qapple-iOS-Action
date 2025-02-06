@@ -42,6 +42,7 @@ struct ProfileEditFeature {
     }
     
     @Dependency(\.memberRepository) var memberRepository
+    @Dependency(\.dismiss) var dismiss
     
     var body: some ReducerOf<Self> {
         BindingReducer()
@@ -51,8 +52,9 @@ struct ProfileEditFeature {
                 return .none
                 
             case .backButtonTapped:
-                // TODO: Navigation 처리
-                return .none
+                return .run { send in
+                    await dismiss()
+                }
                 
             case .successButtonTapped:
                 let nickname = state.nickname
@@ -98,8 +100,6 @@ struct ProfileEditFeature {
                 return .none
                 
             case let .nicknameChanged(nickname):
-                let defaultNickname = state.defaultNickname
-                
                 state.nickname = nickname.trimmingCharacters(in: .whitespacesAndNewlines)
                 
                 if nickname.count > state.textLimit {
@@ -115,7 +115,7 @@ struct ProfileEditFeature {
                     }
                 }
                 
-                return .run { send in
+                return .run { [defaultNickname = state.defaultNickname] send in
                     if defaultNickname == nickname {
                         await send(.toggleNicknameCheck(true))
                         await send(.toggleNicknameChange(false))

@@ -98,14 +98,21 @@ struct TodayQuestionFeature {
                 state.sheet = .seeMore(
                     .init(
                         sheetTarget: answer.isMine ? .mine : .others,
-                        sheetData: .answer(answer)
+                        dataType: .answer(answer)
                     )
                 )
                 return .none
                 
             case .questionTimerTick:
-                state.timeRemainingForQuestion -= 1
-                return .none
+                if state.timeRemainingForQuestion <= 0 {
+                    return .run { send in
+                        await send(.cancelQuestionTimer)
+                        await send(.refresh)
+                    }
+                } else {
+                    state.timeRemainingForQuestion -= 1
+                    return .none
+                }
                 
             case .cancelQuestionTimer:
                 return .cancel(id: CancelID.questionTimer)
@@ -128,6 +135,10 @@ struct TodayQuestionFeature {
                 return .run { send in
                     await send(.refresh)
                 }
+                
+            case .sheet(.presented(.seeMore(.reportButtonTapped))):
+                state.sheet = nil
+                return .none
                 
             case let .toggleLoading(bool):
                 state.isLoading = bool

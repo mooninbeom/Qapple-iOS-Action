@@ -1,5 +1,5 @@
 //
-//  MyPageSectionTitle.swift
+//  ProfileListTitle.swift
 //  Qapple
 //
 //  Created by 김민준 on 9/28/24.
@@ -7,7 +7,7 @@
 
 import SwiftUI
 
-struct MyPageSectionTitle: View {
+struct ProfileListTitle: View {
     
     let title: String
     
@@ -20,5 +20,5 @@ struct MyPageSectionTitle: View {
 }
 
 #Preview {
-    MyPageSectionTitle(title: "질문/답변")
+    ProfileListTitle(title: "질문/답변")
 }

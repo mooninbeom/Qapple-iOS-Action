@@ -7,13 +7,13 @@
 
 import SwiftUI
 
-struct ReportView: View {
+struct LegacyReportView: View {
     
     @EnvironmentObject var pathModel: Router
     @State private var isReportAlertPresented = false
     @State private var isReportCompleteAlertPresented = false
     @State private var isLoading: Bool = false
-    @State private var reportType: ReportType = .DISTRIBUTION_OF_ILLEGAL_PHOTOGRAPHS
+    @State private var reportType: LegacyReportType = .DISTRIBUTION_OF_ILLEGAL_PHOTOGRAPHS
     
     let answerId: Int
     let boardId: Int
@@ -53,7 +53,7 @@ struct ReportView: View {
                 VStack(alignment: .leading) {
                     ForEach(Array(reportList.enumerated()), id: \.offset) { index, report in
                         Button {
-                            reportType = ReportType.allCases[index]
+                            reportType = LegacyReportType.allCases[index]
                             isReportAlertPresented.toggle()
                             HapticService.notification(type: .warning)
                             print("신고타입: \(reportType)")
@@ -112,7 +112,7 @@ struct ReportView: View {
     }
 }
 
-extension ReportView {
+extension LegacyReportView {
     
     /// 해당 답변을 신고합니다.
     @MainActor
@@ -150,5 +150,5 @@ extension ReportView {
 }
 
 #Preview {
-    ReportView(answerId: 1, boardId: -1, isComment: false)
+    LegacyReportView(answerId: 1, boardId: -1, isComment: false)
 }
