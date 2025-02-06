@@ -13,14 +13,14 @@ import ComposableArchitecture
 struct BulletinBoardCell: View {
     
     let board: BulletinBoard
-    let ellipsis: () -> Void
+    let seeMore: () -> Void
     let like: () -> Void
     
     var body: some View {
         if board.isMine {
             NormalBoardCell(
                 board: board,
-                ellipsis: ellipsis,
+                seeMore: seeMore,
                 like: like
             )
         } else {
@@ -32,7 +32,7 @@ struct BulletinBoardCell: View {
             } else {
                 NormalBoardCell(
                     board: board,
-                    ellipsis: ellipsis,
+                    seeMore: seeMore,
                     like: like
                 )
             }
@@ -44,14 +44,14 @@ struct BulletinBoardCell: View {
 private struct NormalBoardCell: View {
     
     let board: BulletinBoard
-    let ellipsis: () -> Void
+    let seeMore: () -> Void
     let like: () -> Void
     
     var body: some View {
         VStack(alignment: .leading, spacing: 0) {
             HeaderView(
                 board: board,
-                ellipsis: ellipsis
+                seeMore: seeMore
             )
             .padding(.horizontal, 16)
             
@@ -75,7 +75,7 @@ private struct NormalBoardCell: View {
 private struct HeaderView: View {
     
     let board: BulletinBoard
-    let ellipsis: () -> Void
+    let seeMore: () -> Void
     
     private var nickname: String {
         if board.writerNickname == "알 수 없음" {
@@ -104,7 +104,7 @@ private struct HeaderView: View {
             Spacer()
             
             Button {
-                ellipsis()
+                seeMore()
             } label: {
                 Image(systemName: "ellipsis")
                     .resizable()

@@ -1,68 +1,60 @@
 //
-//  BulletinBoardFeature.swift
+//  BulletinBoardSearchFeature.swift
 //  Qapple
 //
-//  Created by Simmons on 1/23/25.
+//  Created by Simmons on 1/29/25.
 //
 
 import Foundation
 import ComposableArchitecture
 
 @Reducer
-struct BulletinBoardFeature {
+struct BulletinBoardSearchFeature {
     @ObservableState
     struct State: Equatable {
         @Presents var sheet: Sheet.State?
-        @Presents var alert: AlertState<Action.Alert>?
-        var bulletinBoardList: [BulletinBoard] = []
+        var searchBoardList: [BulletinBoard] = []
         var paginationInfo = QappleAPI.PaginationInfo(threshold: "", hasNext: false)
-        var academyEvents: [AcademyEvent] = [.macro, .epilogue]
-        var isLoading: Bool = false
+        var searchText: String = ""
+        var isLoading = false
     }
     
-    enum Action {
-        case onAppear
+    enum Action: BindableAction {
+        case onAppear // 검색 문구 변화 시 호출
         case onDisappear
         case refresh
         case pagination
-        case bulletinBoardListResponse([BulletinBoard], QappleAPI.PaginationInfo)
+        case searchBoardListResponse([BulletinBoard], QappleAPI.PaginationInfo)
         
-        case boardCellTapped(BulletinBoard)
-        case reportButtonTapped
+        case backButtonTapped
         case likeBoardButtonTapped(BulletinBoard)
         case likeBoard(Int)
         case deleteBoard(Int)
-        case searchButtonTapped
-        case notificationButtonTapped
+        case searchTextChanged
+        case binding(BindingAction<State>)
         case postBoardButtonTapped
         case seeMoreAction(BulletinBoard)
         case toggleLoading(Bool)
         
         case sheet(PresentationAction<Sheet.Action>)
-        case alert(PresentationAction<Alert>)
-        case delegate(Delegate)
-        
-        enum Alert {
-            case confirmReport
-        }
-        
-        enum Delegate {
-            case confirmReport
-        }
     }
     
+    @Dependency(\.dismiss) var dismiss
+    @Dependency(\.continuousClock) var clock
     @Dependency(\.bulletinBoardRepository) var bulletinBoardRepository
     
     var body: some ReducerOf<Self> {
-        Reduce { state,action in
+        BindingReducer()
+        Reduce { state, action in
             switch action {
-            case .onAppear, .refresh:
-                state.bulletinBoardList = []
-                return .run { send in
+            case .onAppear,
+                    .refresh:
+                state.searchBoardList = []
+                return .run { [searchText = state.searchText] send in
                     await send(.toggleLoading(true), animation: .bouncy)
                     do {
-                        let response = try await bulletinBoardRepository.fetchBulletinBoardList(nil)
-                        await send(.bulletinBoardListResponse(response.0, response.1))
+                        let response = try await bulletinBoardRepository.searchBoard(searchText, nil)
+                        await send(.searchBoardListResponse(response.0, response.1))
                     } catch {
                         print(error)
                     }
@@ -73,30 +65,29 @@ struct BulletinBoardFeature {
                 return .none
                 
             case .pagination:
-                return .run { [threshold = Int(state.paginationInfo.threshold)] send in
+                return .run { [
+                    threshold = Int(state.paginationInfo.threshold),
+                    searchText = state.searchText
+                ] send in
                     await send(.toggleLoading(true), animation: .bouncy)
                     do {
-                        let response = try await bulletinBoardRepository.fetchBulletinBoardList(threshold)
-                        await send(.bulletinBoardListResponse(response.0, response.1))
+                        let response = try await bulletinBoardRepository.searchBoard(searchText, threshold)
+                        await send(.searchBoardListResponse(response.0, response.1))
                     } catch {
                         print(error)
                     }
                     await send(.toggleLoading(false), animation: .bouncy)
                 }
                 
-            case let .bulletinBoardListResponse(bulletinBoardList, paginationInfo):
-                state.bulletinBoardList += bulletinBoardList
+            case let .searchBoardListResponse(searchBoardList, paginationInfo):
+                state.searchBoardList += searchBoardList
                 state.paginationInfo = paginationInfo
                 return .none
                 
-            case let .boardCellTapped(board):
-                print("게시판 정보\(board)")
-                // TODO: Navigation 처리
-                return .none
-                
-            case .reportButtonTapped:
-                state.alert = .confirmReport
-                return .none
+            case .backButtonTapped:
+                return .run { _ in
+                    await self.dismiss()
+                }
                 
             case let .likeBoardButtonTapped(board):
                 return .run { send in
@@ -111,25 +102,32 @@ struct BulletinBoardFeature {
                 }
                 
             case let .likeBoard(boardId):
-                if let index = state.bulletinBoardList.firstIndex(where: {$0.id == boardId}) {
-                    state.bulletinBoardList[index].isLiked.toggle()
-                    state.bulletinBoardList[index].heartCount += state.bulletinBoardList[index].isLiked ? 1 : -1
+                if let index = state.searchBoardList.firstIndex(where: {$0.id == boardId}) {
+                    state.searchBoardList[index].isLiked.toggle()
+                    state.searchBoardList[index].heartCount += state.searchBoardList[index].isLiked ? 1 : -1
                 }
                 return .none
                 
             case let .deleteBoard(boardId):
-                if let index = state.bulletinBoardList.firstIndex(where: {$0.id == boardId}) {
-                    state.bulletinBoardList.remove(at: index)
+                if let index = state.searchBoardList.firstIndex(where: {$0.id == boardId}) {
+                    state.searchBoardList.remove(at: index)
                 }
                 return .none
                 
-            case .searchButtonTapped:
-                // TODO: Navigation 처리
+            case .binding(\.searchText):
                 return .none
                 
-            case .notificationButtonTapped:
-                // TODO: Navigation 처리
-                return .none
+            case .searchTextChanged:
+                return .concatenate(
+                    .cancel(id: "searchDebounce"),
+                    .run { [searchText = state.searchText] send in
+                        try await self.clock.sleep(for: .seconds(1))
+                        if !searchText.isEmpty {
+                            await send(.onAppear)
+                        }
+                    }
+                        .cancellable(id: "searchDebounce", cancelInFlight: true)
+                )
                 
             case .postBoardButtonTapped:
                 // TODO: Navigiation 처리
@@ -168,39 +166,19 @@ struct BulletinBoardFeature {
                     await send(.onDisappear)
                 }
                 
-            case .alert(.presented(.confirmReport)):
-                return .run { send in
-                    await send(.delegate(.confirmReport))
-                }
-                
-            case .sheet, .alert, .delegate:
+            case .sheet, .binding:
                 return .none
             }
         }
         .ifLet(\.$sheet, action: \.sheet)
-        .ifLet(\.$alert, action: \.alert)
     }
 }
 
-// MARK: - BulletinBoardSheet
+// MARK: - BulletinBoardSearchSheet
 
-extension BulletinBoardFeature {
+extension BulletinBoardSearchFeature {
     @Reducer(state: .equatable)
     enum Sheet {
         case seeMore(SeeMoreSheetFeature)
-    }
-}
-
-// MARK: - BulletinBoardAlert
-
-extension AlertState where Action == BulletinBoardFeature.Action.Alert {
-    static let confirmReport = Self {
-        TextState("신고된 게시글")
-    } actions: {
-        ButtonState(role: .cancel) {
-            TextState("확인")
-        }
-    } message: {
-        TextState("신고된 게시글은 열람할 수 없습니다.")
     }
 }

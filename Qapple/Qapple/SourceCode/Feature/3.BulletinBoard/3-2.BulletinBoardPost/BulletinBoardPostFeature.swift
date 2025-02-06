@@ -15,21 +15,22 @@ struct BulletinBoardPostFeature {
         @Presents var sheet: Sheet.State?
         @Presents var alert: AlertState<Action.Alert>?
         var isLoading = false
-        var content: String = ""
-        var fontSize: CGFloat = 48
+        var boardText: String = ""
+        var boardTextFontSize: CGFloat = 48
         var textCountLimit = 150
     }
     
-    enum Action {
+    enum Action: BindableAction {
+        case cancelButtonTapped
+        case contentChanged
+        case postBoardButtonTapped
+        case anonymityNoticeButtonTapped
+        case toggleLoading(Bool)
+        case binding(BindingAction<State>)
+        
         case sheet(PresentationAction<Sheet.Action>)
         case alert(PresentationAction<Alert>)
         case delegate(Delegate)
-        
-        case cancelButtonTapped
-        case setContent(String)
-        case postBoardButtonTapped
-        case anonymityButtonTapped
-        case toggleLoading(Bool)
         
         enum Alert {
             case confirmCancel
@@ -43,71 +44,56 @@ struct BulletinBoardPostFeature {
     @Dependency(\.bulletinBoardRepository) var bulletinBoardRepository
     
     var body: some ReducerOf<Self> {
+        BindingReducer()
         Reduce { state, action in
             switch action {
-            case .sheet(.presented(.anonymityButtonTap(.confirmButtonTapped))):
-                return .none
-                
-            case .sheet:
-                return .none
-                
-            case .alert(.presented(.confirmCancel)):
-                return .run { send in
-                    await send(.delegate(.confirmCancel))
-                }
-                
-            case .alert:
-                return .none
-                
-            case .delegate:
-                return .none
-                
             case .cancelButtonTapped:
-                if state.content.isEmpty {
+                if state.boardText.isEmpty {
                     // TODO: Navigation 처리
                 } else {
                     state.alert = .confirmCancel
                 }
                 return .none
                 
-            case let .setContent(content):
-                state.content = content
-                
-                if content.count > state.textCountLimit {
-                    state.content = String(content.prefix(state.textCountLimit))
-                } else {
-                    state.content = content
+            case .contentChanged:
+                state.boardTextFontSize = adaptiveFontSize(from: state.boardText)
+                if state.boardText.count > state.textCountLimit {
+                    state.boardText = String(state.boardText.prefix(state.textCountLimit))
                 }
-                
-                switch state.content.count {
-                case 0..<20: state.fontSize = 48
-                case 20..<32: state.fontSize = 40
-                case 32..<60: state.fontSize = 32
-                case 60...100: state.fontSize = 24
-                case 100...: state.fontSize = 17
-                default: break
-                }
-                
                 return .none
+                
             case .postBoardButtonTapped:
-                let content = state.content
+                let boardText = state.boardText
                 return .run { send in
                     await send(.toggleLoading(true), animation: .bouncy)
                     do {
-                        try await bulletinBoardRepository.postBoard(content)
-                        // TODO: board reset 필요하면 넣기
+                        try await bulletinBoardRepository.postBoard(boardText)
                         // TODO: Navigation 처리
                     } catch {
                         print(error)
                     }
                     await send(.toggleLoading(false), animation: .bouncy)
                 }
-            case .anonymityButtonTapped:
-                state.sheet = .anonymityButtonTap(AnonymityFeature.State())
+                
+            case .anonymityNoticeButtonTapped:
+                state.sheet = .anonymityNotice
                 return .none
                 
             case let .toggleLoading(bool):
                 state.isLoading = bool
+                return .none
+                
+            case .binding(\.boardText):
+                return .run { send in
+                    await send(.contentChanged)
+                }
+                
+            case .alert(.presented(.confirmCancel)):
+                return .run { send in
+                    await send(.delegate(.confirmCancel))
+                }
+                
+            case .binding, .sheet, .alert, .delegate:
                 return .none
             }
         }
@@ -119,13 +105,12 @@ struct BulletinBoardPostFeature {
 // MARK: - BulletinBoardSheet
 
 extension BulletinBoardPostFeature {
-    @Reducer
+    
+    @Reducer(state: .equatable)
     enum Sheet {
-        case anonymityButtonTap(AnonymityFeature)
+        case anonymityNotice
     }
 }
-
-extension BulletinBoardPostFeature.Sheet.State: Equatable {}
 
 // MARK: - BulletinBoardPostAlert
 

@@ -68,7 +68,7 @@ struct MainFlowFeature {
                 return .none
                 
             case let .bulletinBoardTab(.boardCellTapped(board)):
-                state.path.append(.comment(.init(post: board)))
+                state.path.append(.comment(.init(board: board)))
                 return .none
                 
             case .bulletinBoardTab(.notificationButtonTapped):

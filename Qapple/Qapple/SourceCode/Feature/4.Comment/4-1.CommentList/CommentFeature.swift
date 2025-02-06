@@ -8,321 +8,325 @@
 import Foundation
 import ComposableArchitecture
 
-/**
- 게시판 댓글(CommentView) Reducer
- */
 @Reducer
 struct CommentFeature {
     @ObservableState
     struct State: Equatable {
-        var post: BulletinBoard = samplePost
-        
-        var text: String = ""
-        
-        var comments: [BoardComment] = []
-        
+        var board: BulletinBoard
+        var commentText: String = ""
+        var commentList: [BoardComment] = []
+        var paginationInfo = QappleAPI.PaginationInfo(threshold: "", hasNext: false)
         // MARK: 추후 자동 스크롤 연결 예정
         var scrollIndex: Int?
         var isLoading: Bool = false
-        
-        var threshold: Int?
-        var hasNext: Bool = false
-        
-        // 익명화 관련 프로퍼티
-        var anonymousArray: [Int:Int] = [:]
-        var anonymousIndex: Int = 0
-        
+        @Presents var sheet: Sheet.State?
         @Presents var alert: AlertState<Action.Alert>?
     }
     
-    enum Action: Equatable {
-        case commentViewAppeared
-        case paginationCellAppeared
-        case fetchCommentData([BoardComment])
-        case anonymizeComments([BoardComment], String, Bool)
+    enum Action: BindableAction {
+        case onAppear
+        case onDisappear
+        case refresh
+        case pagination
+        case commentListResponse([BoardComment], QappleAPI.PaginationInfo)
         
-        case likeButtonTapped(id: Int)
-        case uploadButtonTapped
-        case deleteButtonTapped(id: Int)
-        case reportButtonTapped(id: Int)
-        case successActionLoading
+        case backButtonTapped
+        case likeCommentButtonTapped(BoardComment)
+        case likeComment(Int)
+        case uploadCommentButtonTapped
+        case commentTextReset
+        case reportButtonTapped
+        case deleteCommentButtonTapped(BoardComment)
+        case successDeletion
         
-        case refreshCommentList
+        case likeBoardButtonTapped
+        case likeBoard
+        case seeMoreAction
+        case toggleLoading(Bool)
+        case binding(BindingAction<State>)
         
-        case commentTextChanged(text: String)
-        
-        case alert(PresentationAction<Alert>)
         case networkErrorAlert
+        case sheet(PresentationAction<Sheet.Action>)
+        case alert(PresentationAction<Alert>)
         
-        @CasePathable
+        
         enum Alert: Equatable {
-            case boardLoadError
-            case deleteComment(Int)
+            case networkError
+            case confirmDeletion(Int)
+            case successDeletion
         }
     }
     
     @Dependency(\.commentRepository) var commentRepository
+    @Dependency(\.bulletinBoardRepository) var bulletinBoardRepository
     
     var body: some ReducerOf<Self> {
+        BindingReducer()
         Reduce { state, action in
             switch action {
-            // MARK: - 데이터 fetch 관련 액션
-            case .commentViewAppeared, .refreshCommentList:
-                state.isLoading = true
-                
-                state.comments.removeAll()
-                state.threshold = nil
-                state.hasNext = false
-                return .run { [boardId = state.post.id] send in
+            case .onAppear, .refresh:
+                state.commentList = []
+                return .run { [boardId = state.board.id] send in
+                    await send(.toggleLoading(true), animation: .bouncy)
                     do {
-                        let result = try await commentRepository.fetchBoardCommentList(boardId, nil)
-                        await send(.anonymizeComments(result.0, result.1.threshold, result.1.hasNext))
+                        let response = try await commentRepository.fetchBoardCommentList(boardId, nil)
+                        await send(.commentListResponse(response.0, response.1))
                     } catch {
                         await send(.networkErrorAlert)
                     }
+                    await send(.toggleLoading(false), animation: .bouncy)
                 }
                 
-            case .paginationCellAppeared:
-                guard state.hasNext else { return .none }
-                state.isLoading = true
+            case .onDisappear:
+                return .none
+                
+            case .pagination:
                 return .run { [
-                    boardId = state.post.id,
-                    threshold = state.threshold
+                    boardId = state.board.id,
+                    threshold = Int(state.paginationInfo.threshold)
                 ] send in
+                    await send(.toggleLoading(true), animation: .bouncy)
                     do {
-                        let result = try await commentRepository.fetchBoardCommentList(boardId, threshold)
-                        await send(.anonymizeComments(result.0, result.1.threshold, result.1.hasNext))
+                        let response = try await commentRepository.fetchBoardCommentList(boardId, threshold)
+                        await send(.commentListResponse(response.0, response.1))
                     } catch {
                         await send(.networkErrorAlert)
                     }
+                    await send(.toggleLoading(false), animation: .bouncy)
                 }
                 
-            case let .fetchCommentData(comments):
-                state.comments.append(contentsOf: comments)
-                state.isLoading = false
+            case let .commentListResponse(commentList, paginationInfo):
+                state.commentList += anonymizeCommentList(state.board.writerId, commentList)
+                state.paginationInfo = paginationInfo
                 return .none
                 
-            case .successActionLoading:
-                state.isLoading = false
+            case .backButtonTapped:
+                // TODO: 네비게이션 수정
                 return .none
                 
-            // MARK: - 버튼 액션 관련(업로드, 좋아요, 삭제, 신고)
-            case let .likeButtonTapped(id: id):
-                state.isLoading = true
-                
-                let index = state.comments.firstIndex{ $0.id == id }!
-                let isLiked = state.comments[index].isLiked
-                state.comments[index].isLiked.toggle()
-                
-                if isLiked {
-                    state.comments[index].heartCount -= 1
-                } else {
-                    state.comments[index].heartCount += 1
-                }
-                
+            case let .likeCommentButtonTapped(boardComment):
+                print(boardComment.id)
                 return .run { send in
+                    await send(.toggleLoading(true), animation: .bouncy)
                     do {
-                        let _ = try await commentRepository.likeBoardComment(id)
-                        await send(.successActionLoading)
+                        try await commentRepository.likeBoardComment(boardComment.id)
+                        await send(.likeComment(boardComment.id))
                     } catch {
+                        print(error)
                         await send(.networkErrorAlert)
                     }
+                    await send(.toggleLoading(false), animation: .bouncy)
                 }
                 
-            case let .commentTextChanged(text: text):
-                state.text = text
+            case let .likeComment(boardCommentId):
+                if let index = state.commentList.firstIndex(where: { $0.id == boardCommentId }) {
+                    state.commentList[index].isLiked.toggle()
+                    state.commentList[index].heartCount += state.commentList[index].isLiked ? 1 : -1
+                }
                 return .none
-            case .uploadButtonTapped:
-                state.isLoading = true
+                
+            case .uploadCommentButtonTapped:
                 return .run { [
-                    text = state.text,
-                    boardId = state.post.id
+                    text = state.commentText,
+                    boardId = state.board.id
                 ] send in
+                    await send(.toggleLoading(true), animation: .bouncy)
                     do {
-                        let _ = try await commentRepository.postBoardComment(boardId, text)
-                        await send(.refreshCommentList)
-                        // TODO: - 댓글 업로드 후 액션 추가
+                        try await commentRepository.postBoardComment(boardId, text)
+                        await send(.refresh)
+                        await send(.commentTextReset)
                     } catch {
                         await send(.networkErrorAlert)
                     }
+                    await send(.toggleLoading(false), animation: .bouncy)
                 }
-            
-            case .reportButtonTapped(id: _):
+                
+            case .commentTextReset:
+                state.commentText = ""
+                return .none
+                
+            case .reportButtonTapped:
                 // TODO: CommentReportView로 navigating
                 return .none
                 
-            case let .deleteButtonTapped(id: id):
-                state.alert = AlertState {
-                    TextState("정말로 댓글을 삭제하시겠습니까?")
-                } actions: {
-                    ButtonState(role: .destructive, action: .deleteComment(id), label: { TextState("삭제") })
-                    ButtonState(role: .cancel, label: { TextState("취소") })
-                }
+            case let .deleteCommentButtonTapped(boardComment):
+                state.alert = .confirmDeletion(boardComment.id)
                 return .none
                 
-            // MARK: - Alert 관련 액션
-            /// Delete 버튼 alert
-            case let .alert(.presented(.deleteComment(id))):
-                // TODO: 댓글 삭제 구현
-                print("댓글 아이디: \(id) 삭제")
+            case .successDeletion:
+                state.alert = .successDeletion
+                return .none
                 
-                state.alert = AlertState {
-                    TextState("댓글이 삭제되었습니다")
-                } actions: {
-                    ButtonState(label: { TextState("확인")})
-                }
-                return .run { send in
+            case .likeBoardButtonTapped:
+                return .run { [board = state.board] send in
+                    await send(.toggleLoading(true), animation: .bouncy)
                     do {
-                        let _ = try await commentRepository.deleteBoardComment(id)
-                        await send(.refreshCommentList)
+                        try await bulletinBoardRepository.likeBoard(board.id)
+                        await send(.likeBoard)
+                    } catch {
+                        print(error)
+                    }
+                    await send(.toggleLoading(false), animation: .bouncy)
+                }
+                
+            case .likeBoard:
+                if state.board.isLiked {
+                    state.board.heartCount -= 1
+                } else {
+                    state.board.heartCount += 1
+                }
+                state.board.isLiked.toggle()
+                return .none
+                
+            case .seeMoreAction:
+                state.sheet = .seeMore(
+                    .init(
+                        sheetTarget: state.board.isMine ? .mine : .others,
+                        dataType: .bulletinBoard(state.board)
+                    )
+                )
+                return .none
+                
+            case let .toggleLoading(bool):
+                state.isLoading = bool
+                return .none
+                
+            case .binding(\.commentText):
+                return .none
+                
+            case .networkErrorAlert:
+                state.alert = .networkError
+                return .none
+                
+            case let .sheet(.presented(.seeMore(.alert(.presented(.confirmDeletion(sheetData)))))):
+                guard case let .bulletinBoard(board) = sheetData else { return .none }
+                return .run { send in
+                    await send(.toggleLoading(true), animation: .bouncy)
+                    do {
+                        try await bulletinBoardRepository.deleteBoard(board.id)
+                        await send(.sheet(.presented(.seeMore(.completionDeletion))))
+                        // TODO: Navigaition 뒤로가기
+                    } catch {
+                        print(error)
+                    }
+                    await send(.toggleLoading(false), animation: .bouncy)
+                }
+                
+            case .sheet(.presented(.seeMore(.alert(.presented(.confirmCompletion))))):
+                state.sheet = nil
+                return .run { send in
+                    await send(.onDisappear)
+                }
+                
+            case let .alert(.presented(.confirmDeletion(boardCommentId))):
+                return .run { send in
+                    await send(.toggleLoading(true), animation: .bouncy)
+                    do {
+                        try await commentRepository.deleteBoardComment(boardCommentId)
+                        await send(.refresh)
+                        await send(.successDeletion)
+                        // TODO: 삭제 후 슬라이드 이동
                     } catch {
                         await send(.networkErrorAlert)
                     }
+                    await send(.toggleLoading(false), animation: .bouncy)
                 }
                 
-            /// 네트워크 오류 대응 alert
-            case .networkErrorAlert:
-                state.isLoading = false
-                state.alert = AlertState {
-                    TextState("알 수 없는 오류가 발생했습니다.")
-                } actions: {
-                    ButtonState(role: .cancel, label: { TextState("확인") })
-                } message: {
-                    TextState("잠시후 다시 시도해주세요.")
-                }
+            case .binding, .sheet, .alert:
                 return .none
-                
-            case .alert:
-                return .none
-                
-            // MARK: 여러가지 메소드들
-            /// BoardComment 익명화 메소드
-            case let .anonymizeComments(comments, threshold, hasNext):
-                state.threshold = Int(threshold)
-                state.hasNext = hasNext
-                
-                let writerId = state.post.writerId
-                let result = comments.map { comment in
-                    // 한번이라도 나온 writer인지 여부 판단
-                    let isContainName = state.anonymousArray.values.contains {
-                        $0 == comment.writeId
-                    }
-                    
-                    if !isContainName { // 처음 나오는 writer일 경우
-                        state.anonymousIndex += 1
-                        
-                        if comment.writeId == writerId {
-                            state.anonymousArray.updateValue(comment.writeId, forKey: -1)
-                        } else {
-                            state.anonymousArray.updateValue(comment.writeId, forKey: state.anonymousIndex)
-                        }
-                        
-                        return BoardComment(
-                            id: comment.id,
-                            writeId: comment.writeId,
-                            content: comment.content,
-                            heartCount: comment.heartCount,
-                            isLiked: comment.isLiked,
-                            isMine: comment.isMine,
-                            isReport: comment.isReport,
-                            createdAt: comment.createdAt,
-                            anonymityId: (comment.writeId == writerId) ? -1 : state.anonymousIndex
-                        )
-                    } else { // 한번 이상 나온 writer일 경우
-                        // 해당 value의 key 값을 찾아 name의 index로 제공
-                        let currentIndex = state.anonymousArray
-                            .filter { $0.value == comment.writeId }
-                            .first!.key
-                        
-                        return BoardComment(
-                            id: comment.id,
-                            writeId: currentIndex,
-                            content: comment.content,
-                            heartCount: comment.heartCount,
-                            isLiked: comment.isLiked,
-                            isMine: comment.isMine,
-                            isReport: comment.isReport,
-                            createdAt: comment.createdAt,
-                            anonymityId: currentIndex
-                        )
-                    }
-                }
-                
-                return .send(.fetchCommentData(result))
             }
         }
+        .ifLet(\.$sheet, action: \.sheet)
         .ifLet(\.$alert, action: \.alert)
     }
 }
 
-
+// MARK: - BulletinBoardSheet
 
 extension CommentFeature {
-    // 이름을 익명화 해주는 method
-    private func anonymizeComment(id: Int, comments: [CommentEntity]) -> [CommentEntity] {
-        var anonymousArray: [Int: Int] = [:]
-        var anonymousIndex: Int = 0
-        
-        let result = comments.map { comment in
-            
-            // 한번이라도 나온 writer인지 여부 판단
-            let isContainName = anonymousArray.values.contains {
-                $0 == comment.writerId
-            }
-            
-            if !isContainName { // 처음 나오는 writer일 경우
-                anonymousIndex += 1
-                
-                if comment.writerId == id {
-                    anonymousArray.updateValue(comment.writerId, forKey: -1)
-                } else {
-                    anonymousArray.updateValue(comment.writerId, forKey: anonymousIndex)
-                }
-                
-                return CommentEntity(
-                    id: comment.id,
-                    writerId: (comment.writerId == id) ? -1 : anonymousIndex,
-                    content: comment.content,
-                    createdAt: comment.createdAt,
-                    heartCount: comment.heartCount,
-                    isLiked: comment.isLiked,
-                    isMine: comment.isMine,
-                    isReport: comment.isReport
-                )
-            } else { // 한번 이상 나온 writer일 경우
-                // 해당 value의 key 값을 찾아 name의 index로 제공
-                let currentIndex = anonymousArray
-                    .filter { $0.value == comment.writerId }
-                    .first!.key
-                
-                return CommentEntity(
-                    id: comment.id,
-                    writerId: currentIndex,
-                    content: comment.content,
-                    createdAt: comment.createdAt,
-                    heartCount: comment.heartCount,
-                    isLiked: comment.isLiked,
-                    isMine: comment.isMine,
-                    isReport: comment.isReport
-                )
-            }
-        }
-        
-        return result
+    @Reducer(state: .equatable)
+    enum Sheet {
+        case seeMore(SeeMoreSheetFeature)
     }
 }
 
+// MARK: - CommentAlert
 
+extension AlertState where Action == CommentFeature.Action.Alert {
+    static func confirmDeletion(_ boardCommentId: Int) -> Self {
+        return Self {
+            TextState("정말로 댓글을 삭제하시겠습니까?")
+        } actions: {
+            ButtonState(role: .cancel){
+                TextState("취소")
+            }
+            ButtonState(role: .destructive, action: .confirmDeletion(boardCommentId)) {
+                TextState("삭제")
+            }
+        }
+    }
+    
+    static let successDeletion = Self {
+        TextState("댓글이 삭제되었습니다")
+    } actions: {
+        ButtonState(role: .cancel) {
+            TextState("확인")
+        }
+    }
+    
+    static let networkError = Self {
+        TextState("알 수 없는 오류가 발생했습니다.")
+    } actions: {
+        ButtonState(role: .cancel) {
+            TextState("확인")
+        }
+    } message: {
+        TextState("잠시후 다시 시도해주세요.")
+    }
+}
 
-private let samplePost = BulletinBoard(
-    id: 1,
-    writerId: 1,
-    writerNickname: "이호창",
-    content: "특전사",
-    heartCount: 10,
-    commentCount: 13,
-    createAt: .init(),
-    isMine: false,
-    isReported: false,
-    isLiked: true
-)
+extension CommentFeature {
+    // 이름을 익명화 해주는 method
+    private func anonymizeCommentList(_ BoardWriterId: Int, _ commentList: [BoardComment]) -> [BoardComment] {
+        var anonymousArray: [Int: Int] = [:]
+        var anonymousIndex: Int = 0
+        
+        return commentList.map { comment in
+            let isContainName = anonymousArray.values.contains { $0 == comment.writeId }
+            
+            if !isContainName {
+                anonymousIndex += 1
+                
+                let anonymityId = (comment.writeId == BoardWriterId) ? -1 : anonymousIndex
+                
+                anonymousArray.updateValue(comment.writeId, forKey: anonymityId)
+                
+                return BoardComment(
+                    id: comment.id,
+                    writeId: comment.writeId,
+                    content: comment.content,
+                    heartCount: comment.heartCount,
+                    isLiked: comment.isLiked,
+                    isMine: comment.isMine,
+                    isReport: comment.isReport,
+                    createdAt: comment.createdAt,
+                    anonymityId: (comment.writeId == BoardWriterId) ? -1 : anonymousIndex
+                )
+            } else {
+                let currentIndex = anonymousArray.first(where: { $0.value == comment.writeId })?.key ?? 0
+                
+                return BoardComment(
+                    id: comment.id,
+                    writeId: currentIndex,
+                    content: comment.content,
+                    heartCount: comment.heartCount,
+                    isLiked: comment.isLiked,
+                    isMine: comment.isMine,
+                    isReport: comment.isReport,
+                    createdAt: comment.createdAt,
+                    anonymityId: currentIndex
+                )
+            }
+        }
+    }
+}

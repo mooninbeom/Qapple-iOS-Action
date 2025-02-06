@@ -13,7 +13,7 @@ struct MyAnswerListFeature {
     
     @ObservableState
     struct State: Equatable {
-        var myAnswerList: [AnswerOfProfile] = []
+        var myAnswerList: [Answer] = []
         var totalCount: QappleAPI.TotalCount = 0
         var paginationInfo = QappleAPI.PaginationInfo(threshold: "", hasNext: false)
         var isLoading = false
@@ -26,14 +26,14 @@ struct MyAnswerListFeature {
         case refresh
         case pagination
         case answerListResponse(
-            [AnswerOfProfile],
+            [Answer],
             QappleAPI.PaginationInfo
         )
         case paginagionResponse(
-            [AnswerOfProfile],
+            [Answer],
             QappleAPI.PaginationInfo
         )
-        case seeMoreAction(AnswerOfProfile)
+        case seeMoreAction(Answer)
         case backButtonTapped
         case toggleLoading(Bool)
         case sheet(PresentationAction<Sheet.Action>)

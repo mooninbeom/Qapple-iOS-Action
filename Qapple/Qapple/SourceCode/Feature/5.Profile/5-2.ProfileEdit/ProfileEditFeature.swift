@@ -48,9 +48,6 @@ struct ProfileEditFeature {
         BindingReducer()
         Reduce { state, action in
             switch action {
-            case .alert, .binding:
-                return .none
-                
             case .backButtonTapped:
                 return .run { send in
                     await dismiss()
@@ -102,13 +99,13 @@ struct ProfileEditFeature {
             case let .nicknameChanged(nickname):
                 state.nickname = nickname.trimmingCharacters(in: .whitespacesAndNewlines)
                 
-                if nickname.count > state.textLimit {
+                if state.nickname.count > state.textLimit {
                     state.nickname = String(state.nickname.prefix(state.textLimit))
                 }
                 
                 if let regex = try? NSRegularExpression(pattern: state.pattern, options: .caseInsensitive) {
-                    let range = NSRange(location: 0, length: nickname.utf16.count)
-                    if regex.firstMatch(in: nickname, options: [], range: range) != nil {
+                    let range = NSRange(location: 0, length: state.nickname.utf16.count)
+                    if regex.firstMatch(in: state.nickname, options: [], range: range) != nil {
                         state.nicknameFieldAvailable = true
                     } else {
                         state.nicknameFieldAvailable = false
@@ -126,6 +123,9 @@ struct ProfileEditFeature {
                 
             case let .toggleLoading(bool):
                 state.isLoading = bool
+                return .none
+                
+            case .alert, .binding:
                 return .none
             }
         }

@@ -14,9 +14,9 @@ import ComposableArchitecture
  */
 struct CommentRepository {
     var fetchBoardCommentList: (_ boardId: Int, _ threshold: Int?) async throws -> ([BoardComment], QappleAPI.PaginationInfo)
-    var deleteBoardComment: (_ boardCommentId: Int) async throws -> DeleteBoardCommentsDTO
-    var postBoardComment: (_ boardId: Int, _ content: String) async throws -> PostBoardCommentsDTO
-    var likeBoardComment: (_ boardCommentId: Int) async throws -> LikeBoardCommentsDTO
+    var deleteBoardComment: (_ boardCommentId: Int) async throws -> Void
+    var postBoardComment: (_ boardId: Int, _ content: String) async throws -> Void
+    var likeBoardComment: (_ boardCommentId: Int) async throws -> Void
     
     
     private static let testComments: [BoardComment] = [
@@ -28,7 +28,7 @@ struct CommentRepository {
             isLiked: false,
             isMine: false,
             isReport: false,
-            createdAt: Date().timeAgo,
+            createdAt: .now,
             anonymityId: -2
         ),
         .init(
@@ -39,7 +39,7 @@ struct CommentRepository {
             isLiked: true,
             isMine: true,
             isReport: false,
-            createdAt: Date().addingTimeInterval(-30).timeAgo,
+            createdAt: Date().addingTimeInterval(-30),
             anonymityId: -2
         ),
         .init(
@@ -50,7 +50,7 @@ struct CommentRepository {
             isLiked: false,
             isMine: false,
             isReport: true,
-            createdAt: Date().addingTimeInterval(-60*20).timeAgo,
+            createdAt: Date().addingTimeInterval(-60*20),
             anonymityId: -2
         ),
         .init(
@@ -61,7 +61,7 @@ struct CommentRepository {
             isLiked: true,
             isMine: true,
             isReport: false,
-            createdAt: Date().addingTimeInterval(-60*60*2).timeAgo,
+            createdAt: Date().addingTimeInterval(-60*60*2),
             anonymityId: -2
         ),
         .init(
@@ -72,7 +72,7 @@ struct CommentRepository {
             isLiked: true,
             isMine: true,
             isReport: false,
-            createdAt: Date().addingTimeInterval(-60*60*2).timeAgo,
+            createdAt: Date().addingTimeInterval(-60*60*2),
             anonymityId: -2
         ),
         .init(
@@ -83,7 +83,7 @@ struct CommentRepository {
             isLiked: true,
             isMine: true,
             isReport: false,
-            createdAt: Date().addingTimeInterval(-60*60*2).timeAgo,
+            createdAt: Date().addingTimeInterval(-60*60*2),
             anonymityId: -2
         ),
     ]
@@ -101,19 +101,16 @@ extension CommentRepository: DependencyKey {
         deleteBoardComment: { boardCommentId in
             let url = try QappleAPI.BoardComment.delete(commentId: boardCommentId).url()
             let response: BaseResponse<DeleteBoardCommentsDTO> = try await NetworkService.shared.delete(url: url)
-            return response.result
         },
         postBoardComment: { boardId, content in
             let url = try QappleAPI.BoardComment.post(boardId: boardId).url()
             let requestBody: PostBoardCommentsRequest = PostBoardCommentsRequest(comment: content)
             let response: BaseResponse<PostBoardCommentsDTO> = try await NetworkService.shared.post(url: url, body: requestBody)
-            return response.result
         },
         likeBoardComment: { boardCommentId in
             let url = try QappleAPI.BoardComment.like(commentId: boardCommentId).url()
             let requestBody: LikeBoardCommentsRequest = LikeBoardCommentsRequest(commentId: boardCommentId)
-            let response: BaseResponse<LikeBoardCommentsDTO> = try await NetworkService.shared.fetch(url: url, body: requestBody)
-            return response.result
+            let response: BaseResponse<LikeBoardCommentsDTO> = try await NetworkService.shared.patch(url: url, body: requestBody)
         }
     )
     
@@ -121,14 +118,14 @@ extension CommentRepository: DependencyKey {
         fetchBoardCommentList: { _, _ in
             (testComments, .init(threshold: "", hasNext: false))
         },
-        deleteBoardComment: { _ in
-                .init(boardCommentId: 0)
+        deleteBoardComment: { boardCommentId in
+                print("\(boardCommentId) 댓글을 삭제했습니다.")
         },
-        postBoardComment: { _, _ in
-                .init(boardCommentId: 0)
+        postBoardComment: { boardId, content in
+                print("\(boardId) 게시글에 \(content)글을 작성했습니다.")
         },
-        likeBoardComment: { _ in
-                .init(boardCommentId: 0, isLike: true)
+        likeBoardComment: { commentId in
+            print("게시글에 좋아요를 눌렀습니다: \(commentId)")
         }
     )
 }

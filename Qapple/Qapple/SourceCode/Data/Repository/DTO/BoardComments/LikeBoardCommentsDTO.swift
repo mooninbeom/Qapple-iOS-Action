@@ -9,7 +9,7 @@ import Foundation
 
 struct LikeBoardCommentsDTO: Codable {
     let boardCommentId: Int
-    let isLike: Bool
+    let isLiked: Bool
 }
 
 struct LikeBoardCommentsRequest: Codable {

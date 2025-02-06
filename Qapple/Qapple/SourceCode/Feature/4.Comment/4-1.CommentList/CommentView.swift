@@ -9,24 +9,28 @@ import SwiftUI
 import ComposableArchitecture
 
 struct CommentView: View {
-    //TODO: 추후 외부 주입으로 수정
-    @Bindable var store: StoreOf<CommentFeature> = .init(initialState: CommentFeature.State()) {
-        CommentFeature()
-    }
+    @Bindable var store: StoreOf<CommentFeature>
     
     private let screenWidth: CGFloat = UIScreen.main.bounds.width
     
     var body: some View {
         VStack(spacing: 0) {
-            HeaderView()
+            NavigationBar(
+                title: "댓글",
+                leadingView: {
+                    NavigationButton(buttonType: .back) {
+                        store.send(.backButtonTapped)
+                    }
+                }
+            )
             
             BulletinBoardCell(
-                board: store.post,
-                ellipsis: {
-                    // TODO: Post Ellipsis 버튼 action
+                board: store.board,
+                seeMore: {
+                    store.send(.seeMoreAction)
                 },
                 like: {
-                    // TODO: Post Like 버튼 action
+                    store.send(.likeBoardButtonTapped)
                 }
             )
             .frame(width: UIScreen.main.bounds.width)
@@ -46,23 +50,24 @@ struct CommentView: View {
             hideKeyboard()
         }
         .navigationBarBackButtonHidden()
-        .task {
-            store.send(.commentViewAppeared)
+        .onAppear {
+            store.send(.onAppear)
+        }
+        .refreshable {
+            store.send(.refresh)
+        }
+        .onReceive(NotificationCenter.default.publisher(for: .updateViewNotification)) { _ in
+            store.send(.refresh)
+        }
+        .loadingIndicator(isLoading: store.isLoading)
+        .sheet(item: $store.scope(state: \.sheet, action: \.sheet)
+        ) { store in
+            switch store.case {
+            case let .seeMore(store): SeeMoreSheet(store: store)
+            }
         }
         .alert($store.scope(state: \.alert, action: \.alert))
-        // TODO: - Post ellipsis 버튼 대응
-//        .sheet(item: $selectedPost) { post in
-//            BulletinBoardSeeMoreSheetView(
-//                sheetType: post.isMine ? .mine : .others,
-//                post: post,
-//                isComment: true
-//            )
-//            .presentationDetents([.height(84)])
-//            .presentationDragIndicator(.visible)
-//        }
-        .onReceive(NotificationCenter.default.publisher(for: .updateViewNotification)) { _ in
-            store.send(.refreshCommentList)
-        }
+        
     }
     
     private var seperator: some View {
@@ -72,57 +77,45 @@ struct CommentView: View {
     }
 }
 
-/**
- 상단 네비게이션 View
- */
-private struct HeaderView: View {
-    var body: some View {
-        NavigationBar(
-            title: "댓글",
-            leadingView: {
-                NavigationButton(buttonType: .back) {
-                    // TODO: 네비게이션 수정 필요
-                }
-            }
-        )
-    }
-}
+// MARK: - CommentListView
 
-/**
- 댓글 리스트 View
- */
 private struct CommentListView: View {
-    @Bindable var store: StoreOf<CommentFeature>
+    let store: StoreOf<CommentFeature>
     
     var body: some View {
         ZStack {
             ScrollView {
                 LazyVStack(spacing: 0) {
                     // 데이터 연결
-                    ForEach(Array(self.store.comments.enumerated()), id: \.offset) { index, comment in
+                    ForEach(Array(self.store.commentList.enumerated()), id: \.offset) { index, comment in
                         CommentCell(
-                            store: self.store,
                             comment: comment,
-                            cellIndex: index
+                            cellIndex: index,
+                            like: {
+                                store.send(.likeCommentButtonTapped(comment))
+                            },
+                            delete: {
+                                store.send(.deleteCommentButtonTapped(comment))
+                            },
+                            report: {
+                                store.send(.reportButtonTapped)
+                            }
                         )
-                        .onAppear {
-                            store.send(.paginationCellAppeared)
-                        }
+                        .configurePagination(
+                            store.commentList,
+                            currentIndex: index,
+                            hasNext: store.paginationInfo.hasNext,
+                            pagination: {
+                                store.send(.pagination)
+                            }
+                        )
                     }
                 }
             }
             .scrollDismissesKeyboard(.immediately)
             .background(Color.bk)
-            .refreshable {
-                store.send(.refreshCommentList)
-            }
             
-            if store.isLoading {
-                ProgressView()
-                    .progressViewStyle(.circular)
-            }
-            
-            if store.comments.isEmpty && !store.isLoading {
+            if store.commentList.isEmpty && !store.isLoading {
                 VStack {
                     Text("아직 작성된 댓글이 없습니다")
                         .font(.pretendard(.medium, size: 14))
@@ -137,17 +130,14 @@ private struct CommentListView: View {
     }
 }
 
+// MARK: - AddCommentView
 
-
-/**
- 댓글 작성 View
- */
 private struct AddCommentView: View {
     @Bindable var store: StoreOf<CommentFeature>
     
     var body: some View {
         HStack(alignment: .bottom) {
-            TextField("댓글 추가", text: $store.text.sending(\.commentTextChanged), axis: .vertical)
+            TextField("댓글 추가", text: $store.commentText, axis: .vertical)
                 .font(.pretendard(.regular, size: 17))
                 .lineLimit(...3)
                 .padding(.horizontal)
@@ -155,7 +145,7 @@ private struct AddCommentView: View {
             
             Button {
                     HapticService.notification(type: .success)
-                    store.send(.uploadButtonTapped)
+                    store.send(.uploadCommentButtonTapped)
             } label: {
                 Image(systemName: "paperplane")
                     .font(.system(size: 20))
@@ -163,7 +153,7 @@ private struct AddCommentView: View {
             .tint(Color.wh)
             .padding(.trailing, 12)
             .padding(.bottom, 12)
-            .disabled(store.text.isEmpty || store.isLoading )
+            .disabled(store.commentText.isEmpty || store.isLoading )
         }
         .background {
             RoundedRectangle(cornerRadius: 11)
@@ -174,11 +164,26 @@ private struct AddCommentView: View {
     }
 }
 
+// MARK: - Preview
 
 #Preview {
-    // TODO: - 추후 usecase 제거 시 수정
-    let usecase = BulletinBoardUseCase()
-    
-    CommentView()
-        .environmentObject(usecase)
+    CommentView(
+        store: Store(
+            initialState: CommentFeature.State(
+                board: BulletinBoard(
+                    id: 1,
+                    writerId: 1,
+                    writerNickname: "이호창",
+                    content: "특전사",
+                    heartCount: 10,
+                    commentCount: 13,
+                    createAt: .init(),
+                    isMine: false,
+                    isReported: false,
+                    isLiked: true
+                )
+            )
+        ){
+        CommentFeature()
+    })
 }

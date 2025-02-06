@@ -11,44 +11,49 @@ import ComposableArchitecture
 // MARK: - BulletinBoardView
 
 struct BulletinBoardView: View {
+    
     @Bindable var store: StoreOf<BulletinBoardFeature>
     
     var body: some View {
         GeometryReader { proxy in
             ZStack {
-                BoardView(store: store)
+                BulletinBoardContentView(store: store)
                 
-                NewPostButton(
-                    title: "게시글 작성",
-                    tapAction: {
-                        store.send(.postBoardButtonTapped)
-                    }
-                )
+                NewBoardPostButton(store: store)
                 .position(
                     CGPoint(
                         x: proxy.size.width / 2,
                         y: proxy.size.height - 40
                     )
                 )
-                .loadingIndicator(isLoading: store.isLoading)
             }
             .background(Background.first)
         }
         .onAppear{
-            store.send(.getBulletinBoardList)
-            
+            store.send(.onAppear)
+        }
+        .refreshable {
+            store.send(.refresh)
         }
         .onReceive(NotificationCenter.default.publisher(for: .updateViewNotification)) { _ in
-            store.send(.refreshBulletinBoardList)
+            store.send(.refresh)
         }
+        .loadingIndicator(isLoading: store.isLoading)
+        .sheet(item: $store.scope(state: \.sheet, action: \.sheet)
+        ) { store in
+            switch store.case {
+            case let .seeMore(store): SeeMoreSheet(store: store)
+            }
+        }
+        .alert($store.scope(state: \.alert, action: \.alert))
     }
 }
 
-// MARK: - BoardView
+// MARK: - BulletinBoardContentView
 
-private struct BoardView: View {
+private struct BulletinBoardContentView: View {
     
-    @Bindable var store: StoreOf<BulletinBoardFeature>
+    let store: StoreOf<BulletinBoardFeature>
     
     var body: some View {
         VStack(spacing: 0) {
@@ -73,7 +78,7 @@ private struct BoardView: View {
             .padding(.top, 8)
             .padding(.horizontal, 16)
             
-            PostListView(store: store)
+            BulletionBoardListView(store: store)
                 .padding(.top, 20)
             
             Spacer()
@@ -82,11 +87,11 @@ private struct BoardView: View {
     }
 }
 
-// MARK: - PostListView
+// MARK: - BulletionBoardListView
 
-private struct PostListView: View {
+private struct BulletionBoardListView: View {
     
-    @Bindable var store: StoreOf<BulletinBoardFeature>
+    let store: StoreOf<BulletinBoardFeature>
     
     var body: some View {
         ScrollView {
@@ -94,20 +99,13 @@ private struct PostListView: View {
                 ForEach(enumerated(store.bulletinBoardList), id: \.offset) { index, board in
                     BulletinBoardCell(
                         board: board,
-                        ellipsis: {
-                            store.send(.ellipsisButtonTapped(board.id, board.isMine))
+                        seeMore: {
+                            store.send(.seeMoreAction(board))
                         },
                         like: {
-                            store.send(.likeBoardButtonTapped(board.id))
+                            store.send(.likeBoardButtonTapped(board))
                         }
                     )
-                    .onAppear {
-                        if index == store.bulletinBoardList.count - 1
-                            && store.hasNext {
-                            print("게시판 페이지네이션")
-                            store.send(.getBulletinBoardList)
-                        }
-                    }
                     .onTapGesture {
                         if !board.isReported {
                             store.send(.boardCellTapped(board))
@@ -116,22 +114,48 @@ private struct PostListView: View {
                             store.send(.reportButtonTapped)
                         }
                     }
+                    .configurePagination(
+                        store.bulletinBoardList,
+                        currentIndex: index,
+                        hasNext: store.paginationInfo.hasNext,
+                        pagination: {
+                            store.send(.pagination)
+                        }
+                    )
                     if index != store.bulletinBoardList.endIndex - 1 {
                         QappleDivider()
                     }
                 }
             }
         }
-        .sheet(item: $store.scope(state: \.sheet?.ellipsisButtonTap, action: \.sheet.ellipsisButtonTap)
-        ) { ellipsisStore in
-            BulletinBoardEllipsisView(store: ellipsisStore)
-                .presentationDetents([.height(84)])
-        }
-        .alert($store.scope(state: \.alert, action: \.alert))
-        .refreshable {
-            store.send(.refreshBulletinBoardList)
-        }
         .disabled(store.isLoading)
+    }
+}
+
+// MARK: - NewBoardPostButton
+
+struct NewBoardPostButton: View {
+    
+    let store: StoreOf<BulletinBoardFeature>
+    
+    var body: some View {
+        Button {
+            store.send(.postBoardButtonTapped)
+        } label: {
+            Text("게시글 작성")
+                .font(.pretendard(.semiBold, size: 17))
+                .foregroundStyle(.white)
+                .padding(.horizontal, 24)
+                .padding(.vertical, 11)
+                .frame(width: 161, height: 47)
+                .background(.regularMaterial)
+                .cornerRadius(32)
+                .shadow(color: .black.opacity(0.15), radius: 2, x: 0, y: 4)
+                .overlay(
+                    RoundedRectangle(cornerRadius: 32)
+                        .stroke(.white.opacity(0.5), lineWidth: 0.33)
+                )
+        }
     }
 }
 
