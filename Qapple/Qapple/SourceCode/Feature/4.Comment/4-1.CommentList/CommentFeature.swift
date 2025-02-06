@@ -182,7 +182,7 @@ struct CommentFeature {
                 state.sheet = .seeMore(
                     .init(
                         sheetTarget: state.board.isMine ? .mine : .others,
-                        sheetData: .bulletinBoard(state.board)
+                        dataType: .bulletinBoard(state.board)
                     )
                 )
                 return .none

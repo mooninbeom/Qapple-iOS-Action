@@ -33,7 +33,7 @@ struct ProfileEditFeature {
         case toggleNicknameCheck(Bool)
         case toggleNicknameChange(Bool)
         case binding(BindingAction<State>)
-        case nicknameChanged
+        case nicknameChanged(String)
         case toggleLoading(Bool)
         
         enum Alert {

@@ -139,7 +139,7 @@ struct BulletinBoardFeature {
                 state.sheet = .seeMore(
                     .init(
                         sheetTarget: board.isMine ? .mine : .others,
-                        sheetData: .bulletinBoard(board)
+                        dataType: .bulletinBoard(board)
                     )
                 )
                 return .none
