@@ -16,7 +16,7 @@ struct MemberRepository {
     var checkNicknameDuplicate: (_ nickname: String) async throws -> Bool
     var fetchMyPage: () async throws -> MyProfile
     var editMyPage: (_ nickname: String, _ profileImage: String?) async throws -> Void
-    var resign: () async throws -> Bool
+    var resign: () async throws -> Void
 }
 
 // MARK: - DependencyKey
@@ -73,8 +73,7 @@ extension MemberRepository: DependencyKey {
         },
         resign: {
             let url = try QappleAPI.Member.resign.url()
-            let response: BaseResponse<Bool> = try await NetworkService.shared.get(url: url)
-            return response.result
+            let response: BaseResponse<ResignDTO> = try await NetworkService.shared.get(url: url)
         }
     )
     
@@ -106,7 +105,6 @@ extension MemberRepository: DependencyKey {
         },
         resign: {
             print("회원 탈퇴 요청")
-            return true
         }
     )
 }

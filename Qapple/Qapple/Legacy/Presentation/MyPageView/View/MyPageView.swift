@@ -95,10 +95,10 @@ private struct QuestionAnswerSection: View {
     
     var body: some View {
         VStack(alignment: .leading, spacing: 0) {
-            MyPageSectionTitle(title: "질문/답변")
+            ProfileListTitle(title: "질문/답변")
                 .padding(.bottom, 12)
             
-            MyPageSectionCell(
+            ProfileListCell(
                 title: "내 답변",
                 icon: .writeAnswerIcon,
                 tapAction: {
@@ -121,10 +121,10 @@ private struct InquiriesReportsSection: View {
     
     var body: some View {
         VStack(alignment: .leading, spacing: 0) {
-            MyPageSectionTitle(title: "문의 및 제보")
+            ProfileListTitle(title: "문의 및 제보")
                 .padding(.bottom, 12)
             
-            MyPageSectionCell(
+            ProfileListCell(
                 title: "문의하기",
                 icon: .inquiryIcon,
                 tapAction: {
@@ -160,10 +160,10 @@ private struct AccountSection: View {
     
     var body: some View {
         VStack(alignment: .leading, spacing: 0) {
-            MyPageSectionTitle(title: "계정 관리")
+            ProfileListTitle(title: "계정 관리")
                 .padding(.bottom, 12)
             
-            MyPageSectionCell(
+            ProfileListCell(
                 title: "로그아웃",
                 icon: .signOutIcon,
                 tapAction: {
@@ -172,7 +172,7 @@ private struct AccountSection: View {
                 }
             )
             
-            MyPageSectionCell(
+            ProfileListCell(
                 title: "회원탈퇴",
                 icon: .resign,
                 isDistructive: true,

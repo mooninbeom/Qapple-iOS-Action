@@ -54,13 +54,11 @@ extension AnswerRepository: DependencyKey {
         postAnswer: { questionId, answer in
             let url = try QappleAPI.Answer.post(questionId: questionId).url()
             let requestBody = PostAnswerRequest(answer: answer)
-            let response: BaseResponse<PostAnswerDTO> = try await networkService.post(url: url, body: requestBody)
-            return ()
+            let _: BaseResponse<PostAnswerDTO> = try await networkService.post(url: url, body: requestBody)
         },
         deleteAnswer: { answerId in
             let url = try QappleAPI.Answer.delete(answerId: answerId).url()
-            let response: BaseResponse<DeleteAnswerDTO> = try await networkService.delete(url: url)
-            return ()
+            let _: BaseResponse<DeleteAnswerDTO> = try await networkService.delete(url: url)
         }
     )
     

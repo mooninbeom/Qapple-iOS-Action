@@ -30,7 +30,7 @@ struct MyAnswerListView: View {
             }
             .loadingIndicator(isLoading: store.isLoading)
         }
-        .background(Background.first)
+        .background(.first)
         .navigationBarBackButtonHidden()
         .onAppear {
             store.send(.onAppear)

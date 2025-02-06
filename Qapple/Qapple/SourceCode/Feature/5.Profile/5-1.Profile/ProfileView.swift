@@ -11,13 +11,13 @@ import ComposableArchitecture
 
 struct ProfileView: View {
     
-    let store: StoreOf<ProfileFeature>
+    @Bindable var store: StoreOf<ProfileFeature>
     
     var body: some View {
         VStack(alignment: .leading, spacing: 0) {
             NavigationBar(
                 title: "프로필",
-                backgroundColor: Background.second
+                backgroundColor: .second
             )
             
             ProfileSummary(store: store)
@@ -35,10 +35,11 @@ struct ProfileView: View {
         .background(.first)
         .navigationBarBackButtonHidden()
         .navigationBarTitleDisplayMode(.inline)
+        .loadingIndicator(isLoading: store.isLoading)
         .onAppear {
             store.send(.getProfile)
         }
-        .loadingIndicator(isLoading: store.isLoading)
+        .alert($store.scope(state: \.alert, action: \.alert))
     }
 }
 
@@ -53,31 +54,32 @@ private struct ProfileSummary: View {
             Image(.cappleDefaultProfile)
                 .resizable()
                 .frame(width: 72, height: 72)
-                .background(Color.white)
+                .background(.white)
                 .clipShape(Circle())
             
             VStack(alignment: .leading, spacing: 16) {
                 
                 HStack(spacing: 6) {
                     Text("\(store.nickname)")
-                        .foregroundStyle(TextLabel.main)
-                        .font(Font.pretendard(.bold, size: 20))
+                        .foregroundStyle(.main)
+                        .font(.pretendard(.bold, size: 20))
                         .frame(height: 14)
                     
                     Button {
-                        store.send(.editProfileButtonTapped)
+                        store.send(.editProfileButtonTapped(nickname: store.nickname))
                     } label: {
                         Image(systemName: "gearshape.fill")
-                            .foregroundStyle(GrayScale.icon)
+                            .foregroundStyle(.icon)
                     }
                 }
                 
                 Text("\(store.joinDate)")
-                    .foregroundStyle(TextLabel.sub3)
+                    .foregroundStyle(.sub3)
                     .font(Font.pretendard(.semiBold, size: 14))
                     .frame(height: 10)
             }
             .frame(height: 40)
+            
             Spacer()
         }
         .padding(24)
@@ -108,14 +110,14 @@ private struct QuestionAnswerSection: View {
     
     var body: some View {
         VStack(alignment: .leading, spacing: 0) {
-            MyPageSectionTitle(title: "질문/답변")
+            ProfileListTitle(title: "질문/답변")
                 .padding(.bottom, 12)
             
-            MyPageSectionCell(
+            ProfileListCell(
                 title: "내 답변",
                 icon: .writeAnswerIcon,
                 tapAction: {
-                    store.send(.MyAnswerListButtonTapped)
+                    store.send(.myAnswerListButtonTapped)
                 }
             )
         }
@@ -134,20 +136,29 @@ private struct InquiriesReportsSection: View {
     
     var body: some View {
         VStack(alignment: .leading, spacing: 0) {
-            MyPageSectionTitle(title: "문의 및 제보")
+            ProfileListTitle(title: "문의 및 제보")
                 .padding(.bottom, 12)
             
-            MyPageSectionCell(
+            ProfileListCell(
                 title: "문의하기",
                 icon: .inquiryIcon,
                 tapAction: {
                     store.send(.inquiryButtonTapped)
                 }
             )
+            
+            ProfileListCell(
+                title: "캐플을 만든 사람들",
+                icon: .peopleWhoMadeQappleIcon,
+                tapAction: {
+                    store.send(.peopleWhoMadeQappleButtonTapped)
+                }
+            )
         }
-        .alert($store.scope(state: \.alert, action: \.alert))
-        .sheet(item: $store.scope(state: \.sheet?.inquiryButtonTap, action: \.sheet.inquiryButtonTap)
-        ) { _ in 
+        .sheet(item: $store.scope(
+            state: \.sheet?.inquiryButtonTap,
+            action: \.sheet.inquiryButtonTap
+        )) { _ in
             MailService.makeMailView(result: $mailResult)
         }
     }
@@ -157,14 +168,14 @@ private struct InquiriesReportsSection: View {
 
 private struct AccountSection: View {
     
-    @Bindable var store: StoreOf<ProfileFeature>
+    let store: StoreOf<ProfileFeature>
     
     var body: some View {
         VStack(alignment: .leading, spacing: 0) {
-            MyPageSectionTitle(title: "계정 관리")
+            ProfileListTitle(title: "계정 관리")
                 .padding(.bottom, 12)
             
-            MyPageSectionCell(
+            ProfileListCell(
                 title: "로그아웃",
                 icon: .signOutIcon,
                 tapAction: {
@@ -173,7 +184,7 @@ private struct AccountSection: View {
                 }
             )
             
-            MyPageSectionCell(
+            ProfileListCell(
                 title: "회원탈퇴",
                 icon: .resign,
                 isDistructive: true,
@@ -183,7 +194,6 @@ private struct AccountSection: View {
                 }
             )
         }
-        .alert($store.scope(state: \.alert, action: \.alert))
     }
 }
 
@@ -198,7 +208,7 @@ private struct BottomSection: View {
     var body: some View {
         Text("앱 버전 \(appVersion)")
             .pretendard(.regular, 15)
-            .foregroundStyle(TextLabel.disable)
+            .foregroundStyle(.disable)
     }
 }
 

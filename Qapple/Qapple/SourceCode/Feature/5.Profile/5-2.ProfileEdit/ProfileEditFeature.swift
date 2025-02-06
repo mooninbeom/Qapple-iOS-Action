@@ -42,14 +42,16 @@ struct ProfileEditFeature {
     }
     
     @Dependency(\.memberRepository) var memberRepository
+    @Dependency(\.dismiss) var dismiss
     
     var body: some ReducerOf<Self> {
         BindingReducer()
         Reduce { state, action in
             switch action {
             case .backButtonTapped:
-                // TODO: Navigation 처리
-                return .none
+                return .run { send in
+                    await dismiss()
+                }
                 
             case .successButtonTapped:
                 let nickname = state.nickname
@@ -92,18 +94,10 @@ struct ProfileEditFeature {
                 return .none
                 
             case .binding(\.nickname):
-                return .run { [state = state] send in
-                    if state.defaultNickname == state.nickname {
-                        await send(.toggleNicknameCheck(true))
-                        await send(.toggleNicknameChange(false))
-                    } else {
-                        await send(.toggleNicknameChange(true))
-                    }
-                    await send(.nicknameChanged)
-                }
+                return .none
                 
-            case .nicknameChanged:
-                state.nickname = state.nickname.trimmingCharacters(in: .whitespacesAndNewlines)
+            case let .nicknameChanged(nickname):
+                state.nickname = nickname.trimmingCharacters(in: .whitespacesAndNewlines)
                 
                 if state.nickname.count > state.textLimit {
                     state.nickname = String(state.nickname.prefix(state.textLimit))
@@ -117,7 +111,15 @@ struct ProfileEditFeature {
                         state.nicknameFieldAvailable = false
                     }
                 }
-                return .none
+                
+                return .run { [defaultNickname = state.defaultNickname] send in
+                    if defaultNickname == nickname {
+                        await send(.toggleNicknameCheck(true))
+                        await send(.toggleNicknameChange(false))
+                    } else {
+                        await send(.toggleNicknameChange(true))
+                    }
+                }
                 
             case let .toggleLoading(bool):
                 state.isLoading = bool

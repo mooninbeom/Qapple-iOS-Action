@@ -26,7 +26,7 @@ struct SeeMoreSheet: View {
                     
                 case .others:
                     SeeMoreCell(title: "신고하기") {
-                        store.send(.reportButtonTapped)
+                        store.send(.reportButtonTapped(store.dataType))
                     }
                 }
                 
@@ -70,8 +70,8 @@ private struct SeeMoreCell: View {
     SeeMoreSheet(
         store: Store(
             initialState: SeeMoreSheetFeature.State(
-                sheetTarget: .mine,
-                sheetData: .answer(.initialState)
+                sheetTarget: .others,
+                dataType: .answer(.initialState)
             )
         ) {
             SeeMoreSheetFeature()

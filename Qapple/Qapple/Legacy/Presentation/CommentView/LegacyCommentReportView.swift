@@ -130,5 +130,5 @@ extension LegacyCommentReportView {
 }
 
 #Preview {
-    ReportView(answerId: 1, boardId: -1, isComment: false)
+    LegacyReportView(answerId: 1, boardId: -1, isComment: false)
 }

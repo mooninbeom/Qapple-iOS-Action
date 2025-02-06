@@ -84,7 +84,7 @@ struct MyAnswerListFeature {
                 state.sheet = .seeMore(
                     .init(
                         sheetTarget: .mine,
-                        sheetData: .myAnswer(answer)
+                        dataType: .myAnswer(answer)
                     )
                 )
                 return .none
@@ -108,11 +108,16 @@ struct MyAnswerListFeature {
                     await send(.onDisappear)
                 }
                 
+            case .backButtonTapped:
+                return .run { send in
+                    await dismiss()
+                }
+                
             case let .toggleLoading(bool):
                 state.isLoading = bool
                 return .none
                 
-            case .backButtonTapped, .sheet:
+            case .sheet:
                 return .none
             }
         }
