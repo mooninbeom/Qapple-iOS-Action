@@ -67,6 +67,7 @@ private struct WriteAnswerNavigationBar: View {
     
     var body: some View {
         NavigationBar(
+            title: "답변하기",
             leadingView: {
                 NavigationButton(buttonType: .text("취소", .wh)) {
                     store.send(.dismissButtonTapped)
