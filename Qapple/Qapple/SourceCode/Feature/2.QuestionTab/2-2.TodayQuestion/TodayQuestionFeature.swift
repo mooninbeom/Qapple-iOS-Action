@@ -104,8 +104,15 @@ struct TodayQuestionFeature {
                 return .none
                 
             case .questionTimerTick:
-                state.timeRemainingForQuestion -= 1
-                return .none
+                if state.timeRemainingForQuestion <= 0 {
+                    return .run { send in
+                        await send(.cancelQuestionTimer)
+                        await send(.refresh)
+                    }
+                } else {
+                    state.timeRemainingForQuestion -= 1
+                    return .none
+                }
                 
             case .cancelQuestionTimer:
                 return .cancel(id: CancelID.questionTimer)
