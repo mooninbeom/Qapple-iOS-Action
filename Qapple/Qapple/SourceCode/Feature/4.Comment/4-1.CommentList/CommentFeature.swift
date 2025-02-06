@@ -41,7 +41,8 @@ struct CommentFeature {
         case likeComment(Int)
         case uploadCommentButtonTapped
         case commentTextReset
-        case deleteButtonTapped(id: Int)
+        case deleteButtonTapped(BoardComment)
+        case successDeletion
         case reportButtonTapped(id: Int)
         
         case likeBoardButtonTapped
@@ -54,10 +55,10 @@ struct CommentFeature {
         case alert(PresentationAction<Alert>)
         case networkErrorAlert
         
-        @CasePathable
         enum Alert: Equatable {
-            case boardLoadError
-            case deleteComment(Int)
+            case networkError
+            case confirmDeletion(Int)
+            case successDeletion
         }
     }
     
@@ -150,31 +151,24 @@ struct CommentFeature {
                 // TODO: CommentReportView로 navigating
                 return .none
                 
-            case let .deleteButtonTapped(id: id):
-                state.alert = AlertState {
-                    TextState("정말로 댓글을 삭제하시겠습니까?")
-                } actions: {
-                    ButtonState(role: .destructive, action: .deleteComment(id), label: { TextState("삭제") })
-                    ButtonState(role: .cancel, label: { TextState("취소") })
-                }
+            case let .deleteButtonTapped(boardComment):
+                state.alert = .confirmDeletion(boardComment.id)
+                return .none
+                
+            case .successDeletion:
+                state.alert = .successDeletion
                 return .none
                 
                 // MARK: - Alert 관련 액션
                 /// Delete 버튼 alert
-            case let .alert(.presented(.deleteComment(id))):
-                // TODO: 댓글 삭제 구현
-                print("댓글 아이디: \(id) 삭제")
-                
-                state.alert = AlertState {
-                    TextState("댓글이 삭제되었습니다")
-                } actions: {
-                    ButtonState(label: { TextState("확인")})
-                }
+            case let .alert(.presented(.confirmDeletion(boardCommentId))):
                 return .run { send in
                     await send(.toggleLoading(true), animation: .bouncy)
                     do {
-                        let _ = try await commentRepository.deleteBoardComment(id)
+                        try await commentRepository.deleteBoardComment(boardCommentId)
                         await send(.refresh)
+                        await send(.successDeletion)
+                        // TODO: 삭제 후 슬라이드 이동
                     } catch {
                         await send(.networkErrorAlert)
                     }
@@ -183,13 +177,7 @@ struct CommentFeature {
                 
                 /// 네트워크 오류 대응 alert
             case .networkErrorAlert:
-                state.alert = AlertState {
-                    TextState("알 수 없는 오류가 발생했습니다.")
-                } actions: {
-                    ButtonState(role: .cancel, label: { TextState("확인") })
-                } message: {
-                    TextState("잠시후 다시 시도해주세요.")
-                }
+                state.alert = .networkError
                 return .none
                 
             case .likeBoardButtonTapped:
@@ -264,6 +252,41 @@ extension CommentFeature {
     @Reducer(state: .equatable)
     enum Sheet {
         case seeMore(SeeMoreSheetFeature)
+    }
+}
+
+// MARK: - CommentAlert
+
+extension AlertState where Action == CommentFeature.Action.Alert {
+    static func confirmDeletion(_ boardCommentId: Int) -> Self {
+        return Self {
+            TextState("정말로 댓글을 삭제하시겠습니까?")
+        } actions: {
+            ButtonState(role: .cancel){
+                TextState("취소")
+            }
+            ButtonState(role: .destructive, action: .confirmDeletion(boardCommentId)) {
+                TextState("삭제")
+            }
+        }
+    }
+    
+    static let successDeletion = Self {
+        TextState("댓글이 삭제되었습니다")
+    } actions: {
+        ButtonState(role: .cancel) {
+            TextState("확인")
+        }
+    }
+    
+    static let networkError = Self {
+        TextState("알 수 없는 오류가 발생했습니다.")
+    } actions: {
+        ButtonState(role: .cancel) {
+            TextState("확인")
+        }
+    } message: {
+        TextState("잠시후 다시 시도해주세요.")
     }
 }
 

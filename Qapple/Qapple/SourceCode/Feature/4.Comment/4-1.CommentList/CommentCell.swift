@@ -180,7 +180,7 @@ struct CommentCell: View {
     
     private var deleteBtn: some View {
         Button {
-            store.send(.deleteButtonTapped(id: self.comment.id))
+            store.send(.deleteButtonTapped(comment))
             HapticService.notification(type: .error)
         } label: {
             ZStack {
