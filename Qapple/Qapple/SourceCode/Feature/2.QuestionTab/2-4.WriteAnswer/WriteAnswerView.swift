@@ -108,8 +108,7 @@ private struct AnswerTextField: View {
                 .autocorrectionDisabled()
                 .multilineTextAlignment(.center)
                 .onChange(of: store.answerText) { _, value in
-                    store.answerText = value.slice(to: store.textLimit)
-                    store.answerTextFontSize = adaptiveFontSize(from: value)
+                    store.send(.typeAnswerText(value))
                 }
         }
         .onTapGesture {

@@ -23,6 +23,7 @@ struct WriteAnswerFeature {
     }
     
     enum Action: BindableAction {
+        case typeAnswerText(String)
         case anonymityNoticeButtonTapped
         case dismissButtonTapped
         case completeButtonTapped
@@ -44,6 +45,11 @@ struct WriteAnswerFeature {
         BindingReducer()
         Reduce { state, action in
             switch action {
+            case let .typeAnswerText(text):
+                state.answerText = text.slice(to: state.textLimit)
+                state.answerTextFontSize = adaptiveFontSize(from: text)
+                return .none
+                
             case .anonymityNoticeButtonTapped:
                 state.sheet = .anonymityNotice
                 return .none
