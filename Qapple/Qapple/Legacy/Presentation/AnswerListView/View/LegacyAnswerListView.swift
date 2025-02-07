@@ -56,7 +56,7 @@ struct LegacyAnswerListView: View {
                 .refreshable {
                     Task {
                         viewModel.refreshAnswersForQuestion(questionId: questionId)
-                        HapticService.impact(style: .light)
+                        LegacyHapticService.impact(style: .light)
                     }
                 }
             }

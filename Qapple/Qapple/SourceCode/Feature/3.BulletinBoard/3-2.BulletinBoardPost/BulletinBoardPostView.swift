@@ -56,7 +56,7 @@ private struct BulletinBoardPostNavigationBar: View {
             trailingView: {
                 NavigationButton(buttonType: .text("완료", store.boardText.isEmpty ? .disable : .button)) {
                     if !store.boardText.isEmpty {
-                        HapticService.notification(type: .success)
+                        LegacyHapticService.notification(type: .success)
                         store.send(.postBoardButtonTapped)
                     }
                 }

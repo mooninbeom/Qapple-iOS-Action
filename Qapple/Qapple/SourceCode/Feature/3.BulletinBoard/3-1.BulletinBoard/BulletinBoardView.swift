@@ -110,7 +110,7 @@ private struct BulletionBoardListView: View {
                         if !board.isReported {
                             store.send(.boardCellTapped(board))
                         } else {
-                            HapticService.notification(type: .warning)
+                            LegacyHapticService.notification(type: .warning)
                             store.send(.reportButtonTapped)
                         }
                     }
