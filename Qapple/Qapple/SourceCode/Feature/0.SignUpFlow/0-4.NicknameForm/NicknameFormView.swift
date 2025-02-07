@@ -64,7 +64,7 @@ struct NicknameFormView: View {
             .padding(.top, 64)
             .padding(.horizontal, 24)
             .onChange(of: store.nicknameText) { _, value in
-                store.nicknameText = value.slice(to: store.nicknameLimit)
+                store.send(.typeNicknameText(value))
             }
             
             Spacer()
