@@ -49,6 +49,7 @@ struct SignUpFlowFeature {
             case let .socialLogin(.delegate(.signInResponse(isSignUp))):
                 if isSignUp {
                     state.$isSignIn.withLock { $0 = true }
+                    HapticService.shared.impact(style: .heavy)
                 } else {
                     state.path.append(.emailForm(.init()))
                 }

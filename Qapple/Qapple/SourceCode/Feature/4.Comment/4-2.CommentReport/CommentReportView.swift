@@ -47,7 +47,7 @@ struct CommentReportView: View {
                     ForEach(Array(self.reportList.enumerated()), id: \.offset) { index, report in
                         Button {
                             store.send(.reportListItemTapped(index))
-                            LegacyHapticService.notification(type: .warning)
+                            HapticService.shared.notification(type: .warning)
                         } label: {
                             Text(report)
                                 .font(.pretendard(.medium, size: 16))

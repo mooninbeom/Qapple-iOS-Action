@@ -168,7 +168,7 @@ private struct AccountSection: View {
                 icon: .signOutIcon,
                 tapAction: {
                     isLogOutAlertPresented.toggle()
-                    LegacyHapticService.notification(type: .warning)
+                    HapticService.shared.notification(type: .warning)
                 }
             )
             
@@ -178,7 +178,7 @@ private struct AccountSection: View {
                 isDistructive: true,
                 tapAction: {
                     isResignAlertPresented.toggle()
-                    LegacyHapticService.notification(type: .warning)
+                    HapticService.shared.notification(type: .warning)
                 }
             )
         }

@@ -156,7 +156,7 @@ private struct RemoteView: View {
     var body: some View {
         HStack {
             Button {
-                if !board.isLiked { LegacyHapticService.impact(style: .light) }
+                if !board.isLiked { HapticService.shared.impact(style: .light) }
                 like()
             } label: {
                 HStack(spacing: 4) {

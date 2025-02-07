@@ -165,7 +165,7 @@ private struct PostListView: View {
                             pathModel.pushView(screen: BulletinBoardPathType.comment(post: post))
                             bulletinBoardUseCase.isClickComment = true
                         } else {
-                            LegacyHapticService.notification(type: .warning)
+                            HapticService.shared.notification(type: .warning)
                             isReportedPostTappedAlert.toggle()
                         }
                     }

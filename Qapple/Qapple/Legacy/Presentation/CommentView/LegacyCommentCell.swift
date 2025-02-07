@@ -166,7 +166,7 @@ struct LegacyCommentCell: View {
                 Button {
                     if !comment.isReport {
                         Task {
-                            if !comment.isLiked { LegacyHapticService.impact(style: .light) }
+                            if !comment.isLiked { HapticService.shared.impact(style: .light) }
                             await commentViewModel.act(.like(id: comment.id))
                             await commentViewModel.refreshComments(boardId: post.boardId)
                             while commentViewModel.hasNext {
@@ -214,7 +214,7 @@ struct LegacyCommentCell: View {
     private var deleteBtn: some View {
         Button {
             self.isDelete.toggle()
-            LegacyHapticService.notification(type: .error)
+            HapticService.shared.notification(type: .error)
         } label: {
             ZStack {
                 Color.delete

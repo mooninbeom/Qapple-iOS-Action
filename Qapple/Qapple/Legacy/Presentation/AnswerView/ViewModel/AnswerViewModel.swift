@@ -64,7 +64,7 @@ extension AnswerViewModel {
                 questionID: questionId
             )
             print("답변 등록 성공!")
-            LegacyHapticService.notification(type: .success)
+            HapticService.shared.notification(type: .success)
         } catch {
             print("답변 등록 실패,,,")
         }

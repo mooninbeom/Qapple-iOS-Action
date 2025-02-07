@@ -250,7 +250,7 @@ private struct HomeView: View {
         }
         .tabViewStyle(PageTabViewStyle(indexDisplayMode: .never))
         .onChange(of: tab) { _, _ in
-            LegacyHapticService.impact(style: .light)
+            HapticService.shared.impact(style: .light)
         }
     }
 }

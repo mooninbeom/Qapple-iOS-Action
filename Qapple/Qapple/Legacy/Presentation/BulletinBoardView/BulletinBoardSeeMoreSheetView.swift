@@ -87,7 +87,7 @@ private struct SeeMoreCellButton: View {
     var body: some View {
         HStack {
             Button {
-                LegacyHapticService.notification(type: .success)
+                HapticService.shared.notification(type: .success)
                 tapAction()
             } label: {
                 Text(title)
