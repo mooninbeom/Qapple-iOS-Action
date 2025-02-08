@@ -62,19 +62,31 @@ extension NotificationRepository: DependencyKey {
             return response.result.toEntity
         },
         isAnsweredQuestion: { questionId in
-            let url = try QappleAPI.Answer.listOfProfile(threshold: nil, pageSize: 100).url()
-            let response: BaseResponse<AnswersOfProfileDTO> = try await NetworkService.shared.get(url: url)
-            let isAnswered = response.result.content.contains{ $0.questionId == questionId }
+            var hasNext = true
+            var threshold: String?
             
-            // TODO: Question 패치 필요
-            let question = Question(
-                id: questionId,
-                content: "테스트 질문 입니다.",
-                publishedDate: .init(),
-                isAnswered: false,
-                isLived: true
-            )
-            return (isAnswered, question)
+            while hasNext {
+                let url = try QappleAPI.Question.list(threshold: threshold, pageSize: 30).url()
+                let response: BaseResponse<QuestionsDTO> = try await NetworkService.shared.get(url: url)
+                
+                if let question = response.result.content.first(where: { $0.questionId == questionId }) {
+                    let entity = Question(
+                        id: question.questionId,
+                        content: question.content,
+                        publishedDate: question.livedAt?.ISO8601ToDate ?? .init(),
+                        isAnswered: question.isAnswered,
+                        isLived: question.questionStatus == "LIVE"
+                    )
+                    
+                    return (question.isAnswered, entity)
+                }
+                
+                hasNext = response.result.hasNext
+                threshold = response.result.threshold
+            }
+            
+            // id에 맞는 질문 찾기 실패시 에러 던지기
+            throw NSError()
         }
     )
     
