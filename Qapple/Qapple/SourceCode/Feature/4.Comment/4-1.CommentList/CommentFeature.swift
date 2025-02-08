@@ -153,6 +153,7 @@ struct CommentFeature {
                 return .none
                 
             case .reportButtonTapped:
+                NotificationCenter.default.post(name: .updateCommentCellToggle, object: nil)
                 return .none
                 
             case let .deleteCommentButtonTapped(boardComment):
@@ -161,6 +162,7 @@ struct CommentFeature {
                 
             case .successDeletion:
                 state.alert = .successDeletion
+                NotificationCenter.default.post(name: .updateCommentCellToggle, object: nil)
                 return .none
                 
             case .likeBoardButtonTapped:

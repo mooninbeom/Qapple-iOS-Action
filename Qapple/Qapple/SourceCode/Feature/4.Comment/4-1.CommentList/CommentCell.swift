@@ -20,11 +20,11 @@ struct CommentCell: View {
     let screenWidth: CGFloat = UIScreen.main.bounds.width
     let anchorWidth: CGFloat = 73
     
+    let publisher = NotificationCenter.default.publisher(for: .updateCommentCellToggle)
+    
     @State private var hOffset: CGFloat = 0
     @State private var anchor: CGFloat = 0
     @State private var isCellToggled: Bool = false
-    @State private var isDelete: Bool = false
-    @State private var isDeleteComplete: Bool = false
     @State private var isReportedComment: Bool = false
     
     var body: some View {
@@ -53,6 +53,12 @@ struct CommentCell: View {
             if comment.isReport {
                 self.isReportedComment = true
             }
+        }
+        .onReceive(publisher) { _ in
+            // TODO: 애니메이션 수정 필요
+            hOffset = 0
+            anchor = 0
+            isCellToggled = false
         }
     }
     
@@ -213,7 +219,6 @@ private struct CommentReportButton: View {
     
     var body: some View {
         Button {
-            // TODO: 네비게이션 연결 필요
             report()
         } label: {
             ZStack {
