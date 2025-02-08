@@ -62,6 +62,7 @@ struct EmailFormView: View {
         .background(.first)
         .navigationBarBackButtonHidden()
         .loadingIndicator(isLoading: store.isLoading)
+        .alert($store.scope(state: \.alert, action: \.alert))
         .onTapGesture {
             isTextFieldFocused = false
         }

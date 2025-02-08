@@ -64,13 +64,14 @@ struct NicknameFormFeature {
                         let _ = try await memberRepository.checkNicknameDuplicate(nickname)
                         await send(.checkNicknameDuplicateResponse)
                     } catch {
-                        print(error)
+                        HapticService.notification(type: .error)
                     }
                     await send(.toggleLoading(false), animation: .bouncy)
                 }
                 
             case .checkNicknameDuplicateResponse:
                 state.isNicknameCheckComplete = true
+                HapticService.notification(type: .success)
                 return .none
                 
             case .nicknameFormComplete:

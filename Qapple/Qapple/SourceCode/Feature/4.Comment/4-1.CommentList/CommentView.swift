@@ -144,7 +144,7 @@ private struct AddCommentView: View {
                 .padding(.vertical, 12)
             
             Button {
-                HapticService.shared.notification(type: .success)
+                LegacyHapticService.shared.notification(type: .success)
                     store.send(.uploadCommentButtonTapped)
             } label: {
                 Image(systemName: "paperplane")

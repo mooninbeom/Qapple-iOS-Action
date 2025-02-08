@@ -2,23 +2,23 @@
 //  HapticService.swift
 //  Qapple
 //
-//  Created by 김민준 on 1/20/25.
+//  Created by 김민준 on 2/8/25.
 //
 
 import UIKit
 
-final class HapticService {
-    static let shared = HapticService()
+struct HapticService {
+    
     private init() {}
     
-    private let notificationGenerator = UINotificationFeedbackGenerator()
-    private let impactGenerator = UIImpactFeedbackGenerator(style: .medium)
+    private static let notificationGenerator = UINotificationFeedbackGenerator()
+    private static let impactGenerator = UIImpactFeedbackGenerator(style: .medium)
     
-    func notification(type: UINotificationFeedbackGenerator.FeedbackType) {
+    static func notification(type: UINotificationFeedbackGenerator.FeedbackType) {
         notificationGenerator.notificationOccurred(type)
     }
     
-    func impact(style: UIImpactFeedbackGenerator.FeedbackStyle) {
+    static func impact(style: UIImpactFeedbackGenerator.FeedbackStyle) {
         impactGenerator.impactOccurred()
     }
 }
