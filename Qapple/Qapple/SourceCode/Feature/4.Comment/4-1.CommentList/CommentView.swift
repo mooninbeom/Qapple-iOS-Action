@@ -17,6 +17,7 @@ struct CommentView: View {
         VStack(spacing: 0) {
             NavigationBar(
                 title: "댓글",
+                backgroundColor: Background.first,
                 leadingView: {
                     NavigationButton(buttonType: .back) {
                         store.send(.backButtonTapped)
