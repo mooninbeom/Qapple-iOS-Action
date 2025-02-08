@@ -33,7 +33,7 @@ struct NotificationFeature {
         
         case fetchNotifications([QappleNotification], QappleAPI.PaginationInfo)
         
-        case navigateToBulletinBoard(BulletinBoard)
+        case navigateToComment(BulletinBoard)
         case navigateToWriteAnswer(Question)
         case navigateToAnswerList(Question)
         
@@ -86,7 +86,7 @@ struct NotificationFeature {
                         // 신고된 게시물일 경우
                         if result.isReported { await send(.reportedNotificationCellTapped) }
                         else {
-                            await send(.navigateToBulletinBoard(result))
+                            await send(.navigateToComment(result))
                         }
                     // 질문 관련 알림일때
                     } else if let questionId = Int(noti.id) {
@@ -101,7 +101,7 @@ struct NotificationFeature {
                     }
                 }
                 
-            case .navigateToBulletinBoard:
+            case .navigateToComment:
                 state.isLoading = false
                 return .none
             case .navigateToWriteAnswer:
