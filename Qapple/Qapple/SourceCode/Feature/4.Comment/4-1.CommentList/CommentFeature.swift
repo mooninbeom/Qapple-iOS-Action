@@ -59,6 +59,7 @@ struct CommentFeature {
     
     @Dependency(\.commentRepository) var commentRepository
     @Dependency(\.bulletinBoardRepository) var bulletinBoardRepository
+    @Dependency(\.dismiss) var dismiss
     
     var body: some ReducerOf<Self> {
         BindingReducer()
@@ -101,8 +102,9 @@ struct CommentFeature {
                 return .none
                 
             case .backButtonTapped:
-                // TODO: 네비게이션 수정
-                return .none
+                return .run { _ in
+                    await dismiss()
+                }
                 
             case let .likeCommentButtonTapped(boardComment):
                 print(boardComment.id)
