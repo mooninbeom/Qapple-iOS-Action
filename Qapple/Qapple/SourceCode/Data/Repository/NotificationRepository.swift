@@ -15,7 +15,7 @@ import ComposableArchitecture
 struct NotificationRepository {
     var fetchNotificationList: (_ threshold: Int?) async throws -> ([QappleNotification], QappleAPI.PaginationInfo)
     var fetchSingleBoard: (_ boardId: Int) async throws -> BulletinBoard
-    var isAnsweredQuestion: (_ questionId: Int) async throws -> Bool
+    var isAnsweredQuestion: (_ questionId: Int) async throws -> (Bool, Question)
     
     private static let dummyNoti: [QappleNotification] = {
         var result = [QappleNotification]()
@@ -64,8 +64,17 @@ extension NotificationRepository: DependencyKey {
         isAnsweredQuestion: { questionId in
             let url = try QappleAPI.Answer.listOfProfile(threshold: nil, pageSize: 100).url()
             let response: BaseResponse<AnswersOfProfileDTO> = try await NetworkService.shared.get(url: url)
-            let result = response.result.content.contains{ $0.questionId == questionId }
-            return result
+            let isAnswered = response.result.content.contains{ $0.questionId == questionId }
+            
+            // TODO: Question 패치 필요
+            let question = Question(
+                id: questionId,
+                content: "테스트 질문 입니다.",
+                publishedDate: .init(),
+                isAnswered: false,
+                isLived: true
+            )
+            return (isAnswered, question)
         }
     )
     
@@ -77,7 +86,15 @@ extension NotificationRepository: DependencyKey {
             NotificationRepository.dummyBoard
         },
         isAnsweredQuestion: { _ in
-            false
+            let question = Question(
+                id: 1234,
+                content: "테스트 질문 입니다.",
+                publishedDate: .init(),
+                isAnswered: false,
+                isLived: true
+            )
+            
+            return (false, question)
         }
     )
 }

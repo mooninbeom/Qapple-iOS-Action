@@ -32,7 +32,10 @@ struct NotificationFeature {
         case backButtonTapped
         
         case fetchNotifications([QappleNotification], QappleAPI.PaginationInfo)
-        case evaluateQuestion(Bool)
+        
+        case navigateToBulletinBoard(BulletinBoard)
+        case navigateToWriteAnswer(Question)
+        case navigateToAnswerList(Question)
         
         case alert(PresentationAction<Alert>)
         
@@ -74,6 +77,7 @@ struct NotificationFeature {
                 return .none
                 
             case let .notificationCellTapped(index):
+                state.isLoading = true
                 return .run { [noti = state.notifications[index] ] send in
                     // 게시판 관련 알림일때
                     if let boardId = Int(noti.boardId) {
@@ -82,20 +86,30 @@ struct NotificationFeature {
                         // 신고된 게시물일 경우
                         if result.isReported { await send(.reportedNotificationCellTapped) }
                         else {
-                            // TODO: 게시판으로 네비게이팅
+                            await send(.navigateToBulletinBoard(result))
                         }
                     // 질문 관련 알림일때
                     } else if let questionId = Int(noti.id) {
-                        // MARK: 현재 해당 질문의 답변 여부 파악을 위해 전체 질문을 뽑아서 찾음, 개선안 필요할듯
                         let result = try await notificationRepository.isAnsweredQuestion(questionId)
-                        await send(.evaluateQuestion(result))
+                        
+                        if result.0 {
+                            await send(.navigateToAnswerList(result.1))
+                        } else {
+                            await send(.navigateToWriteAnswer(result.1))
+                        }
+                        
                     }
                 }
                 
-            case .evaluateQuestion:
-                // TODO: 답변 여부에 따른 네비게이팅 필요
+            case .navigateToBulletinBoard:
+                state.isLoading = false
                 return .none
-                
+            case .navigateToWriteAnswer:
+                state.isLoading = false
+                return .none
+            case .navigateToAnswerList:
+                state.isLoading = false
+                return .none
                 
             case .reportedNotificationCellTapped:
                 state.alert = AlertState {
