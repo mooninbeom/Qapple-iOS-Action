@@ -57,9 +57,6 @@ struct CommentView: View {
         .refreshable {
             store.send(.refresh)
         }
-        .onReceive(NotificationCenter.default.publisher(for: .updateViewNotification)) { _ in
-            store.send(.refresh)
-        }
         .loadingIndicator(isLoading: store.isLoading)
         .sheet(item: $store.scope(state: \.sheet, action: \.sheet)
         ) { store in
