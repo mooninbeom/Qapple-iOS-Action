@@ -35,6 +35,7 @@ struct TodayQuestionView: View {
             store.send(.onDisappear)
         }
         .loadingIndicator(isLoading: store.isLoading)
+        .alert($store.scope(state: \.alert, action: \.alert))
         .sheet(item: $store.scope(
             state: \.sheet,
             action: \.sheet)
