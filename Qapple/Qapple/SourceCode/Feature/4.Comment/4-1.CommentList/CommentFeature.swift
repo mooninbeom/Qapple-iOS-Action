@@ -29,6 +29,7 @@ struct CommentFeature {
         case refresh
         case pagination
         case commentListResponse([BoardComment], QappleAPI.PaginationInfo)
+        case paginationResponse([BoardComment], QappleAPI.PaginationInfo)
         
         case backButtonTapped
         case likeCommentButtonTapped(BoardComment)
@@ -66,7 +67,6 @@ struct CommentFeature {
         Reduce { state, action in
             switch action {
             case .onAppear, .refresh:
-                state.commentList = []
                 return .run { [boardId = state.board.id] send in
                     await send(.toggleLoading(true), animation: .bouncy)
                     do {
@@ -89,7 +89,7 @@ struct CommentFeature {
                     await send(.toggleLoading(true), animation: .bouncy)
                     do {
                         let response = try await commentRepository.fetchBoardCommentList(boardId, threshold)
-                        await send(.commentListResponse(response.0, response.1))
+                        await send(.paginationResponse(response.0, response.1))
                     } catch {
                         await send(.networkErrorAlert)
                     }
@@ -97,7 +97,12 @@ struct CommentFeature {
                 }
                 
             case let .commentListResponse(commentList, paginationInfo):
-                state.commentList += anonymizeCommentList(state.board.writerId, commentList)
+                state.commentList = anonymizeCommentList(state.board.writerId, commentList)
+                state.paginationInfo = paginationInfo
+                return .none
+                
+            case let .paginationResponse(commentList, paginationInfo):
+                state.commentList.append(contentsOf: anonymizeCommentList(state.board.writerId, commentList))
                 state.paginationInfo = paginationInfo
                 return .none
                 
@@ -148,7 +153,6 @@ struct CommentFeature {
                 return .none
                 
             case .reportButtonTapped:
-                // TODO: CommentReportView로 navigating
                 return .none
                 
             case let .deleteCommentButtonTapped(boardComment):
