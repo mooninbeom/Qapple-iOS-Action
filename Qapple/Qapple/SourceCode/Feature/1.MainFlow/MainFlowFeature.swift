@@ -109,6 +109,10 @@ struct MainFlowFeature {
                     state.path.append(.report(.init(dataType: dataType)))
                     return .none
                     
+                case let .element(id: _, action: .comment(.reportButtonTapped(comment))):
+                    state.path.append(.report(.init(dataType: .comment(comment))))
+                    return .none
+                    
                 case .element(id: _, action: .answerList(.backButtonTapped)):
                     state.path.removeAll()
                     return .none

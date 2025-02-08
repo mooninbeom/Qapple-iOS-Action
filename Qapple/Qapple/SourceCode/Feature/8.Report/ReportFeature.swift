@@ -56,6 +56,10 @@ struct ReportFeature {
                             
                         case let .bulletinBoard(bulletinBoard):
                             break
+                            
+                        case let .comment(comment):
+                            try await reportRepository.reportComment(comment.id, reportType)
+                            
                         }
                         await send(.completionReport)
                     } catch {
@@ -122,6 +126,7 @@ extension AlertState where Action == ReportFeature.Action.Alert {
         let targetText = switch dataType {
         case .answer, .myAnswer: "답변"
         case .bulletinBoard: "게시글"
+        case .comment: "댓글"
         }
         return Self {
             TextState("\(targetText)을 신고하시겠어요?")
@@ -140,6 +145,7 @@ extension AlertState where Action == ReportFeature.Action.Alert {
         let targetText = switch dataType {
         case .answer, .myAnswer: "답변"
         case .bulletinBoard: "게시글"
+        case .comment: "댓글"
         }
         return Self {
             TextState("\(targetText)이 신고되었어요")

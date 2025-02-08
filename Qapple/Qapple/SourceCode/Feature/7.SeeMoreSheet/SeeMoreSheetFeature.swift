@@ -78,6 +78,7 @@ extension AlertState where Action == SeeMoreSheetFeature.Action.Alert {
         let targetText = switch dataType {
         case .answer, .myAnswer: "답변"
         case .bulletinBoard: "게시글"
+        case .comment: "댓글"
         }
         return Self {
             TextState("\(targetText)을 삭제하시겠어요?")
@@ -98,6 +99,7 @@ extension AlertState where Action == SeeMoreSheetFeature.Action.Alert {
         let targetText = switch dataType {
         case .answer, .myAnswer: "답변"
         case .bulletinBoard: "게시글"
+        case .comment: "댓글"
         }
         return Self {
             TextState("\(targetText)이 삭제되었어요")

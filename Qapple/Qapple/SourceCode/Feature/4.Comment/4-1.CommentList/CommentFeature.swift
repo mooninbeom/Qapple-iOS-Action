@@ -35,7 +35,7 @@ struct CommentFeature {
         case likeComment(Int)
         case uploadCommentButtonTapped
         case commentTextReset
-        case reportButtonTapped
+        case reportButtonTapped(BoardComment)
         case deleteCommentButtonTapped(BoardComment)
         case successDeletion
         

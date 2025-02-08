@@ -99,7 +99,7 @@ private struct CommentListView: View {
                                 store.send(.deleteCommentButtonTapped(comment))
                             },
                             report: {
-                                store.send(.reportButtonTapped)
+                                store.send(.reportButtonTapped(comment))
                             }
                         )
                         .configurePagination(
