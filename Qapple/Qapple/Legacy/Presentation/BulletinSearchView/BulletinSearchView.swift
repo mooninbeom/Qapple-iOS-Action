@@ -115,7 +115,7 @@ private struct SearchListView: View {
                             pathModel.pushView(screen: BulletinBoardPathType.comment(post: post))
                             bulletinBoardUseCase.isClickComment = true
                         } else {
-                            HapticService.notification(type: .warning)
+                            LegacyHapticService.shared.notification(type: .warning)
                         }
                     }
                 }

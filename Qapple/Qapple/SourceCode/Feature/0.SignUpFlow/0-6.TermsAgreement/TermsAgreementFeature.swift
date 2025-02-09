@@ -20,6 +20,7 @@ struct TermsAgreementFeature {
         var isUserLicenseAgree = false
         var isLoading = false
         @Presents var sheet: Sheet.State?
+        @Presents var alert: AlertState<Action.Alert>?
     }
     
     enum Action {
@@ -32,8 +33,12 @@ struct TermsAgreementFeature {
         case termsOfServicePageButtonTapped
         case privacyPolicyPageButtonTapped
         case signUpResponse
+        case signUpFailed
         case toggleLoading(Bool)
         case sheet(PresentationAction<Sheet.Action>)
+        case alert(PresentationAction<Alert>)
+        
+        enum Alert: Equatable {}
     }
     
     @Dependency(\.memberRepository) var memberRepository
@@ -54,7 +59,7 @@ struct TermsAgreementFeature {
                         try await memberRepository.signUp(email, nickname)
                         await send(.signUpResponse)
                     } catch {
-                        print(error)
+                        await send(.signUpFailed)
                     }
                     await send(.toggleLoading(false), animation: .bouncy)
                 }
@@ -98,17 +103,23 @@ struct TermsAgreementFeature {
             case .signUpResponse:
                 return .none
                 
+            case .signUpFailed:
+                state.alert = .failedSignUp
+                HapticService.notification(type: .error)
+                return .none
+                
             case let .toggleLoading(bool):
                 state.isLoading = bool
                 return .none
                 
-            case .sheet:
+            case .sheet, .alert:
                 return .none
             }
         }
         .ifLet(\.$sheet, action: \.sheet)
     }
 }
+
 
 // MARK: - Sheet
 
@@ -118,5 +129,19 @@ extension TermsAgreementFeature {
     enum Sheet {
         case termsOfService
         case privacyPolicy
+    }
+}
+
+// MARK: - Alert
+
+extension AlertState where Action == TermsAgreementFeature.Action.Alert {
+    static let failedSignUp = AlertState {
+        TextState("네트워크 연결이 불안정해요")
+    } actions: {
+        ButtonState(role: .cancel) {
+            TextState("확인")
+        }
+    } message: {
+        TextState("잠시 후 다시 시도해주세요")
     }
 }

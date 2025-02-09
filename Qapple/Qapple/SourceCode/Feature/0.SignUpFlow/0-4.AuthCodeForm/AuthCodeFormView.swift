@@ -80,6 +80,7 @@ struct AuthCodeFormView: View {
         .background(.first)
         .navigationBarBackButtonHidden()
         .loadingIndicator(isLoading: store.isLoading)
+        .alert($store.scope(state: \.alert, action: \.alert))
         .onChange(of: store.authCodeText) { _, value in
             if value.count >= store.authCodeLimit {
                 isTextFieldFocused = false

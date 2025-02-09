@@ -22,7 +22,6 @@ struct MyAnswerListFeature {
     
     enum Action {
         case onAppear
-        case onDisappear
         case refresh
         case pagination
         case answerListResponse(
@@ -57,9 +56,6 @@ struct MyAnswerListFeature {
                     await send(.toggleLoading(false), animation: .bouncy)
                 }
                 
-            case .onDisappear:
-                return .none
-                
             case .pagination:
                 return .run { [state = state]  send in
                     await send(.toggleLoading(true), animation: .bouncy)
@@ -84,7 +80,7 @@ struct MyAnswerListFeature {
                 state.sheet = .seeMore(
                     .init(
                         sheetTarget: .mine,
-                        dataType: .myAnswer(answer)
+                        dataType: .answer(answer)
                     )
                 )
                 return .none
@@ -105,7 +101,7 @@ struct MyAnswerListFeature {
             case .sheet(.presented(.seeMore(.alert(.presented(.confirmCompletion))))):
                 state.sheet = nil
                 return .run { send in
-                    await send(.onDisappear)
+                    await send(.refresh)
                 }
                 
             case .backButtonTapped:

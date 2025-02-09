@@ -180,7 +180,7 @@ private struct AccountSection: View {
                 icon: .signOutIcon,
                 tapAction: {
                     store.send(.logOutButtonTapped)
-                    HapticService.notification(type: .warning)
+                    LegacyHapticService.shared.notification(type: .warning)
                 }
             )
             
@@ -190,7 +190,7 @@ private struct AccountSection: View {
                 isDistructive: true,
                 tapAction: {
                     store.send(.resignButtonTapped)
-                    HapticService.notification(type: .warning)
+                    LegacyHapticService.shared.notification(type: .warning)
                 }
             )
         }

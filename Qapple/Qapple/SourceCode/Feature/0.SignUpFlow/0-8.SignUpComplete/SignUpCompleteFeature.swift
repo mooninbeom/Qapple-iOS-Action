@@ -11,9 +11,7 @@ import ComposableArchitecture
 struct SignUpCompleteFeature {
     
     @ObservableState
-    struct State: Equatable {
-        
-    }
+    struct State: Equatable {}
     
     enum Action {
         case startButtonTapped
@@ -23,6 +21,7 @@ struct SignUpCompleteFeature {
         Reduce { state, action in
             switch action {
             case .startButtonTapped:
+                HapticService.impact(style: .medium)
                 return .none
             }
         }

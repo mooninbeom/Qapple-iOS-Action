@@ -41,6 +41,12 @@ struct ProfileEditView: View {
                 placeholder: store.defaultNickname,
                 helperText: store.nicknameChange ? beforeDescription : afterDescription,
                 state: store.nicknameFieldAvailable ? .default : .inValid,
+                topTrailingView: {
+                    Text("\(store.nickname.count)/\(store.textLimit)")
+                        .foregroundStyle(TextLabel.ph)
+                        .font(.pretendard(.semiBold, size: 14))
+                        .frame(height: 8)
+                },
                 bottomTrailingView: {
                     QPSubButton(
                         title: "중복 검사",

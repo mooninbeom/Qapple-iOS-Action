@@ -55,7 +55,7 @@ struct LegacyReportView: View {
                         Button {
                             reportType = LegacyReportType.allCases[index]
                             isReportAlertPresented.toggle()
-                            HapticService.notification(type: .warning)
+                            LegacyHapticService.shared.notification(type: .warning)
                             print("신고타입: \(reportType)")
                         } label: {
                             Text(report)
