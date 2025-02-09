@@ -10,9 +10,7 @@ import ComposableArchitecture
 
 
 struct CommentCell: View {
-    // TODO: 추후 property 정리 필요
     let comment: BoardComment
-    let cellIndex: Int
     let like: () -> Void
     let delete: () -> Void
     let report: () -> Void
@@ -270,7 +268,6 @@ private struct CommentReportButton: View {
     
     CommentCell(
         comment: comment,
-        cellIndex: 1,
         like: {},
         delete: {},
         report: {})

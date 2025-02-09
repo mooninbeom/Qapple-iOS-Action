@@ -88,7 +88,6 @@ private struct CommentListView: View {
                     ForEach(Array(self.store.commentList.enumerated()), id: \.offset) { index, comment in
                         CommentCell(
                             comment: comment,
-                            cellIndex: index,
                             like: {
                                 store.send(.likeCommentButtonTapped(comment))
                             },

@@ -16,8 +16,6 @@ struct CommentFeature {
         var commentText: String = ""
         var commentList: [BoardComment] = []
         var paginationInfo = QappleAPI.PaginationInfo(threshold: "", hasNext: false)
-        // MARK: 추후 자동 스크롤 연결 예정
-        var scrollIndex: Int?
         var isLoading: Bool = false
         @Presents var sheet: Sheet.State?
         @Presents var alert: AlertState<Action.Alert>?
