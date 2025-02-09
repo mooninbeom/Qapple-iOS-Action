@@ -28,11 +28,16 @@ struct NotificationFeature {
         case onRefresh
         case onPagenationCellAppear(Int)
         case notificationCellTapped(Int)
-        case reportedNotificationCellTapped
+        case reportedBoard
+        case unknownError
+        
         case backButtonTapped
         
         case fetchNotifications([QappleNotification], QappleAPI.PaginationInfo)
-        case evaluateQuestion(Bool)
+        
+        case navigateToComment(BulletinBoard)
+        case navigateToWriteAnswer(Question)
+        case navigateToAnswerList(Question)
         
         case alert(PresentationAction<Alert>)
         
@@ -74,37 +79,55 @@ struct NotificationFeature {
                 return .none
                 
             case let .notificationCellTapped(index):
+                state.isLoading = true
                 return .run { [noti = state.notifications[index] ] send in
                     // 게시판 관련 알림일때
                     if let boardId = Int(noti.boardId) {
-                        let result = try await notificationRepository.fetchSingleBoard(boardId)
-                        
-                        // 신고된 게시물일 경우
-                        if result.isReported { await send(.reportedNotificationCellTapped) }
-                        else {
-                            // TODO: 게시판으로 네비게이팅
+                        do {
+                            let result = try await notificationRepository.fetchSingleBoard(boardId)
+                            
+                            // 신고된 게시물일 경우
+                            if result.isReported { await send(.reportedBoard) }
+                            else {
+                                await send(.navigateToComment(result))
+                            }
+                        } catch {
+                            await send(.unknownError)
                         }
                     // 질문 관련 알림일때
                     } else if let questionId = Int(noti.id) {
-                        // MARK: 현재 해당 질문의 답변 여부 파악을 위해 전체 질문을 뽑아서 찾음, 개선안 필요할듯
-                        let result = try await notificationRepository.isAnsweredQuestion(questionId)
-                        await send(.evaluateQuestion(result))
+                        do {
+                            let result = try await notificationRepository.isAnsweredQuestion(questionId)
+                            
+                            if result.0 {
+                                await send(.navigateToAnswerList(result.1))
+                            } else {
+                                await send(.navigateToWriteAnswer(result.1))
+                            }
+                        } catch {
+                            await send(.unknownError)
+                        }
+                        
                     }
                 }
                 
-            case .evaluateQuestion:
-                // TODO: 답변 여부에 따른 네비게이팅 필요
+            case .navigateToComment:
+                state.isLoading = false
+                return .none
+            case .navigateToWriteAnswer:
+                state.isLoading = false
+                return .none
+            case .navigateToAnswerList:
+                state.isLoading = false
                 return .none
                 
-                
-            case .reportedNotificationCellTapped:
-                state.alert = AlertState {
-                    TextState("신고된 게시글")
-                } actions: {
-                    ButtonState(role: .none, label: { TextState("확인") })
-                } message: {
-                    TextState("신고된 게시글은 열람할 수 없습니다.")
-                }
+            case .reportedBoard:
+                state.isLoading = false
+                state.alert = .reportedBoard
+                return .none
+            case .unknownError:
+                state.isLoading = false
+                state.alert = .unknownError
                 return .none
                 
             case .backButtonTapped:
@@ -117,5 +140,26 @@ struct NotificationFeature {
             }
         }
         .ifLet(\.alert, action: \.alert)
+    }
+}
+
+
+extension AlertState where Action == NotificationFeature.Action.Alert {
+    static let reportedBoard = Self {
+        TextState("신고된 게시글")
+    } actions: {
+        ButtonState(role: .none, label: { TextState("확인") })
+    } message: {
+        TextState("신고된 게시글은 열람할 수 없습니다.")
+    }
+    
+    static let unknownError = Self {
+        TextState("알 수 없는 오류가 발생했습니다.")
+    } actions: {
+        ButtonState(role: .cancel) {
+            TextState("확인")
+        }
+    } message: {
+        TextState("잠시후 다시 시도해주세요.")
     }
 }
