@@ -61,6 +61,7 @@ struct TermsAgreementView: View {
         .background(.first)
         .navigationBarBackButtonHidden()
         .loadingIndicator(isLoading: store.isLoading)
+        .alert($store.scope(state: \.alert, action: \.alert))
         .sheet(item: $store.scope(state: \.sheet, action: \.sheet)) { sheet in
             switch sheet.case {
             case .termsOfService: TermsContentView(title: "서비스 이용 약관", content: Constant.termsOfService)

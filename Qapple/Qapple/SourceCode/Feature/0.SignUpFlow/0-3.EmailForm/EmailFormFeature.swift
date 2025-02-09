@@ -15,14 +15,19 @@ struct EmailFormFeature {
         var emailText = ""
         var isEmailTextValid = false
         var isLoading = false
+        @Presents var alert: AlertState<Action.Alert>?
     }
     
     enum Action: BindableAction {
         case backButtonTapped
         case sendMailButtonTapped
         case sendCertificationEmailResponse(String)
+        case sendCertificationEmailFailed
         case toggleLoading(Bool)
+        case alert(PresentationAction<Alert>)
         case binding(BindingAction<State>)
+        
+        enum Alert: Equatable {}
     }
     
     @Dependency(\.memberRepository) var memberRepository
@@ -44,12 +49,17 @@ struct EmailFormFeature {
                         let _ = try await memberRepository.sendCertificationEmail(email)
                         await send(.sendCertificationEmailResponse(email))
                     } catch {
-                        print(error)
+                        await send(.sendCertificationEmailFailed)
                     }
                     await send(.toggleLoading(false), animation: .bouncy)
                 }
                 
             case .sendCertificationEmailResponse:
+                return .none
+                
+            case .sendCertificationEmailFailed:
+                state.alert = .existEmail
+                HapticService.notification(type: .error)
                 return .none
                 
             case let .toggleLoading(bool):
@@ -60,9 +70,23 @@ struct EmailFormFeature {
                 state.isEmailTextValid = !state.emailText.isEmpty
                 return .none
                 
-            case .binding:
+            case .alert, .binding:
                 return .none
             }
         }
+    }
+}
+
+// MARK: - Alert
+
+extension AlertState where Action == EmailFormFeature.Action.Alert {
+    static let existEmail = AlertState {
+        TextState("이미 가입된 이메일이에요")
+    } actions: {
+        ButtonState(role: .cancel) {
+            TextState("확인")
+        }
+    } message: {
+        TextState("다른 이메일을 입력해주세요")
     }
 }

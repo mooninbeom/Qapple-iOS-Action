@@ -23,10 +23,12 @@ struct WriteAnswerFeature {
     }
     
     enum Action: BindableAction {
+        case typeAnswerText(String)
         case anonymityNoticeButtonTapped
         case dismissButtonTapped
         case completeButtonTapped
         case postAnswerResponse(Question)
+        case networkingFailed
         case toggleLoading(Bool)
         case sheet(PresentationAction<Sheet.Action>)
         case alert(PresentationAction<Alert>)
@@ -44,6 +46,11 @@ struct WriteAnswerFeature {
         BindingReducer()
         Reduce { state, action in
             switch action {
+            case let .typeAnswerText(text):
+                state.answerText = text.slice(to: state.textLimit)
+                state.answerTextFontSize = adaptiveFontSize(from: text)
+                return .none
+                
             case .anonymityNoticeButtonTapped:
                 state.sheet = .anonymityNotice
                 return .none
@@ -54,6 +61,7 @@ struct WriteAnswerFeature {
                         await dismiss()
                     }
                 } else {
+                    HapticService.notification(type: .warning)
                     state.alert = .stopAnswering
                     return .none
                 }
@@ -66,7 +74,7 @@ struct WriteAnswerFeature {
                         try await postAnswer(state.question.id, state.answerText)
                         await send(.postAnswerResponse(state.question))
                     } catch {
-                        print(error)
+                        await send(.networkingFailed)
                     }
                     await send(.toggleLoading(false), animation: .bouncy)
                 }
@@ -77,6 +85,12 @@ struct WriteAnswerFeature {
                 }
                 
             case .postAnswerResponse:
+                HapticService.notification(type: .success)
+                return .none
+                
+            case .networkingFailed:
+                HapticService.notification(type: .error)
+                state.alert = .failedNetworking
                 return .none
                 
             case let .toggleLoading(bool):

@@ -19,6 +19,7 @@ struct TodayQuestionFeature {
         var timeRemainingForQuestion: TimeInterval = 0
         var isLoading = true
         @Presents var sheet: Sheet.State?
+        @Presents var alert: AlertState<Action.Alert>?
     }
     
     enum Action {
@@ -27,6 +28,7 @@ struct TodayQuestionFeature {
         case refresh
         case mainQuestionResponse(Question)
         case answerListResponse([Answer])
+        case networkingFailed
         case questionButtonTapped(Question)
         case seeAllAnswerButtonTapped(Question)
         case seeMoreAnswerButtonTapped(Answer)
@@ -34,6 +36,9 @@ struct TodayQuestionFeature {
         case cancelQuestionTimer
         case toggleLoading(Bool)
         case sheet(PresentationAction<Sheet.Action>)
+        case alert(PresentationAction<Alert>)
+        
+        enum Alert: Equatable {}
     }
     
     enum CancelID {
@@ -57,7 +62,7 @@ struct TodayQuestionFeature {
                         await send(.mainQuestionResponse(mainQuestion))
                         await send(.answerListResponse(answerList))
                     } catch {
-                        print(error)
+                        await send(.networkingFailed)
                     }
                     await send(.toggleLoading(false), animation: .bouncy)
                 }
@@ -86,6 +91,11 @@ struct TodayQuestionFeature {
                 
             case let .answerListResponse(answerList):
                 state.answerPreviewList = answerList
+                return .none
+                
+            case .networkingFailed:
+                HapticService.notification(type: .error)
+                state.alert = .failedNetworking
                 return .none
                 
             case .questionButtonTapped:
@@ -125,7 +135,7 @@ struct TodayQuestionFeature {
                         try await answerRepository.deleteAnswer(answer.id)
                         await send(.sheet(.presented(.seeMore(.completionDeletion))))
                     } catch {
-                        print(error)
+                        await send(.networkingFailed)
                     }
                     await send(.toggleLoading(false), animation: .bouncy)
                 }
@@ -144,7 +154,7 @@ struct TodayQuestionFeature {
                 state.isLoading = bool
                 return .none
                 
-            case .sheet:
+            case .sheet, .alert:
                 return .none
             }
         }

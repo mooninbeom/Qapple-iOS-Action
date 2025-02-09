@@ -23,6 +23,7 @@ struct NicknameFormFeature {
     }
     
     enum Action: BindableAction {
+        case typeNicknameText(String)
         case backButtonTapped
         case nextButtonTapped
         case checkDuplicateButtonTapped
@@ -39,6 +40,13 @@ struct NicknameFormFeature {
         BindingReducer()
         Reduce { state, action in
             switch action {
+            case let .typeNicknameText(text):
+                state.nicknameText = text.slice(to: state.nicknameLimit)
+                state.isNicknameValidate = state.nicknameText.checkSpecialChar
+                state.isNicknameDuplicate = false
+                state.isNicknameCheckComplete = false
+                return .none
+                
             case .backButtonTapped:
                 return .run { send in
                     await dismiss()
@@ -56,13 +64,14 @@ struct NicknameFormFeature {
                         let _ = try await memberRepository.checkNicknameDuplicate(nickname)
                         await send(.checkNicknameDuplicateResponse)
                     } catch {
-                        print(error)
+                        HapticService.notification(type: .error)
                     }
                     await send(.toggleLoading(false), animation: .bouncy)
                 }
                 
             case .checkNicknameDuplicateResponse:
                 state.isNicknameCheckComplete = true
+                HapticService.notification(type: .success)
                 return .none
                 
             case .nicknameFormComplete:
@@ -73,9 +82,6 @@ struct NicknameFormFeature {
                 return .none
                 
             case .binding(\.nicknameText):
-                state.isNicknameValidate = state.nicknameText.checkSpecialChar
-                state.isNicknameDuplicate = false
-                state.isNicknameCheckComplete = false
                 return .none
                 
             case .binding:

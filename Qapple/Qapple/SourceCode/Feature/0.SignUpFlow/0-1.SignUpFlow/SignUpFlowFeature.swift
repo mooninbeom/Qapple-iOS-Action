@@ -49,6 +49,7 @@ struct SignUpFlowFeature {
             case let .socialLogin(.delegate(.signInResponse(isSignUp))):
                 if isSignUp {
                     state.$isSignIn.withLock { $0 = true }
+                    HapticService.notification(type: .success)
                 } else {
                     state.path.append(.emailForm(.init()))
                 }
@@ -70,6 +71,7 @@ struct SignUpFlowFeature {
                     
                 case .element(id: _, action: .termsAgreement(.signUpResponse)):
                     state.path.append(.signUpComplete(.init()))
+                    HapticService.notification(type: .success)
                     return .none
                     
                 case .element(id: _, action: .signUpComplete(.startButtonTapped)):

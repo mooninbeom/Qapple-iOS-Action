@@ -84,7 +84,7 @@ private struct NaviBar: View {
                 Button("올리기") {
                     if !postingUseCase._state.content.isEmpty {
                         Task {
-                            HapticService.notification(type: .success)
+                            LegacyHapticService.shared.notification(type: .success)
                             try await postingUseCase.effect(.uploadPost)
                             bulletinBoardUseCase.reset()
                             pathModel.pop()

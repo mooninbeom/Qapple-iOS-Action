@@ -18,6 +18,7 @@ struct AnswerListFeature {
         var paginationInfo = QappleAPI.PaginationInfo(threshold: "", hasNext: false)
         var isLoading = false
         @Presents var sheet: Sheet.State?
+        @Presents var alert: AlertState<Action.Alert>?
     }
     
     enum Action {
@@ -25,19 +26,16 @@ struct AnswerListFeature {
         case onDisappear
         case refresh
         case pagination
-        case answerListResponse(
-            [Answer],
-            QappleAPI.TotalCount,
-            QappleAPI.PaginationInfo
-        )
-        case paginagionResponse(
-            [Answer],
-            QappleAPI.PaginationInfo
-        )
+        case answerListResponse([Answer], QappleAPI.TotalCount, QappleAPI.PaginationInfo)
+        case paginagionResponse([Answer], QappleAPI.PaginationInfo)
+        case networkingFailed
         case seeMoreAction(Answer)
         case backButtonTapped
         case toggleLoading(Bool)
         case sheet(PresentationAction<Sheet.Action>)
+        case alert(PresentationAction<Alert>)
+        
+        enum Alert: Equatable {}
     }
     
     @Dependency(\.answerRepository) var answerRepository
@@ -63,7 +61,7 @@ struct AnswerListFeature {
                             )
                         )
                     } catch {
-                        print(error)
+                        await send(.networkingFailed)
                     }
                     await send(.toggleLoading(false), animation: .bouncy)
                 }
@@ -74,11 +72,15 @@ struct AnswerListFeature {
             case .pagination:
                 return .run { [state = state]  send in
                     await send(.toggleLoading(true), animation: .bouncy)
-                    let response = try await answerRepository.fetchAnswerListOfQuestion(
-                        state.question.id,
-                        state.paginationInfo.threshold
-                    )
-                    await send(.paginagionResponse(response.0, response.2))
+                    do {
+                        let response = try await answerRepository.fetchAnswerListOfQuestion(
+                            state.question.id,
+                            state.paginationInfo.threshold
+                        )
+                        await send(.paginagionResponse(response.0, response.2))
+                    } catch {
+                        await send(.networkingFailed)
+                    }
                     await send(.toggleLoading(false), animation: .bouncy)
                 }
                 
@@ -91,6 +93,11 @@ struct AnswerListFeature {
             case let .paginagionResponse(answerList, paginationInfo):
                 state.answerList.insert(contentsOf: answerList.reversed(), at: 0)
                 state.paginationInfo = paginationInfo
+                return .none
+                
+            case .networkingFailed:
+                HapticService.notification(type: .error)
+                state.alert = .failedNetworking
                 return .none
                 
             case let .seeMoreAction(answer):
@@ -110,7 +117,7 @@ struct AnswerListFeature {
                         try await answerRepository.deleteAnswer(answer.id)
                         await send(.sheet(.presented(.seeMore(.completionDeletion))))
                     } catch {
-                        print(error)
+                        await send(.networkingFailed)
                     }
                     await send(.toggleLoading(false), animation: .bouncy)
                 }
@@ -129,7 +136,7 @@ struct AnswerListFeature {
                 state.isLoading = bool
                 return .none
                 
-            case .backButtonTapped, .sheet:
+            case .backButtonTapped, .sheet, .alert:
                 return .none
             }
         }
