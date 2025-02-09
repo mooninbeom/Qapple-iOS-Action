@@ -44,7 +44,6 @@ struct CommentCell: View {
                     }
                 }
                 .offset(x: hOffset)
-                .animation(.easeInOut, value: hOffset)
             } else {
                 reportCell
             }
@@ -55,7 +54,6 @@ struct CommentCell: View {
             }
         }
         .onReceive(publisher) { _ in
-            // TODO: 애니메이션 수정 필요
             hOffset = 0
             anchor = 0
             isCellToggled = false
@@ -87,23 +85,27 @@ struct CommentCell: View {
     private var drag: some Gesture {
         DragGesture(minimumDistance: 50)
             .onChanged { value in
-                let transWidth = value.translation.width
-
-                hOffset = anchor + transWidth
-
-                if anchor < 0 {
-                    isCellToggled = hOffset < -screenWidth / 3 + screenWidth / 15
-                } else {
-                    isCellToggled = hOffset < -screenWidth / 15
+                withAnimation(.easeInOut) {
+                    let transWidth = value.translation.width
+                    
+                    hOffset = anchor + transWidth
+                    
+                    if anchor < 0 {
+                        isCellToggled = hOffset < -screenWidth / 3 + screenWidth / 15
+                    } else {
+                        isCellToggled = hOffset < -screenWidth / 15
+                    }
                 }
             }
             .onEnded { value in
-                if isCellToggled {
-                    anchor = -anchorWidth
-                } else {
-                    anchor = 0
+                withAnimation(.easeInOut) {
+                    if isCellToggled {
+                        anchor = -anchorWidth
+                    } else {
+                        anchor = 0
+                    }
+                    hOffset = anchor
                 }
-                hOffset = anchor
             }
     }
     
