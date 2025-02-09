@@ -63,7 +63,6 @@ extension SeeMoreSheetFeature {
     
     /// Sheet가 어떤 Data를 이용하는지
     enum SheetData: Equatable {
-        case myAnswer(Answer)
         case answer(Answer)
         case bulletinBoard(BulletinBoard)
     }
@@ -76,7 +75,7 @@ extension AlertState where Action == SeeMoreSheetFeature.Action.Alert {
     /// 삭제 확인
     static func deletionCheck(from dataType: DataType) -> Self {
         let targetText = switch dataType {
-        case .answer, .myAnswer: "답변"
+        case .answer: "답변"
         case .bulletinBoard: "게시글"
         case .comment: "댓글"
         }
@@ -97,7 +96,7 @@ extension AlertState where Action == SeeMoreSheetFeature.Action.Alert {
     /// 삭제 완료
     static func deletionComplete(from dataType: DataType) -> Self {
         let targetText = switch dataType {
-        case .answer, .myAnswer: "답변"
+        case .answer: "답변"
         case .bulletinBoard: "게시글"
         case .comment: "댓글"
         }

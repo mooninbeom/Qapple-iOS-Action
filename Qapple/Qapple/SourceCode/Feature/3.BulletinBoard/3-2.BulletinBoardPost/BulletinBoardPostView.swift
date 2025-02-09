@@ -86,6 +86,9 @@ private struct BoardTextField: View {
                 .padding(.horizontal, 24)
                 .autocorrectionDisabled()
                 .multilineTextAlignment(.center)
+                .onChange(of: store.boardText) { _ in
+                    store.send(.boardTextChanged)
+                }
         }
         .onTapGesture {
             isTextFieldFocused = true

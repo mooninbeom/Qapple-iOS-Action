@@ -227,6 +227,9 @@ struct CommentFeature {
                     await send(.onDisappear)
                 }
                 
+            case .sheet(.presented(.seeMore(.reportButtonTapped))):
+                state.sheet = nil
+                return .none
             case let .alert(.presented(.confirmDeletion(boardCommentId))):
                 return .run { send in
                     await send(.toggleLoading(true), animation: .bouncy)

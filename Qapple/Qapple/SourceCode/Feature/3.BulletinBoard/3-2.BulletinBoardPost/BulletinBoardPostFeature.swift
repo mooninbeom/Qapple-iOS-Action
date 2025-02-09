@@ -22,7 +22,7 @@ struct BulletinBoardPostFeature {
     
     enum Action: BindableAction {
         case cancelButtonTapped
-        case contentChanged
+        case boardTextChanged
         case postBoardButtonTapped
         case anonymityNoticeButtonTapped
         case toggleLoading(Bool)
@@ -55,7 +55,7 @@ struct BulletinBoardPostFeature {
                 }
                 return .none
                 
-            case .contentChanged:
+            case .boardTextChanged:
                 state.boardTextFontSize = adaptiveFontSize(from: state.boardText)
                 if state.boardText.count > state.textCountLimit {
                     state.boardText = String(state.boardText.prefix(state.textCountLimit))
@@ -84,9 +84,7 @@ struct BulletinBoardPostFeature {
                 return .none
                 
             case .binding(\.boardText):
-                return .run { send in
-                    await send(.contentChanged)
-                }
+                return .none
                 
             case .alert(.presented(.confirmCancel)):
                 return .run { send in

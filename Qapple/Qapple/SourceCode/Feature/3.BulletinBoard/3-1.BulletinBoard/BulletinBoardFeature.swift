@@ -22,10 +22,10 @@ struct BulletinBoardFeature {
     
     enum Action {
         case onAppear
-        case onDisappear
         case refresh
         case pagination
         case bulletinBoardListResponse([BulletinBoard], QappleAPI.PaginationInfo)
+        case paginationResponse([BulletinBoard], QappleAPI.PaginationInfo)
         
         case boardCellTapped(BulletinBoard)
         case reportButtonTapped
@@ -57,7 +57,6 @@ struct BulletinBoardFeature {
         Reduce { state,action in
             switch action {
             case .onAppear, .refresh:
-                state.bulletinBoardList = []
                 return .run { send in
                     await send(.toggleLoading(true), animation: .bouncy)
                     do {
@@ -69,15 +68,12 @@ struct BulletinBoardFeature {
                     await send(.toggleLoading(false), animation: .bouncy)
                 }
                 
-            case .onDisappear:
-                return .none
-                
             case .pagination:
                 return .run { [threshold = Int(state.paginationInfo.threshold)] send in
                     await send(.toggleLoading(true), animation: .bouncy)
                     do {
                         let response = try await bulletinBoardRepository.fetchBulletinBoardList(threshold)
-                        await send(.bulletinBoardListResponse(response.0, response.1))
+                        await send(.paginationResponse(response.0, response.1))
                     } catch {
                         print(error)
                     }
@@ -85,6 +81,11 @@ struct BulletinBoardFeature {
                 }
                 
             case let .bulletinBoardListResponse(bulletinBoardList, paginationInfo):
+                state.bulletinBoardList = bulletinBoardList
+                state.paginationInfo = paginationInfo
+                return .none
+                
+            case let .paginationResponse(bulletinBoardList, paginationInfo):
                 state.bulletinBoardList += bulletinBoardList
                 state.paginationInfo = paginationInfo
                 return .none
@@ -164,9 +165,11 @@ struct BulletinBoardFeature {
                 
             case .sheet(.presented(.seeMore(.alert(.presented(.confirmCompletion))))):
                 state.sheet = nil
-                return .run { send in
-                    await send(.onDisappear)
-                }
+                return .none
+                
+            case .sheet(.presented(.seeMore(.reportButtonTapped))):
+                state.sheet = nil
+                return .none
                 
             case .alert(.presented(.confirmReport)):
                 return .run { send in

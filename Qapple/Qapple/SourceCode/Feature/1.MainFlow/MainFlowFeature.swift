@@ -83,6 +83,9 @@ struct MainFlowFeature {
                 state.path.append(.bulletinBoardPost(.init()))
                 return .none
                 
+            case let .bulletinBoardTab(.sheet(.presented(.seeMore(.reportButtonTapped(dataType))))):
+                state.path.append(.report(.init(dataType: dataType)))
+                return .none
             case let .profileTab(.editProfileButtonTapped(nickname)):
                 state.path.append(.profileEdit(.init(nickname: nickname, defaultNickname: nickname)))
                 return .none
@@ -112,6 +115,10 @@ struct MainFlowFeature {
                 case let .element(id: _, action: .comment(.reportButtonTapped(comment))):
                     state.path.append(.report(.init(dataType: .comment(comment))))
                     return .none
+                    
+                case let .element(id: _, action: .comment(.sheet(.presented(.seeMore(.reportButtonTapped(dataType)))))):
+                    state.path.append(.report(.init(dataType: dataType)))
+                    return .none
                   
                 case let .element(id: _, action: .notificationList(.navigateToComment(board))):
                     state.path.append(.comment(.init(board: board)))
@@ -130,6 +137,10 @@ struct MainFlowFeature {
                     return .none
                     
                 case .element(id: _, action: .answerList(.onDisappear)):
+                    state.path.removeAll()
+                    return .none
+                    
+                case .element(id: _, action: .comment(.onDisappear)):
                     state.path.removeAll()
                     return .none
                     
