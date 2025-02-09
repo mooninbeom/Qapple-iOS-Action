@@ -112,6 +112,18 @@ struct MainFlowFeature {
                 case let .element(id: _, action: .comment(.reportButtonTapped(comment))):
                     state.path.append(.report(.init(dataType: .comment(comment))))
                     return .none
+                  
+                case let .element(id: _, action: .notificationList(.navigateToComment(board))):
+                    state.path.append(.comment(.init(board: board)))
+                    return .none
+                    
+                case let .element(id: _, action: .notificationList(.navigateToWriteAnswer(question))):
+                    state.path.append(.writeAnswer(.init(question: question)))
+                    return .none
+                    
+                case let .element(id: _, action: .notificationList(.navigateToAnswerList(question))):
+                    state.path.append(.answerList(.init(question: question)))
+                    return .none
                     
                 case .element(id: _, action: .answerList(.backButtonTapped)):
                     state.path.removeAll()
