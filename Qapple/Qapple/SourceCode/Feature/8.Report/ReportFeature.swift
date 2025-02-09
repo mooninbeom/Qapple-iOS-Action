@@ -40,6 +40,7 @@ struct ReportFeature {
                 return .run { send in await dismiss() }
                 
             case let .reportCellTapped(reportType):
+                HapticService.notification(type: .warning)
                 state.alert = .reportCheck(from: state.dataType, type: reportType)
                 return .none
                 

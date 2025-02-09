@@ -133,6 +133,7 @@ struct CommentFeature {
                 return .none
                 
             case .uploadCommentButtonTapped:
+                HapticService.notification(type: .success)
                 return .run { [
                     text = state.commentText,
                     boardId = state.board.id
@@ -157,6 +158,7 @@ struct CommentFeature {
                 return .none
                 
             case let .deleteCommentButtonTapped(boardComment):
+                HapticService.notification(type: .error)
                 state.alert = .confirmDeletion(boardComment.id)
                 return .none
                 
@@ -166,6 +168,7 @@ struct CommentFeature {
                 return .none
                 
             case .likeBoardButtonTapped:
+                HapticService.impact(style: .light)
                 return .run { [board = state.board] send in
                     await send(.toggleLoading(true), animation: .bouncy)
                     do {
