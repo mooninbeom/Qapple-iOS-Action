@@ -12,13 +12,13 @@ extension AlertState {
     /// 네트워킹 실패 기본 Alert
     static var failedNetworking: Self {
         Self {
-            TextState("이미 가입된 이메일이에요")
+            TextState("네트워크 상태가 불안정해요")
         } actions: {
             ButtonState(role: .cancel) {
                 TextState("확인")
             }
         } message: {
-            TextState("다른 이메일을 입력해주세요")
+            TextState("현재 상태가 지속될 시 관리자 문의를 부탁드려요")
         }
     }
 }
