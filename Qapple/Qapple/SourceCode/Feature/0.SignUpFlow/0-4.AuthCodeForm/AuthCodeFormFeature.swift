@@ -27,7 +27,7 @@ struct AuthCodeFormFeature {
         case checkAuthCodeButtonTapped
         case reSendMailButtonTapped
         case checkAuthCodeResponse
-        case reSendMailResponse
+        case resendMailResponse
         case checkAuthCodeFailed
         case reSendMailFailed
         case nextButtonTapped
