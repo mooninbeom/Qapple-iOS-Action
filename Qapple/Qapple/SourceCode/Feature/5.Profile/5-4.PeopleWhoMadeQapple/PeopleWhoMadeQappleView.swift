@@ -110,11 +110,11 @@ private struct iOSDeveloper: View {
                 avatar: .mooni,
                 backgroundColor: .mooni,
                 nicknameKor: "무니",
-                nicknameEng: "monni",
+                nicknameEng: "mooni",
                 position: "iOS Developer",
                 description: "월드 클래스 디벨로퍼",
-                githubLink: nil,
-                linkedinLink: "www.linkedin.com/in/인범-문-94ba63298"
+                githubLink: "https://github.com/mooninbeom",
+                linkedinLink: nil
             )
             PeopleWhoMadeQappleCell(
                 avatar: .simons,

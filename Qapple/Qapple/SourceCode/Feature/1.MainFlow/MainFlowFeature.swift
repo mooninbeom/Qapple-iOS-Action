@@ -109,6 +109,10 @@ struct MainFlowFeature {
                     state.path.append(.report(.init(dataType: dataType)))
                     return .none
                     
+                case let .element(id: _, action: .comment(.reportButtonTapped(comment))):
+                    state.path.append(.report(.init(dataType: .comment(comment))))
+                    return .none
+                  
                 case let .element(id: _, action: .notificationList(.navigateToComment(board))):
                     state.path.append(.comment(.init(board: board)))
                     return .none

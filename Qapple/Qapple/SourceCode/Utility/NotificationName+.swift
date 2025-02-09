@@ -9,4 +9,5 @@ import Foundation
 
 extension Notification.Name {
     static let updateViewNotification = Notification.Name("updateViewNotification")
+    static let updateCommentCellToggle = Notification.Name("updateCommentCellToggle")
 }

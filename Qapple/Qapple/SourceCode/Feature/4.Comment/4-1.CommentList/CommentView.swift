@@ -17,6 +17,7 @@ struct CommentView: View {
         VStack(spacing: 0) {
             NavigationBar(
                 title: "댓글",
+                backgroundColor: Background.first,
                 leadingView: {
                     NavigationButton(buttonType: .back) {
                         store.send(.backButtonTapped)
@@ -56,9 +57,6 @@ struct CommentView: View {
         .refreshable {
             store.send(.refresh)
         }
-        .onReceive(NotificationCenter.default.publisher(for: .updateViewNotification)) { _ in
-            store.send(.refresh)
-        }
         .loadingIndicator(isLoading: store.isLoading)
         .sheet(item: $store.scope(state: \.sheet, action: \.sheet)
         ) { store in
@@ -90,7 +88,6 @@ private struct CommentListView: View {
                     ForEach(Array(self.store.commentList.enumerated()), id: \.offset) { index, comment in
                         CommentCell(
                             comment: comment,
-                            cellIndex: index,
                             like: {
                                 store.send(.likeCommentButtonTapped(comment))
                             },
@@ -98,7 +95,7 @@ private struct CommentListView: View {
                                 store.send(.deleteCommentButtonTapped(comment))
                             },
                             report: {
-                                store.send(.reportButtonTapped)
+                                store.send(.reportButtonTapped(comment))
                             }
                         )
                         .configurePagination(

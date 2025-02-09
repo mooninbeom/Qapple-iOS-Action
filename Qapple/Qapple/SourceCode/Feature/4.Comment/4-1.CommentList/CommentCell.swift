@@ -10,9 +10,7 @@ import ComposableArchitecture
 
 
 struct CommentCell: View {
-    // TODO: 추후 property 정리 필요
     let comment: BoardComment
-    let cellIndex: Int
     let like: () -> Void
     let delete: () -> Void
     let report: () -> Void
@@ -20,11 +18,11 @@ struct CommentCell: View {
     let screenWidth: CGFloat = UIScreen.main.bounds.width
     let anchorWidth: CGFloat = 73
     
+    let publisher = NotificationCenter.default.publisher(for: .updateCommentCellToggle)
+    
     @State private var hOffset: CGFloat = 0
     @State private var anchor: CGFloat = 0
     @State private var isCellToggled: Bool = false
-    @State private var isDelete: Bool = false
-    @State private var isDeleteComplete: Bool = false
     @State private var isReportedComment: Bool = false
     
     var body: some View {
@@ -44,7 +42,6 @@ struct CommentCell: View {
                     }
                 }
                 .offset(x: hOffset)
-                .animation(.easeInOut, value: hOffset)
             } else {
                 reportCell
             }
@@ -53,6 +50,11 @@ struct CommentCell: View {
             if comment.isReport {
                 self.isReportedComment = true
             }
+        }
+        .onReceive(publisher) { _ in
+            hOffset = 0
+            anchor = 0
+            isCellToggled = false
         }
     }
     
@@ -81,23 +83,27 @@ struct CommentCell: View {
     private var drag: some Gesture {
         DragGesture(minimumDistance: 50)
             .onChanged { value in
-                let transWidth = value.translation.width
-
-                hOffset = anchor + transWidth
-
-                if anchor < 0 {
-                    isCellToggled = hOffset < -screenWidth / 3 + screenWidth / 15
-                } else {
-                    isCellToggled = hOffset < -screenWidth / 15
+                withAnimation(.easeInOut) {
+                    let transWidth = value.translation.width
+                    
+                    hOffset = anchor + transWidth
+                    
+                    if anchor < 0 {
+                        isCellToggled = hOffset < -screenWidth / 3 + screenWidth / 15
+                    } else {
+                        isCellToggled = hOffset < -screenWidth / 15
+                    }
                 }
             }
             .onEnded { value in
-                if isCellToggled {
-                    anchor = -anchorWidth
-                } else {
-                    anchor = 0
+                withAnimation(.easeInOut) {
+                    if isCellToggled {
+                        anchor = -anchorWidth
+                    } else {
+                        anchor = 0
+                    }
+                    hOffset = anchor
                 }
-                hOffset = anchor
             }
     }
     
@@ -213,7 +219,6 @@ private struct CommentReportButton: View {
     
     var body: some View {
         Button {
-            // TODO: 네비게이션 연결 필요
             report()
         } label: {
             ZStack {
@@ -263,7 +268,6 @@ private struct CommentReportButton: View {
     
     CommentCell(
         comment: comment,
-        cellIndex: 1,
         like: {},
         delete: {},
         report: {})

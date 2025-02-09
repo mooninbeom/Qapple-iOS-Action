@@ -10,6 +10,7 @@ import Foundation
 
 struct ReportRepository {
     var reportAnswer: (_ answerId: Int, _ reportType: ReportFeature.ReportType) async throws -> Void
+    var reportComment: (_ commentId: Int, _ reportType: ReportFeature.ReportType) async throws -> Void
 }
 
 // MARK: - DependencyKey
@@ -22,6 +23,12 @@ extension ReportRepository: DependencyKey {
             let reportType = "QUESTION_" + reportType.rawValue
             let requestBody: AnswerReportsRequest = AnswerReportsRequest(answerId: answerId, reportType: reportType)
             let _: BaseResponse<AnswerReportsDTO> = try await NetworkService.shared.post(url: url, body: requestBody)
+        },
+        reportComment: { commentId, reportType in
+            let url = try QappleAPI.Reports.boardComment.url()
+            let reportType = "COMMENT_" + reportType.rawValue
+            let requestBody: BoardCommentReportsRequest = .init(boardCommentId: commentId, boardCommentReportType: reportType)
+            let _: BaseResponse<BoardCommentReportsDTO> = try await NetworkService.shared.post(url: url, body: requestBody)
         }
     )
 }

@@ -16,8 +16,6 @@ struct CommentFeature {
         var commentText: String = ""
         var commentList: [BoardComment] = []
         var paginationInfo = QappleAPI.PaginationInfo(threshold: "", hasNext: false)
-        // MARK: 추후 자동 스크롤 연결 예정
-        var scrollIndex: Int?
         var isLoading: Bool = false
         @Presents var sheet: Sheet.State?
         @Presents var alert: AlertState<Action.Alert>?
@@ -29,13 +27,14 @@ struct CommentFeature {
         case refresh
         case pagination
         case commentListResponse([BoardComment], QappleAPI.PaginationInfo)
+        case paginationResponse([BoardComment], QappleAPI.PaginationInfo)
         
         case backButtonTapped
         case likeCommentButtonTapped(BoardComment)
         case likeComment(Int)
         case uploadCommentButtonTapped
         case commentTextReset
-        case reportButtonTapped
+        case reportButtonTapped(BoardComment)
         case deleteCommentButtonTapped(BoardComment)
         case successDeletion
         
@@ -59,13 +58,13 @@ struct CommentFeature {
     
     @Dependency(\.commentRepository) var commentRepository
     @Dependency(\.bulletinBoardRepository) var bulletinBoardRepository
+    @Dependency(\.dismiss) var dismiss
     
     var body: some ReducerOf<Self> {
         BindingReducer()
         Reduce { state, action in
             switch action {
             case .onAppear, .refresh:
-                state.commentList = []
                 return .run { [boardId = state.board.id] send in
                     await send(.toggleLoading(true), animation: .bouncy)
                     do {
@@ -88,7 +87,7 @@ struct CommentFeature {
                     await send(.toggleLoading(true), animation: .bouncy)
                     do {
                         let response = try await commentRepository.fetchBoardCommentList(boardId, threshold)
-                        await send(.commentListResponse(response.0, response.1))
+                        await send(.paginationResponse(response.0, response.1))
                     } catch {
                         await send(.networkErrorAlert)
                     }
@@ -96,13 +95,19 @@ struct CommentFeature {
                 }
                 
             case let .commentListResponse(commentList, paginationInfo):
-                state.commentList += anonymizeCommentList(state.board.writerId, commentList)
+                state.commentList = anonymizeCommentList(state.board.writerId, commentList)
+                state.paginationInfo = paginationInfo
+                return .none
+                
+            case let .paginationResponse(commentList, paginationInfo):
+                state.commentList.append(contentsOf: anonymizeCommentList(state.board.writerId, commentList))
                 state.paginationInfo = paginationInfo
                 return .none
                 
             case .backButtonTapped:
-                // TODO: 네비게이션 수정
-                return .none
+                return .run { _ in
+                    await dismiss()
+                }
                 
             case let .likeCommentButtonTapped(boardComment):
                 print(boardComment.id)
@@ -126,6 +131,7 @@ struct CommentFeature {
                 return .none
                 
             case .uploadCommentButtonTapped:
+                HapticService.notification(type: .success)
                 return .run { [
                     text = state.commentText,
                     boardId = state.board.id
@@ -146,18 +152,21 @@ struct CommentFeature {
                 return .none
                 
             case .reportButtonTapped:
-                // TODO: CommentReportView로 navigating
+                NotificationCenter.default.post(name: .updateCommentCellToggle, object: nil)
                 return .none
                 
             case let .deleteCommentButtonTapped(boardComment):
+                HapticService.notification(type: .error)
                 state.alert = .confirmDeletion(boardComment.id)
                 return .none
                 
             case .successDeletion:
                 state.alert = .successDeletion
+                NotificationCenter.default.post(name: .updateCommentCellToggle, object: nil)
                 return .none
                 
             case .likeBoardButtonTapped:
+                HapticService.impact(style: .light)
                 return .run { [board = state.board] send in
                     await send(.toggleLoading(true), animation: .bouncy)
                     do {

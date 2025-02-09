@@ -12,4 +12,5 @@ enum DataType: Equatable {
     case myAnswer(Answer)
     case answer(Answer)
     case bulletinBoard(BulletinBoard)
+    case comment(BoardComment)
 }

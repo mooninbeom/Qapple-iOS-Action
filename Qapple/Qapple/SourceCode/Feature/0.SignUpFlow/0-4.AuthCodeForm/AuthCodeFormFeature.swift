@@ -25,11 +25,11 @@ struct AuthCodeFormFeature {
     enum Action: BindableAction {
         case backButtonTapped
         case checkAuthCodeButtonTapped
-        case reSendMailButtonTapped
+        case resendMailButtonTapped
         case checkAuthCodeResponse
         case resendMailResponse
         case checkAuthCodeFailed
-        case reSendMailFailed
+        case resendMailFailed
         case nextButtonTapped
         case authCodeFormComplete(email: String)
         case toggleLoading(Bool)
@@ -63,7 +63,7 @@ struct AuthCodeFormFeature {
                     await send(.toggleLoading(false), animation: .bouncy)
                 }
                 
-            case .reSendMailButtonTapped:
+            case .resendMailButtonTapped:
                 state.authCodeText.removeAll()
                 state.isAuthCodeEnterComplete = false
                 state.isAuthCodeValidate = true
@@ -71,9 +71,9 @@ struct AuthCodeFormFeature {
                     await send(.toggleLoading(true), animation: .bouncy)
                     do {
                         let _ = try await memberRepository.checkAuthCode(state.emailText, state.authCodeText)
-                        await send(.reSendMailResponse)
+                        await send(.resendMailResponse)
                     } catch {
-                        await send(.reSendMailFailed)
+                        await send(.resendMailFailed)
                     }
                     await send(.toggleLoading(false), animation: .bouncy)
                 }
@@ -82,7 +82,7 @@ struct AuthCodeFormFeature {
                 state.isAuthCheckComplete = true
                 return .none
                 
-            case .reSendMailResponse:
+            case .resendMailResponse:
                 state.alert = .reSendMail
                 return .none
                 
@@ -92,7 +92,7 @@ struct AuthCodeFormFeature {
                 HapticService.notification(type: .error)
                 return .none
                 
-            case .reSendMailFailed:
+            case .resendMailFailed:
                 state.alert = .failedReSendMail
                 HapticService.notification(type: .error)
                 return .none
