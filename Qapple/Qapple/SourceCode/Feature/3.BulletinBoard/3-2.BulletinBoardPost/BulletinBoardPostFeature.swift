@@ -67,6 +67,7 @@ struct BulletinBoardPostFeature {
                 return .none
                 
             case .postBoardButtonTapped:
+                HapticService.notification(type: .success)
                 let boardText = state.boardText
                 return .run { send in
                     await send(.toggleLoading(true), animation: .bouncy)

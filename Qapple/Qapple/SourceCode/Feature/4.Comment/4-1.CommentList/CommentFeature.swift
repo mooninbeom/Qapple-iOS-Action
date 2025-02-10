@@ -108,7 +108,7 @@ struct CommentFeature {
                 }
                 
             case let .likeCommentButtonTapped(boardComment):
-                print(boardComment.id)
+                HapticService.impact(style: .light)
                 return .run { send in
                     await send(.toggleLoading(true), animation: .bouncy)
                     do {

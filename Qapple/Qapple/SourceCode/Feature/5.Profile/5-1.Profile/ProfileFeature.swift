@@ -127,10 +127,12 @@ struct ProfileFeature {
                 return .none
                 
             case .logOutButtonTapped:
+                HapticService.notification(type: .warning)
                 state.alert = .confirmLogout
                 return .none
                 
             case .resignButtonTapped:
+                HapticService.notification(type: .warning)
                 state.alert = .confirmResign
                 return .none
                 

@@ -150,7 +150,6 @@ struct CommentCell: View {
                 // 댓글 좋아요 버튼
                 Button {
                     if !comment.isReport {
-                        LegacyHapticService.shared.impact(style: .light)
                         like()
                     } else {
                         self.isReportedComment.toggle()
@@ -195,7 +194,6 @@ private struct CommentDeleteButton: View {
     var body: some View {
         Button {
             delete()
-            LegacyHapticService.shared.notification(type: .error)
         } label: {
             ZStack {
                 Color.delete

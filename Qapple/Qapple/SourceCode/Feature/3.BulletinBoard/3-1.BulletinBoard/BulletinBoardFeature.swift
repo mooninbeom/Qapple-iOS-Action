@@ -95,10 +95,12 @@ struct BulletinBoardFeature {
                 return .none
                 
             case .reportButtonTapped:
+                HapticService.notification(type: .warning)
                 state.alert = .confirmReport
                 return .none
                 
             case let .likeBoardButtonTapped(board):
+                HapticService.impact(style: .light)
                 return .run { send in
                     await send(.toggleLoading(true), animation: .bouncy)
                     do {
