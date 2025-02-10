@@ -13,6 +13,7 @@ struct BulletinBoardSearchFeature {
     @ObservableState
     struct State: Equatable {
         @Presents var sheet: Sheet.State?
+        @Presents var alert: AlertState<Action.Alert>?
         var searchBoardList: [BulletinBoard] = []
         var paginationInfo = QappleAPI.PaginationInfo(threshold: "", hasNext: false)
         var searchText: String = ""
@@ -33,9 +34,13 @@ struct BulletinBoardSearchFeature {
         case binding(BindingAction<State>)
         case boardCellTapped(BulletinBoard)
         case seeMoreAction(BulletinBoard)
+        case networkingFailed
         case toggleLoading(Bool)
         
         case sheet(PresentationAction<Sheet.Action>)
+        case alert(PresentationAction<Alert>)
+        
+        enum Alert: Equatable {}
     }
     
     @Dependency(\.dismiss) var dismiss
@@ -54,7 +59,7 @@ struct BulletinBoardSearchFeature {
                         let response = try await bulletinBoardRepository.searchBoard(searchText, nil)
                         await send(.searchBoardListResponse(response.0, response.1))
                     } catch {
-                        print(error)
+                        await send(.networkingFailed)
                     }
                     await send(.toggleLoading(false), animation: .bouncy)
                 }
@@ -69,7 +74,7 @@ struct BulletinBoardSearchFeature {
                         let response = try await bulletinBoardRepository.searchBoard(searchText, threshold)
                         await send(.searchBoardListResponse(response.0, response.1))
                     } catch {
-                        print(error)
+                        await send(.networkingFailed)
                     }
                     await send(.toggleLoading(false), animation: .bouncy)
                 }
@@ -91,7 +96,7 @@ struct BulletinBoardSearchFeature {
                         try await bulletinBoardRepository.likeBoard(board.id)
                         await send(.likeBoard(board.id))
                     } catch {
-                        print(error)
+                        await send(.networkingFailed)
                     }
                     await send(.toggleLoading(false), animation: .bouncy)
                 }
@@ -136,6 +141,11 @@ struct BulletinBoardSearchFeature {
                 )
                 return .none
                 
+            case .networkingFailed:
+                HapticService.notification(type: .error)
+                state.alert = .failedNetworking
+                return .none
+                
             case let .toggleLoading(bool):
                 state.isLoading = bool
                 return .none
@@ -149,7 +159,7 @@ struct BulletinBoardSearchFeature {
                         await send(.deleteBoard(board.id))
                         await send(.sheet(.presented(.seeMore(.completionDeletion))))
                     } catch {
-                        print(error)
+                        await send(.networkingFailed)
                     }
                     await send(.toggleLoading(false), animation: .bouncy)
                 }
@@ -162,10 +172,11 @@ struct BulletinBoardSearchFeature {
                 state.sheet = nil
                 return .none
                 
-            case .sheet, .binding:
+            case .alert, .sheet, .binding:
                 return .none
             }
         }
+        .ifLet(\.$alert, action: \.alert)
         .ifLet(\.$sheet, action: \.sheet)
     }
 }

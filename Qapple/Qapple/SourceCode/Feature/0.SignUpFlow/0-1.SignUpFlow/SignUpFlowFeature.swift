@@ -13,6 +13,7 @@ struct SignUpFlowFeature {
     @ObservableState
     struct State: Equatable {
         @Shared(.inMemory(Constant.isSignIn)) var isSignIn = false
+        @Presents var alert: AlertState<Action.Alert>?
         var socialLogin = SocialLoginFeature.State()
         var path = StackState<Path.State>()
     }
@@ -21,7 +22,11 @@ struct SignUpFlowFeature {
         case onAppear
         case autoLoginResponse
         case socialLogin(SocialLoginFeature.Action)
+        case networkingFailed
         case path(StackActionOf<Path>)
+        case alert(PresentationAction<Alert>)
+        
+        enum Alert: Equatable {}
     }
     
     @Dependency(\.appleLoginService) var appleLoginService
@@ -38,7 +43,7 @@ struct SignUpFlowFeature {
                         try await appleLoginService.autoLogin()
                         await send(.autoLoginResponse)
                     } catch {
-                        print(error)
+                        await send(.networkingFailed)
                     }
                 }
                 
@@ -53,6 +58,11 @@ struct SignUpFlowFeature {
                 } else {
                     state.path.append(.emailForm(.init()))
                 }
+                return .none
+                
+            case .networkingFailed:
+                HapticService.notification(type: .error)
+                state.alert = .failedNetworking
                 return .none
                 
             case let .path(stackAction):
@@ -82,10 +92,15 @@ struct SignUpFlowFeature {
                 default:
                     return .none
                 }
+                
+            case .alert:
+                return .none
+                
             default:
                 return .none
             }
         }
+        .ifLet(\.$alert, action: \.alert)
         .forEach(\.path, action: \.path)
     }
 }
