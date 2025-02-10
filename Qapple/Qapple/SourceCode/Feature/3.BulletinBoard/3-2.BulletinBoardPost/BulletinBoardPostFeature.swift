@@ -42,6 +42,7 @@ struct BulletinBoardPostFeature {
     }
     
     @Dependency(\.bulletinBoardRepository) var bulletinBoardRepository
+    @Dependency(\.dismiss) var dismiss
     
     var body: some ReducerOf<Self> {
         BindingReducer()
@@ -49,7 +50,9 @@ struct BulletinBoardPostFeature {
             switch action {
             case .cancelButtonTapped:
                 if state.boardText.isEmpty {
-                    // TODO: Navigation 처리
+                    return .run { send in
+                        await dismiss()
+                    }
                 } else {
                     state.alert = .confirmCancel
                 }
@@ -68,7 +71,7 @@ struct BulletinBoardPostFeature {
                     await send(.toggleLoading(true), animation: .bouncy)
                     do {
                         try await bulletinBoardRepository.postBoard(boardText)
-                        // TODO: Navigation 처리
+                        await dismiss()
                     } catch {
                         print(error)
                     }
@@ -89,6 +92,7 @@ struct BulletinBoardPostFeature {
             case .alert(.presented(.confirmCancel)):
                 return .run { send in
                     await send(.delegate(.confirmCancel))
+                    await dismiss()
                 }
                 
             case .binding, .sheet, .alert, .delegate:
