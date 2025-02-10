@@ -91,8 +91,6 @@ struct BulletinBoardFeature {
                 return .none
                 
             case let .boardCellTapped(board):
-                print("게시판 정보\(board)")
-                // TODO: Navigation 처리
                 return .none
                 
             case .reportButtonTapped:
@@ -125,15 +123,12 @@ struct BulletinBoardFeature {
                 return .none
                 
             case .searchButtonTapped:
-                // TODO: Navigation 처리
                 return .none
                 
             case .notificationButtonTapped:
-                // TODO: Navigation 처리
                 return .none
                 
             case .postBoardButtonTapped:
-                // TODO: Navigiation 처리
                 return .none
                 
             case let .seeMoreAction(board):

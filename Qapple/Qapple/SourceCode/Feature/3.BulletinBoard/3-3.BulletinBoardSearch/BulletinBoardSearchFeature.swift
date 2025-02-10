@@ -21,7 +21,6 @@ struct BulletinBoardSearchFeature {
     
     enum Action: BindableAction {
         case onAppear // 검색 문구 변화 시 호출
-        case onDisappear
         case refresh
         case pagination
         case searchBoardListResponse([BulletinBoard], QappleAPI.PaginationInfo)
@@ -32,7 +31,7 @@ struct BulletinBoardSearchFeature {
         case deleteBoard(Int)
         case searchTextChanged
         case binding(BindingAction<State>)
-        case postBoardButtonTapped
+        case boardCellTapped(BulletinBoard)
         case seeMoreAction(BulletinBoard)
         case toggleLoading(Bool)
         
@@ -60,9 +59,6 @@ struct BulletinBoardSearchFeature {
                     }
                     await send(.toggleLoading(false), animation: .bouncy)
                 }
-                
-            case .onDisappear:
-                return .none
                 
             case .pagination:
                 return .run { [
@@ -129,8 +125,7 @@ struct BulletinBoardSearchFeature {
                         .cancellable(id: "searchDebounce", cancelInFlight: true)
                 )
                 
-            case .postBoardButtonTapped:
-                // TODO: Navigiation 처리
+            case let .boardCellTapped(board):
                 return .none
                 
             case let .seeMoreAction(board):
@@ -162,9 +157,11 @@ struct BulletinBoardSearchFeature {
                 
             case .sheet(.presented(.seeMore(.alert(.presented(.confirmCompletion))))):
                 state.sheet = nil
-                return .run { send in
-                    await send(.onDisappear)
-                }
+                return .none
+                
+            case .sheet(.presented(.seeMore(.reportButtonTapped))):
+                state.sheet = nil
+                return .none
                 
             case .sheet, .binding:
                 return .none

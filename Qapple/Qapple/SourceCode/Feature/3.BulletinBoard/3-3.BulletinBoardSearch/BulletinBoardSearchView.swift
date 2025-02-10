@@ -90,7 +90,7 @@ private struct SearchListView: View {
             LazyVStack(spacing: 0) {
                 ForEach(enumerated(searchBoardList), id: \.offset) { index, board in
                     Button {
-                        store.send(.postBoardButtonTapped)
+                        store.send(.boardCellTapped(board))
                     } label: {
                         BulletinBoardCell(
                             board: board,
