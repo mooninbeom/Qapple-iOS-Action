@@ -214,7 +214,6 @@ struct CommentFeature {
                     do {
                         try await bulletinBoardRepository.deleteBoard(board.id)
                         await send(.sheet(.presented(.seeMore(.completionDeletion))))
-                        // TODO: Navigaition 뒤로가기
                     } catch {
                         print(error)
                     }
@@ -230,6 +229,7 @@ struct CommentFeature {
             case .sheet(.presented(.seeMore(.reportButtonTapped))):
                 state.sheet = nil
                 return .none
+                
             case let .alert(.presented(.confirmDeletion(boardCommentId))):
                 return .run { send in
                     await send(.toggleLoading(true), animation: .bouncy)
@@ -237,7 +237,6 @@ struct CommentFeature {
                         try await commentRepository.deleteBoardComment(boardCommentId)
                         await send(.refresh)
                         await send(.successDeletion)
-                        // TODO: 삭제 후 슬라이드 이동
                     } catch {
                         await send(.networkErrorAlert)
                     }

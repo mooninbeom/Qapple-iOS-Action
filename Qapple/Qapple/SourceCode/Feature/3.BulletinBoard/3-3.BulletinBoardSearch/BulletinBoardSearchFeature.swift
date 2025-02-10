@@ -46,8 +46,7 @@ struct BulletinBoardSearchFeature {
         BindingReducer()
         Reduce { state, action in
             switch action {
-            case .onAppear,
-                    .refresh:
+            case .onAppear, .refresh:
                 state.searchBoardList = []
                 return .run { [searchText = state.searchText] send in
                     await send(.toggleLoading(true), animation: .bouncy)

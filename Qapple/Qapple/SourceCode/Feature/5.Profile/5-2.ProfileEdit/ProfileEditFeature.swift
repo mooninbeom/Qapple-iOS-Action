@@ -59,7 +59,7 @@ struct ProfileEditFeature {
                     await send(.toggleLoading(true), animation: .bouncy)
                     do {
                         try await memberRepository.editMyPage(nickname, nil)
-                        // TODO: Navigation 처리
+                        await dismiss()
                     } catch {
                         print(error)
                         await send(.failEdit)
