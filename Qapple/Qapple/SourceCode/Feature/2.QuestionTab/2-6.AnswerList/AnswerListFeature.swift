@@ -141,6 +141,7 @@ struct AnswerListFeature {
             }
         }
         .ifLet(\.$sheet, action: \.sheet)
+        .ifLet(\.$alert, action: \.alert)
     }
 }
 

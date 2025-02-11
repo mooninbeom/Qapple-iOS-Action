@@ -65,8 +65,7 @@ struct AuthCodeFormView: View {
             .padding(.horizontal, 24)
             .disabled(store.isAuthCheckComplete)
             .onChange(of: store.authCodeText) { _, value in
-                store.authCodeText = value.slice(to: store.authCodeLimit)
-                store.authCodeText = value.uppercased()
+                store.send(.typeAuthCode(value))
             }
             
             Spacer()

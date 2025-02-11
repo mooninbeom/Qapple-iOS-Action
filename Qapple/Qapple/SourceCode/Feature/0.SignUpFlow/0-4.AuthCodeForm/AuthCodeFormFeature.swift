@@ -23,6 +23,7 @@ struct AuthCodeFormFeature {
     }
     
     enum Action: BindableAction {
+        case typeAuthCode(String)
         case backButtonTapped
         case checkAuthCodeButtonTapped
         case resendMailButtonTapped
@@ -46,6 +47,13 @@ struct AuthCodeFormFeature {
         BindingReducer()
         Reduce { state, action in
             switch action {
+            case let .typeAuthCode(text):
+                state.authCodeText = text.slice(to: state.authCodeLimit)
+                state.authCodeText = state.authCodeText.uppercased()
+                state.isAuthCodeValidate = true
+                state.isAuthCodeEnterComplete = state.authCodeText.count >= state.authCodeLimit
+                return .none
+                
             case .backButtonTapped:
                 return .run { send in
                     await dismiss()
@@ -67,10 +75,10 @@ struct AuthCodeFormFeature {
                 state.authCodeText.removeAll()
                 state.isAuthCodeEnterComplete = false
                 state.isAuthCodeValidate = true
-                return .run { [state = state] send in
+                return .run { [email = state.emailText] send in
                     await send(.toggleLoading(true), animation: .bouncy)
                     do {
-                        let _ = try await memberRepository.checkAuthCode(state.emailText, state.authCodeText)
+                        let _ = try await memberRepository.sendCertificationEmail(email)
                         await send(.resendMailResponse)
                     } catch {
                         await send(.resendMailFailed)
@@ -83,7 +91,7 @@ struct AuthCodeFormFeature {
                 return .none
                 
             case .resendMailResponse:
-                state.alert = .reSendMail
+                state.alert = .resendMail
                 return .none
                 
             case .checkAuthCodeFailed:
@@ -110,14 +118,13 @@ struct AuthCodeFormFeature {
                 return .none
                 
             case .binding(\.authCodeText):
-                state.isAuthCodeValidate = true
-                state.isAuthCodeEnterComplete = state.authCodeText.count >= 5
                 return .none
                 
             case .alert, .binding:
                 return .none
             }
         }
+        .ifLet(\.$alert, action: \.alert)
     }
 }
 
@@ -134,7 +141,7 @@ extension AlertState where Action == AuthCodeFormFeature.Action.Alert {
         TextState("메일함의 인증코드를 다시 확인해주세요")
     }
     
-    static let reSendMail = AlertState {
+    static let resendMail = AlertState {
         TextState("메일이 재발송 되었어요")
     } actions: {
         ButtonState(role: .cancel) {
