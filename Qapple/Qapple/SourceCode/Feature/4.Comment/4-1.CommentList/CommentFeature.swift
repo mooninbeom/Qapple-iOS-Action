@@ -28,6 +28,7 @@ struct CommentFeature {
         case pagination
         case commentListResponse([BoardComment], QappleAPI.PaginationInfo)
         case paginationResponse([BoardComment], QappleAPI.PaginationInfo)
+        case boardResponse(BulletinBoard)
         
         case backButtonTapped
         case likeCommentButtonTapped(BoardComment)
@@ -66,8 +67,10 @@ struct CommentFeature {
                 return .run { [boardId = state.board.id] send in
                     await send(.toggleLoading(true), animation: .bouncy)
                     do {
-                        let response = try await commentRepository.fetchBoardCommentList(boardId, nil)
-                        await send(.commentListResponse(response.0, response.1))
+                        let commentResponse = try await commentRepository.fetchBoardCommentList(boardId, nil)
+                        let boardResponse = try await bulletinBoardRepository.fetchSingleBoard(boardId)
+                        await send(.commentListResponse(commentResponse.0, commentResponse.1))
+                        await send(.boardResponse(boardResponse))
                     } catch {
                         await send(.networkingFailed)
                     }
@@ -100,6 +103,10 @@ struct CommentFeature {
             case let .paginationResponse(commentList, paginationInfo):
                 state.commentList.append(contentsOf: anonymizeCommentList(state.board.writerId, commentList))
                 state.paginationInfo = paginationInfo
+                return .none
+                
+            case let .boardResponse(board):
+                state.board = board
                 return .none
                 
             case .backButtonTapped:
@@ -160,7 +167,7 @@ struct CommentFeature {
             case .successDeletion:
                 state.alert = .successDeletion
                 NotificationCenter.default.post(name: .updateCommentCellToggle, object: nil)
-                return .none
+                return .send(.refresh)
                 
             case .likeBoardButtonTapped:
                 HapticService.impact(style: .light)
