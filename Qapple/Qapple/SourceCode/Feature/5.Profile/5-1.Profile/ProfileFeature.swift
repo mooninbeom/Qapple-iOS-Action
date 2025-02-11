@@ -36,6 +36,7 @@ struct ProfileFeature {
         case peopleWhoMadeQappleButtonTapped
         case logOutButtonTapped
         case resignButtonTapped
+        case networkingFailed
         case toggleLoading(Bool)
         
         enum Alert {
@@ -60,9 +61,6 @@ struct ProfileFeature {
             case .sheet(.presented(.inquiryButtonTap)):
                 return .none
                 
-            case .sheet:
-                return .none
-                
             case .alert(.presented(.confirmEmailDisabled)):
                 return .run { send in
                     await send(.delegate(.confirmEmailDisabled))
@@ -74,7 +72,7 @@ struct ProfileFeature {
                         isSignIn.withLock { $0 = false }
                         try keychainService.createData(.userId, "")
                     } catch {
-                        print(error)
+                        await send(.networkingFailed)
                     }
                 }
                 
@@ -86,16 +84,10 @@ struct ProfileFeature {
                         isSignIn.withLock { $0 = false }
                         try keychainService.createData(.userId, "")
                     } catch {
-                        print(error)
+                        await send(.networkingFailed)
                     }
                     await send(.toggleLoading(false), animation: .bouncy)
                 }
-                
-            case .alert:
-                return .none
-                
-            case .delegate:
-                return .none
                 
             case .getProfile:
                 return .run { send in
@@ -104,7 +96,7 @@ struct ProfileFeature {
                         let data = try await memberRepository.fetchMyPage()
                         await send(.fetchProfile(data))
                     } catch {
-                        print(error)
+                        await send(.networkingFailed)
                     }
                     await send(.toggleLoading(false), animation: .bouncy)
                 }
@@ -135,15 +127,25 @@ struct ProfileFeature {
                 return .none
                 
             case .logOutButtonTapped:
+                HapticService.notification(type: .warning)
                 state.alert = .confirmLogout
                 return .none
                 
             case .resignButtonTapped:
+                HapticService.notification(type: .warning)
                 state.alert = .confirmResign
+                return .none
+                
+            case .networkingFailed:
+                HapticService.notification(type: .error)
+                state.alert = .failedNetworking
                 return .none
                 
             case let .toggleLoading(bool):
                 state.isLoading = bool
+                return .none
+                
+            case .alert, .sheet, .delegate:
                 return .none
             }
         }

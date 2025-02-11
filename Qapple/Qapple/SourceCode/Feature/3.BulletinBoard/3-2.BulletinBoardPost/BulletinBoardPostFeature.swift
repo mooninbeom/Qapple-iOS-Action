@@ -22,9 +22,10 @@ struct BulletinBoardPostFeature {
     
     enum Action: BindableAction {
         case cancelButtonTapped
-        case contentChanged
+        case boardTextChanged
         case postBoardButtonTapped
         case anonymityNoticeButtonTapped
+        case networkingFailed
         case toggleLoading(Bool)
         case binding(BindingAction<State>)
         
@@ -42,6 +43,7 @@ struct BulletinBoardPostFeature {
     }
     
     @Dependency(\.bulletinBoardRepository) var bulletinBoardRepository
+    @Dependency(\.dismiss) var dismiss
     
     var body: some ReducerOf<Self> {
         BindingReducer()
@@ -49,13 +51,15 @@ struct BulletinBoardPostFeature {
             switch action {
             case .cancelButtonTapped:
                 if state.boardText.isEmpty {
-                    // TODO: Navigation 처리
+                    return .run { send in
+                        await dismiss()
+                    }
                 } else {
                     state.alert = .confirmCancel
                 }
                 return .none
                 
-            case .contentChanged:
+            case .boardTextChanged:
                 state.boardTextFontSize = adaptiveFontSize(from: state.boardText)
                 if state.boardText.count > state.textCountLimit {
                     state.boardText = String(state.boardText.prefix(state.textCountLimit))
@@ -63,14 +67,15 @@ struct BulletinBoardPostFeature {
                 return .none
                 
             case .postBoardButtonTapped:
+                HapticService.notification(type: .success)
                 let boardText = state.boardText
                 return .run { send in
                     await send(.toggleLoading(true), animation: .bouncy)
                     do {
                         try await bulletinBoardRepository.postBoard(boardText)
-                        // TODO: Navigation 처리
+                        await dismiss()
                     } catch {
-                        print(error)
+                        await send(.networkingFailed)
                     }
                     await send(.toggleLoading(false), animation: .bouncy)
                 }
@@ -79,18 +84,22 @@ struct BulletinBoardPostFeature {
                 state.sheet = .anonymityNotice
                 return .none
                 
+            case .networkingFailed:
+                HapticService.notification(type: .error)
+                state.alert = .failedNetworking
+                return .none
+                
             case let .toggleLoading(bool):
                 state.isLoading = bool
                 return .none
                 
             case .binding(\.boardText):
-                return .run { send in
-                    await send(.contentChanged)
-                }
+                return .none
                 
             case .alert(.presented(.confirmCancel)):
                 return .run { send in
                     await send(.delegate(.confirmCancel))
+                    await dismiss()
                 }
                 
             case .binding, .sheet, .alert, .delegate:

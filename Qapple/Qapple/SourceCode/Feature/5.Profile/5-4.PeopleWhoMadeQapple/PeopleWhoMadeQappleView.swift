@@ -117,14 +117,14 @@ private struct iOSDeveloper: View {
                 linkedinLink: nil
             )
             PeopleWhoMadeQappleCell(
-                avatar: .simons,
-                backgroundColor: .simons,
+                avatar: .simmons,
+                backgroundColor: .simmons,
                 nicknameKor: "시몬스",
-                nicknameEng: "simons",
+                nicknameEng: "simmons",
                 position: "iOS Developer",
                 description: "흔들리지 않는 편안함",
-                githubLink: nil,
-                linkedinLink: "https://www.linkedin.com/in/omj0722/"
+                githubLink: "https://github.com/OhMyungJin",
+                linkedinLink: nil
             )
         }
     }

@@ -18,6 +18,7 @@ struct MyAnswerListFeature {
         var paginationInfo = QappleAPI.PaginationInfo(threshold: "", hasNext: false)
         var isLoading = false
         @Presents var sheet: Sheet.State?
+        @Presents var alert: AlertState<Action.Alert>?
     }
     
     enum Action {
@@ -34,8 +35,12 @@ struct MyAnswerListFeature {
         )
         case seeMoreAction(Answer)
         case backButtonTapped
+        case networkingFailed
         case toggleLoading(Bool)
         case sheet(PresentationAction<Sheet.Action>)
+        case alert(PresentationAction<Alert>)
+        
+        enum Alert: Equatable {}
     }
     
     @Dependency(\.answerRepository) var answerRepository
@@ -51,7 +56,7 @@ struct MyAnswerListFeature {
                         let response = try await answerRepository.fetchAnswerListOfProfile(nil)
                         await send(.answerListResponse(response.0, response.1))
                     } catch {
-                        print(error)
+                        await send(.networkingFailed)
                     }
                     await send(.toggleLoading(false), animation: .bouncy)
                 }
@@ -93,7 +98,7 @@ struct MyAnswerListFeature {
                         try await answerRepository.deleteAnswer(answer.id)
                         await send(.sheet(.presented(.seeMore(.completionDeletion))))
                     } catch {
-                        print(error)
+                        await send(.networkingFailed)
                     }
                     await send(.toggleLoading(false), animation: .bouncy)
                 }
@@ -109,14 +114,20 @@ struct MyAnswerListFeature {
                     await dismiss()
                 }
                 
+            case .networkingFailed:
+                HapticService.notification(type: .error)
+                state.alert = .failedNetworking
+                return .none
+                
             case let .toggleLoading(bool):
                 state.isLoading = bool
                 return .none
                 
-            case .sheet:
+            case .alert, .sheet:
                 return .none
             }
         }
+        .ifLet(\.$alert, action: \.alert)
         .ifLet(\.$sheet, action: \.sheet)
     }
 }

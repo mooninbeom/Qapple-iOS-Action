@@ -35,9 +35,6 @@ struct BulletinBoardView: View {
         .refreshable {
             store.send(.refresh)
         }
-        .onReceive(NotificationCenter.default.publisher(for: .updateViewNotification)) { _ in
-            store.send(.refresh)
-        }
         .loadingIndicator(isLoading: store.isLoading)
         .sheet(item: $store.scope(state: \.sheet, action: \.sheet)
         ) { store in
@@ -97,22 +94,22 @@ private struct BulletionBoardListView: View {
         ScrollView {
             LazyVStack(spacing: 0) {
                 ForEach(enumerated(store.bulletinBoardList), id: \.offset) { index, board in
-                    BulletinBoardCell(
-                        board: board,
-                        seeMore: {
-                            store.send(.seeMoreAction(board))
-                        },
-                        like: {
-                            store.send(.likeBoardButtonTapped(board))
-                        }
-                    )
-                    .onTapGesture {
+                    Button {
                         if !board.isReported {
                             store.send(.boardCellTapped(board))
                         } else {
-                            LegacyHapticService.shared.notification(type: .warning)
                             store.send(.reportButtonTapped)
                         }
+                    } label: {
+                        BulletinBoardCell(
+                            board: board,
+                            seeMore: {
+                                store.send(.seeMoreAction(board))
+                            },
+                            like: {
+                                store.send(.likeBoardButtonTapped(board))
+                            }
+                        )
                     }
                     .configurePagination(
                         store.bulletinBoardList,
@@ -128,7 +125,6 @@ private struct BulletionBoardListView: View {
                 }
             }
         }
-        .disabled(store.isLoading)
     }
 }
 

@@ -134,6 +134,7 @@ private struct ContentView: View {
                     .pretendard(.medium, 16)
                     .foregroundStyle(TextLabel.main)
                     .padding(.top, 2)
+                    .multilineTextAlignment(.leading)
                 
                 RemoteView(
                     board: board,
@@ -156,7 +157,6 @@ private struct RemoteView: View {
     var body: some View {
         HStack {
             Button {
-                if !board.isLiked { LegacyHapticService.shared.impact(style: .light) }
                 like()
             } label: {
                 HStack(spacing: 4) {

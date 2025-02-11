@@ -14,13 +14,19 @@ struct SocialLoginFeature {
     @ObservableState
     struct State: Equatable {
         var isLoading = false
+        @Presents var alert: AlertState<Action.Alert>?
     }
     
     enum Action {
         case appleLoginOnRequest(ASAuthorizationAppleIDRequest)
         case appleLoginOnCompletion(Result<ASAuthorization, Error>)
+        case networkingFailed
         case toggleLoading(Bool)
         case delegate(Delegate)
+        
+        case alert(PresentationAction<Alert>)
+        
+        enum Alert: Equatable {}
         
         enum Delegate {
             case signInResponse(Bool)
@@ -45,18 +51,24 @@ struct SocialLoginFeature {
                         let isSignUp = try await memberRepository.signIn(authCode)
                         await send(.delegate(.signInResponse(isSignUp)))
                     } catch {
-                        print(error)
+                        await send(.networkingFailed)
                     }
                     await send(.toggleLoading(false), animation: .bouncy)
                 }
+                
+            case .networkingFailed:
+                HapticService.notification(type: .error)
+                state.alert = .failedNetworking
+                return .none
                 
             case let .toggleLoading(bool):
                 state.isLoading = bool
                 return .none
                 
-            case .delegate:
+            case .alert, .delegate:
                 return .none
             }
         }
+        .ifLet(\.$alert, action: \.alert)
     }
 }

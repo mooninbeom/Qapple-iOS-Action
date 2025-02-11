@@ -83,6 +83,9 @@ struct MainFlowFeature {
                 state.path.append(.bulletinBoardPost(.init()))
                 return .none
                 
+            case let .bulletinBoardTab(.sheet(.presented(.seeMore(.reportButtonTapped(dataType))))):
+                state.path.append(.report(.init(dataType: dataType)))
+                return .none
             case let .profileTab(.editProfileButtonTapped(nickname)):
                 state.path.append(.profileEdit(.init(nickname: nickname, defaultNickname: nickname)))
                 return .none
@@ -109,8 +112,23 @@ struct MainFlowFeature {
                     state.path.append(.report(.init(dataType: dataType)))
                     return .none
                     
+                case let .element(id: _, action: .bulletinBoardSearch(.sheet(.presented(.seeMore(.reportButtonTapped(dataType)))))):
+                    state.path.append(.report(.init(dataType: dataType)))
+                    return .none
+                    
                 case let .element(id: _, action: .comment(.reportButtonTapped(comment))):
                     state.path.append(.report(.init(dataType: .comment(comment))))
+                    return .none
+                    
+                case let .element(id: _, action: .comment(.sheet(.presented(.seeMore(.reportButtonTapped(dataType)))))):
+                    state.path.append(.report(.init(dataType: dataType)))
+                    return .none
+                    
+                case .element(id: _, action: .report(.alert(.presented(.confirmCompletion)))):
+                    let previousPath = state.path.dropLast().last
+                    if case .comment = previousPath {
+                        state.path.removeLast(2)
+                    }
                     return .none
                   
                 case let .element(id: _, action: .notificationList(.navigateToComment(board))):
@@ -125,11 +143,19 @@ struct MainFlowFeature {
                     state.path.append(.answerList(.init(question: question)))
                     return .none
                     
+                case let .element(id: _, action: .bulletinBoardSearch(.boardCellTapped(board))):
+                    state.path.append(.comment(.init(board: board)))
+                    return .none
+                    
                 case .element(id: _, action: .answerList(.backButtonTapped)):
                     state.path.removeAll()
                     return .none
                     
                 case .element(id: _, action: .answerList(.onDisappear)):
+                    state.path.removeAll()
+                    return .none
+                    
+                case .element(id: _, action: .comment(.onDisappear)):
                     state.path.removeAll()
                     return .none
                     

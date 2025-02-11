@@ -115,18 +115,6 @@ private struct AnswerTextField: View {
             isTextFieldFocused = true
         }
     }
-    
-    /// 답변 글자 수에 따른 적응형 폰트 사이즈를 반환합니다.
-    private func adaptiveFontSize(from answerText: String) -> CGFloat {
-        switch answerText.count {
-        case 0..<20: 48
-        case 20..<32: 40
-        case 32..<60: 32
-        case 60...100: 24
-        case 100...: 17
-        default: 48
-        }
-    }
 }
 
 // MARK: - Bottom

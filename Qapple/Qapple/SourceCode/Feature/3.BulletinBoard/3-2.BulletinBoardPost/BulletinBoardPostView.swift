@@ -56,7 +56,6 @@ private struct BulletinBoardPostNavigationBar: View {
             trailingView: {
                 NavigationButton(buttonType: .text("완료", store.boardText.isEmpty ? .disable : .button)) {
                     if !store.boardText.isEmpty {
-                        LegacyHapticService.shared.notification(type: .success)
                         store.send(.postBoardButtonTapped)
                     }
                 }
@@ -86,6 +85,9 @@ private struct BoardTextField: View {
                 .padding(.horizontal, 24)
                 .autocorrectionDisabled()
                 .multilineTextAlignment(.center)
+                .onChange(of: store.boardText) { _ in
+                    store.send(.boardTextChanged)
+                }
         }
         .onTapGesture {
             isTextFieldFocused = true

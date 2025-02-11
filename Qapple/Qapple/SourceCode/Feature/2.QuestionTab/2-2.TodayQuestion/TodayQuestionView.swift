@@ -206,18 +206,14 @@ private struct AnswerPreviewList: View {
         VStack(spacing: 0) {
             ForEach(enumerated(store.answerPreviewList), id: \.element.id) {
                 index, answer in
-                Button {
-                    
-                } label: {
-                    AnswerCell(
-                        answer: answer,
-                        index: index,
-                        state: .normal,
-                        seeMoreAction: {
-                            store.send(.seeMoreAnswerButtonTapped(answer))
-                        }
-                    )
-                }
+                AnswerCell(
+                    answer: answer,
+                    index: index,
+                    state: .normal,
+                    seeMoreAction: {
+                        store.send(.seeMoreAnswerButtonTapped(answer))
+                    }
+                )
             }
         }
     }

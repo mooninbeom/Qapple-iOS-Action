@@ -13,6 +13,7 @@ struct BulletinBoardSearchFeature {
     @ObservableState
     struct State: Equatable {
         @Presents var sheet: Sheet.State?
+        @Presents var alert: AlertState<Action.Alert>?
         var searchBoardList: [BulletinBoard] = []
         var paginationInfo = QappleAPI.PaginationInfo(threshold: "", hasNext: false)
         var searchText: String = ""
@@ -21,7 +22,6 @@ struct BulletinBoardSearchFeature {
     
     enum Action: BindableAction {
         case onAppear // 검색 문구 변화 시 호출
-        case onDisappear
         case refresh
         case pagination
         case searchBoardListResponse([BulletinBoard], QappleAPI.PaginationInfo)
@@ -32,11 +32,15 @@ struct BulletinBoardSearchFeature {
         case deleteBoard(Int)
         case searchTextChanged
         case binding(BindingAction<State>)
-        case postBoardButtonTapped
+        case boardCellTapped(BulletinBoard)
         case seeMoreAction(BulletinBoard)
+        case networkingFailed
         case toggleLoading(Bool)
         
         case sheet(PresentationAction<Sheet.Action>)
+        case alert(PresentationAction<Alert>)
+        
+        enum Alert: Equatable {}
     }
     
     @Dependency(\.dismiss) var dismiss
@@ -47,8 +51,7 @@ struct BulletinBoardSearchFeature {
         BindingReducer()
         Reduce { state, action in
             switch action {
-            case .onAppear,
-                    .refresh:
+            case .onAppear, .refresh:
                 state.searchBoardList = []
                 return .run { [searchText = state.searchText] send in
                     await send(.toggleLoading(true), animation: .bouncy)
@@ -56,13 +59,10 @@ struct BulletinBoardSearchFeature {
                         let response = try await bulletinBoardRepository.searchBoard(searchText, nil)
                         await send(.searchBoardListResponse(response.0, response.1))
                     } catch {
-                        print(error)
+                        await send(.networkingFailed)
                     }
                     await send(.toggleLoading(false), animation: .bouncy)
                 }
-                
-            case .onDisappear:
-                return .none
                 
             case .pagination:
                 return .run { [
@@ -74,7 +74,7 @@ struct BulletinBoardSearchFeature {
                         let response = try await bulletinBoardRepository.searchBoard(searchText, threshold)
                         await send(.searchBoardListResponse(response.0, response.1))
                     } catch {
-                        print(error)
+                        await send(.networkingFailed)
                     }
                     await send(.toggleLoading(false), animation: .bouncy)
                 }
@@ -96,7 +96,7 @@ struct BulletinBoardSearchFeature {
                         try await bulletinBoardRepository.likeBoard(board.id)
                         await send(.likeBoard(board.id))
                     } catch {
-                        print(error)
+                        await send(.networkingFailed)
                     }
                     await send(.toggleLoading(false), animation: .bouncy)
                 }
@@ -129,8 +129,7 @@ struct BulletinBoardSearchFeature {
                         .cancellable(id: "searchDebounce", cancelInFlight: true)
                 )
                 
-            case .postBoardButtonTapped:
-                // TODO: Navigiation 처리
+            case let .boardCellTapped(board):
                 return .none
                 
             case let .seeMoreAction(board):
@@ -140,6 +139,11 @@ struct BulletinBoardSearchFeature {
                         dataType: .bulletinBoard(board)
                     )
                 )
+                return .none
+                
+            case .networkingFailed:
+                HapticService.notification(type: .error)
+                state.alert = .failedNetworking
                 return .none
                 
             case let .toggleLoading(bool):
@@ -155,21 +159,24 @@ struct BulletinBoardSearchFeature {
                         await send(.deleteBoard(board.id))
                         await send(.sheet(.presented(.seeMore(.completionDeletion))))
                     } catch {
-                        print(error)
+                        await send(.networkingFailed)
                     }
                     await send(.toggleLoading(false), animation: .bouncy)
                 }
                 
             case .sheet(.presented(.seeMore(.alert(.presented(.confirmCompletion))))):
                 state.sheet = nil
-                return .run { send in
-                    await send(.onDisappear)
-                }
+                return .none
                 
-            case .sheet, .binding:
+            case .sheet(.presented(.seeMore(.reportButtonTapped))):
+                state.sheet = nil
+                return .none
+                
+            case .alert, .sheet, .binding:
                 return .none
             }
         }
+        .ifLet(\.$alert, action: \.alert)
         .ifLet(\.$sheet, action: \.sheet)
     }
 }

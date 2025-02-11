@@ -16,7 +16,15 @@ struct BulletinBoardSearchView: View {
         GeometryReader { proxy in
             ZStack {
                 VStack(spacing: 0) {
-                    SearchNavigationBar(store: store)
+                    NavigationBar(
+                        title: "검색하기",
+                        backgroundColor: Background.first,
+                        leadingView: {
+                            NavigationButton(buttonType: .back) {
+                                store.send(.backButtonTapped)
+                            }
+                        }
+                    )
                     
                     SearchBar(store: store)
                         .padding(.horizontal, 16)
@@ -31,6 +39,11 @@ struct BulletinBoardSearchView: View {
             .background(Background.first)
             .navigationBarBackButtonHidden()
         }
+        .onAppear {
+            if !store.searchText.isEmpty {
+                store.send(.onAppear)
+            }
+        }
         .refreshable {
             store.send(.refresh)
         }
@@ -44,24 +57,6 @@ struct BulletinBoardSearchView: View {
         .onTapGesture {
             hideKeyboard()
         }
-    }
-}
-
-// MARK: - SearchNavigationBar
-
-private struct SearchNavigationBar: View {
-    
-    let store: StoreOf<BulletinBoardSearchFeature>
-    
-    var body: some View {
-        NavigationBar(
-            title: "검색하기",
-            backgroundColor: Background.first,
-            leadingView: {
-                NavigationButton(buttonType: .xmark) {
-                    store.send(.backButtonTapped)
-                }
-            })
     }
 }
 
@@ -99,17 +94,18 @@ private struct SearchListView: View {
         ScrollView {
             LazyVStack(spacing: 0) {
                 ForEach(enumerated(searchBoardList), id: \.offset) { index, board in
-                    BulletinBoardCell(
-                        board: board,
-                        seeMore: {
-                            store.send(.seeMoreAction(board))
-                        },
-                        like: {
-                            store.send(.likeBoardButtonTapped(board))
-                        }
-                    )
-                    .onTapGesture {
-                        store.send(.postBoardButtonTapped)
+                    Button {
+                        store.send(.boardCellTapped(board))
+                    } label: {
+                        BulletinBoardCell(
+                            board: board,
+                            seeMore: {
+                                store.send(.seeMoreAction(board))
+                            },
+                            like: {
+                                store.send(.likeBoardButtonTapped(board))
+                            }
+                        )
                     }
                     .configurePagination(
                         store.searchBoardList,

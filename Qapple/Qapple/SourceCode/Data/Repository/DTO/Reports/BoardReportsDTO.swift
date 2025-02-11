@@ -8,8 +8,7 @@
 import Foundation
 
 struct BoardReportsDTO: Codable {
-    let boardId: Int
-    let boardReportType: String
+    let boardReportId: Int
 }
 
 struct BoardReportsRequest: Codable {

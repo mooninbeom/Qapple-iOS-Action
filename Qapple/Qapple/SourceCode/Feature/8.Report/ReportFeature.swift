@@ -21,6 +21,7 @@ struct ReportFeature {
         case backButtonTapped
         case reportCellTapped(ReportType)
         case completionReport
+        case networkingFailed
         case toggleLoading(Bool)
         case alert(PresentationAction<Alert>)
         
@@ -49,14 +50,11 @@ struct ReportFeature {
                     await send(.toggleLoading(true), animation: .bouncy)
                     do {
                         switch dataType {
-                        case let .myAnswer(answer):
-                            break
-                            
                         case let .answer(answer):
                             try await reportRepository.reportAnswer(answer.id, reportType)
                             
-                        case let .bulletinBoard(bulletinBoard):
-                            break
+                        case let .bulletinBoard(board):
+                            try await reportRepository.reportBoard(board.id, reportType)
                             
                         case let .comment(comment):
                             try await reportRepository.reportComment(comment.id, reportType)
@@ -64,7 +62,7 @@ struct ReportFeature {
                         }
                         await send(.completionReport)
                     } catch {
-                        print(error)
+                        await send(.networkingFailed)
                     }
                     await send(.toggleLoading(false), animation: .bouncy)
                 }
@@ -77,6 +75,11 @@ struct ReportFeature {
                 return .run { send in
                     await dismiss()
                 }
+                
+            case .networkingFailed:
+                HapticService.notification(type: .error)
+                state.alert = .failedNetworking
+                return .none
                 
             case let .toggleLoading(bool):
                 state.isLoading = bool
@@ -125,7 +128,7 @@ extension AlertState where Action == ReportFeature.Action.Alert {
     /// 신고 확인
     static func reportCheck(from dataType: DataType, type: ReportFeature.ReportType) -> Self {
         let targetText = switch dataType {
-        case .answer, .myAnswer: "답변"
+        case .answer: "답변"
         case .bulletinBoard: "게시글"
         case .comment: "댓글"
         }
@@ -144,7 +147,7 @@ extension AlertState where Action == ReportFeature.Action.Alert {
     /// 신고 완료
     static func reportComplete(from dataType: DataType) -> Self {
         let targetText = switch dataType {
-        case .answer, .myAnswer: "답변"
+        case .answer: "답변"
         case .bulletinBoard: "게시글"
         case .comment: "댓글"
         }

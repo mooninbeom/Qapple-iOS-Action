@@ -41,16 +41,14 @@ struct CommentFeature {
         case likeBoardButtonTapped
         case likeBoard
         case seeMoreAction
+        case networkingFailed
         case toggleLoading(Bool)
         case binding(BindingAction<State>)
         
-        case networkErrorAlert
         case sheet(PresentationAction<Sheet.Action>)
         case alert(PresentationAction<Alert>)
         
-        
         enum Alert: Equatable {
-            case networkError
             case confirmDeletion(Int)
             case successDeletion
         }
@@ -71,7 +69,7 @@ struct CommentFeature {
                         let response = try await commentRepository.fetchBoardCommentList(boardId, nil)
                         await send(.commentListResponse(response.0, response.1))
                     } catch {
-                        await send(.networkErrorAlert)
+                        await send(.networkingFailed)
                     }
                     await send(.toggleLoading(false), animation: .bouncy)
                 }
@@ -89,7 +87,7 @@ struct CommentFeature {
                         let response = try await commentRepository.fetchBoardCommentList(boardId, threshold)
                         await send(.paginationResponse(response.0, response.1))
                     } catch {
-                        await send(.networkErrorAlert)
+                        await send(.networkingFailed)
                     }
                     await send(.toggleLoading(false), animation: .bouncy)
                 }
@@ -110,15 +108,14 @@ struct CommentFeature {
                 }
                 
             case let .likeCommentButtonTapped(boardComment):
-                print(boardComment.id)
+                HapticService.impact(style: .light)
                 return .run { send in
                     await send(.toggleLoading(true), animation: .bouncy)
                     do {
                         try await commentRepository.likeBoardComment(boardComment.id)
                         await send(.likeComment(boardComment.id))
                     } catch {
-                        print(error)
-                        await send(.networkErrorAlert)
+                        await send(.networkingFailed)
                     }
                     await send(.toggleLoading(false), animation: .bouncy)
                 }
@@ -142,7 +139,7 @@ struct CommentFeature {
                         await send(.refresh)
                         await send(.commentTextReset)
                     } catch {
-                        await send(.networkErrorAlert)
+                        await send(.networkingFailed)
                     }
                     await send(.toggleLoading(false), animation: .bouncy)
                 }
@@ -173,7 +170,7 @@ struct CommentFeature {
                         try await bulletinBoardRepository.likeBoard(board.id)
                         await send(.likeBoard)
                     } catch {
-                        print(error)
+                        await send(.networkingFailed)
                     }
                     await send(.toggleLoading(false), animation: .bouncy)
                 }
@@ -196,15 +193,16 @@ struct CommentFeature {
                 )
                 return .none
                 
+            case .networkingFailed:
+                HapticService.notification(type: .error)
+                state.alert = .failedNetworking
+                return .none
+                
             case let .toggleLoading(bool):
                 state.isLoading = bool
                 return .none
                 
             case .binding(\.commentText):
-                return .none
-                
-            case .networkErrorAlert:
-                state.alert = .networkError
                 return .none
                 
             case let .sheet(.presented(.seeMore(.alert(.presented(.confirmDeletion(sheetData)))))):
@@ -214,9 +212,8 @@ struct CommentFeature {
                     do {
                         try await bulletinBoardRepository.deleteBoard(board.id)
                         await send(.sheet(.presented(.seeMore(.completionDeletion))))
-                        // TODO: Navigaition 뒤로가기
                     } catch {
-                        print(error)
+                        await send(.networkingFailed)
                     }
                     await send(.toggleLoading(false), animation: .bouncy)
                 }
@@ -227,6 +224,10 @@ struct CommentFeature {
                     await send(.onDisappear)
                 }
                 
+            case .sheet(.presented(.seeMore(.reportButtonTapped))):
+                state.sheet = nil
+                return .none
+                
             case let .alert(.presented(.confirmDeletion(boardCommentId))):
                 return .run { send in
                     await send(.toggleLoading(true), animation: .bouncy)
@@ -234,9 +235,8 @@ struct CommentFeature {
                         try await commentRepository.deleteBoardComment(boardCommentId)
                         await send(.refresh)
                         await send(.successDeletion)
-                        // TODO: 삭제 후 슬라이드 이동
                     } catch {
-                        await send(.networkErrorAlert)
+                        await send(.networkingFailed)
                     }
                     await send(.toggleLoading(false), animation: .bouncy)
                 }
@@ -281,16 +281,6 @@ extension AlertState where Action == CommentFeature.Action.Alert {
         ButtonState(role: .cancel) {
             TextState("확인")
         }
-    }
-    
-    static let networkError = Self {
-        TextState("알 수 없는 오류가 발생했습니다.")
-    } actions: {
-        ButtonState(role: .cancel) {
-            TextState("확인")
-        }
-    } message: {
-        TextState("잠시후 다시 시도해주세요.")
     }
 }
 
