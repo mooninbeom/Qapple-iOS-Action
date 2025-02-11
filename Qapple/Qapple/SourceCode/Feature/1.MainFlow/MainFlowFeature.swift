@@ -125,8 +125,8 @@ struct MainFlowFeature {
                     return .none
                     
                 case .element(id: _, action: .report(.alert(.presented(.confirmCompletion)))):
-                    let previousScreen = state.path.dropLast().last
-                    if case .comment = previousScreen {
+                    let previousPath = state.path.dropLast().last
+                    if case .comment = previousPath {
                         state.path.removeLast(2)
                     }
                     return .none
