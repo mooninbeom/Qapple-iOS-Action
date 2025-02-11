@@ -27,7 +27,7 @@ struct ReportFeature {
         
         enum Alert: Equatable {
             case confirmReport(ReportType)
-            case confirmCompletion
+            case confirmCompletion(DataType)
         }
     }
     
@@ -70,11 +70,6 @@ struct ReportFeature {
             case .completionReport:
                 state.alert = .reportComplete(from: state.dataType)
                 return .none
-                
-            case .alert(.presented(.confirmCompletion)):
-                return .run { send in
-                    await dismiss()
-                }
                 
             case .networkingFailed:
                 HapticService.notification(type: .error)
@@ -154,7 +149,7 @@ extension AlertState where Action == ReportFeature.Action.Alert {
         return Self {
             TextState("\(targetText)이 신고되었어요")
         } actions: {
-            ButtonState(role: .none, action: .confirmCompletion) {
+            ButtonState(role: .none, action: .confirmCompletion(dataType)) {
                 TextState("확인")
             }
         } message: {
