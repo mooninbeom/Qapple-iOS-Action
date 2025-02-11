@@ -39,6 +39,11 @@ struct BulletinBoardSearchView: View {
             .background(Background.first)
             .navigationBarBackButtonHidden()
         }
+        .onAppear {
+            if !store.searchText.isEmpty {
+                store.send(.onAppear)
+            }
+        }
         .refreshable {
             store.send(.refresh)
         }
