@@ -67,10 +67,10 @@ struct AuthCodeFormFeature {
                 state.authCodeText.removeAll()
                 state.isAuthCodeEnterComplete = false
                 state.isAuthCodeValidate = true
-                return .run { [state = state] send in
+                return .run { [email = state.emailText] send in
                     await send(.toggleLoading(true), animation: .bouncy)
                     do {
-                        let _ = try await memberRepository.checkAuthCode(state.emailText, state.authCodeText)
+                        let _ = try await memberRepository.sendCertificationEmail(email)
                         await send(.resendMailResponse)
                     } catch {
                         await send(.resendMailFailed)
@@ -118,6 +118,7 @@ struct AuthCodeFormFeature {
                 return .none
             }
         }
+        .ifLet(\.$alert, action: \.alert)
     }
 }
 

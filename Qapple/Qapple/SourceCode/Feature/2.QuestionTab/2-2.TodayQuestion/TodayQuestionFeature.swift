@@ -159,6 +159,7 @@ struct TodayQuestionFeature {
             }
         }
         .ifLet(\.$sheet, action: \.sheet)
+        .ifLet(\.$alert, action: \.alert)
     }
 }
 
