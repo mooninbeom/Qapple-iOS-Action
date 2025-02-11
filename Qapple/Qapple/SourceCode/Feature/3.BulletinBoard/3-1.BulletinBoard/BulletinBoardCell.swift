@@ -134,6 +134,7 @@ private struct ContentView: View {
                     .pretendard(.medium, 16)
                     .foregroundStyle(TextLabel.main)
                     .padding(.top, 2)
+                    .multilineTextAlignment(.leading)
                 
                 RemoteView(
                     board: board,

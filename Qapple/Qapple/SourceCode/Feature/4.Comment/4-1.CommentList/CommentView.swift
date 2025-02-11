@@ -34,7 +34,7 @@ struct CommentView: View {
                     store.send(.likeBoardButtonTapped)
                 }
             )
-            .frame(width: UIScreen.main.bounds.width)
+            .frame(width: screenWidth)
             .disabled(store.isLoading)
             
             CommentListView(store: store)
