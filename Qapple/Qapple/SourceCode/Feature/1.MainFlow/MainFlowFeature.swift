@@ -124,10 +124,13 @@ struct MainFlowFeature {
                     state.path.append(.report(.init(dataType: dataType)))
                     return .none
                     
-                case .element(id: _, action: .report(.alert(.presented(.confirmCompletion)))):
+                case let .element(id: _, action: .report(.alert(.presented(.confirmCompletion(dataType))))):
                     let previousPath = state.path.dropLast().last
-                    if case .comment = previousPath {
+                    
+                    if case .comment = previousPath, case .bulletinBoard = dataType {
                         state.path.removeLast(2)
+                    } else {
+                        state.path.removeLast()
                     }
                     return .none
                   

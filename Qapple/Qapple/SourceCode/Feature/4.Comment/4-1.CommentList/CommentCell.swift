@@ -15,25 +15,24 @@ struct CommentCell: View {
     let delete: () -> Void
     let report: () -> Void
     
-    let screenWidth: CGFloat = UIScreen.main.bounds.width
-    let anchorWidth: CGFloat = 73
-    
-    let publisher = NotificationCenter.default.publisher(for: .updateCommentCellToggle)
-    
     @State private var hOffset: CGFloat = 0
-    @State private var anchor: CGFloat = 0
-    @State private var isCellToggled: Bool = false
-    @State private var isReportedComment: Bool = false
+    @State private var reportedCommentVisible: Bool = false
     
     var body: some View {
         ZStack {
-            if !isReportedComment {
+            if comment.isReport, !reportedCommentVisible {
+                ReportCell(reportedCommentVisible: $reportedCommentVisible)
+            } else {
                 HStack(spacing: 0) {
                     Spacer()
                         .frame(width: 73)
                     
-                    content
-                        .frame(width: screenWidth)
+                    CommentContentView(
+                        hOffset: $hOffset,
+                        reportedCommentVisible: $reportedCommentVisible,
+                        comment: comment,
+                        like: like
+                    )
                     
                     if comment.isMine {
                         CommentDeleteButton(delete: delete)
@@ -42,23 +41,19 @@ struct CommentCell: View {
                     }
                 }
                 .offset(x: hOffset)
-            } else {
-                reportCell
             }
-        }
-        .onAppear {
-            if comment.isReport {
-                self.isReportedComment = true
-            }
-        }
-        .onReceive(publisher) { _ in
-            hOffset = 0
-            anchor = 0
-            isCellToggled = false
         }
     }
+}
+
+
+// MARK: - ReportCell
+private struct ReportCell: View {
+    @Binding var reportedCommentVisible: Bool
     
-    private var reportCell: some View {
+    let screenWidth: CGFloat = UIScreen.main.bounds.width
+    
+    var body: some View {
         HStack {
             Text("신고에 의해 숨김처리 된 댓글입니다.")
                 .font(.pretendard(.semiBold, size: 14))
@@ -68,7 +63,7 @@ struct CommentCell: View {
             Spacer()
             
             Button {
-                self.isReportedComment.toggle()
+                reportedCommentVisible.toggle()
             } label: {
                 Text("댓글 보기")
                     .font(.pretendard(.medium, size: 14))
@@ -79,35 +74,26 @@ struct CommentCell: View {
         .frame(width: screenWidth, height: 56.03)
         .opacity(0.5)
     }
+}
+
+
+// MARK: - ReportedCommentCell
+private struct CommentContentView: View {
+    @State private var anchor: CGFloat = 0
+    @State private var isCellToggled: Bool = false
     
-    private var drag: some Gesture {
-        DragGesture(minimumDistance: 50)
-            .onChanged { value in
-                withAnimation(.easeInOut) {
-                    let transWidth = value.translation.width
-                    
-                    hOffset = anchor + transWidth
-                    
-                    if anchor < 0 {
-                        isCellToggled = hOffset < -screenWidth / 3 + screenWidth / 15
-                    } else {
-                        isCellToggled = hOffset < -screenWidth / 15
-                    }
-                }
-            }
-            .onEnded { value in
-                withAnimation(.easeInOut) {
-                    if isCellToggled {
-                        anchor = -anchorWidth
-                    } else {
-                        anchor = 0
-                    }
-                    hOffset = anchor
-                }
-            }
-    }
+    @Binding var hOffset: CGFloat
+    @Binding var reportedCommentVisible: Bool
     
-    private var content: some View {
+    let comment: BoardComment
+    let like: () -> Void
+    
+    let screenWidth: CGFloat = UIScreen.main.bounds.width
+    let anchorWidth: CGFloat = 73
+    
+    let publisher = NotificationCenter.default.publisher(for: .updateCommentCellToggle)
+    
+    var body: some View {
         HStack(alignment: .top, spacing: 13) {
             // 사용자 이미지
             Image(.profileDummy)
@@ -152,7 +138,7 @@ struct CommentCell: View {
                     if !comment.isReport {
                         like()
                     } else {
-                        self.isReportedComment.toggle()
+                        reportedCommentVisible.toggle()
                     }
                 } label: {
                     if !comment.isReport {
@@ -181,7 +167,40 @@ struct CommentCell: View {
         }
         .padding(.horizontal, 16)
         .background(Color.bk)
+        .frame(width: screenWidth)
         .gesture(drag, isEnabled: !comment.isReport)
+        .onReceive(publisher) { _ in
+            hOffset = 0
+            anchor = 0
+            isCellToggled = false
+        }
+    }
+    
+    private var drag: some Gesture {
+        DragGesture(minimumDistance: 50)
+            .onChanged { value in
+                withAnimation(.easeInOut) {
+                    let transWidth = value.translation.width
+                    
+                    hOffset = anchor + transWidth
+                    
+                    if anchor < 0 {
+                        isCellToggled = hOffset < -screenWidth / 3 + screenWidth / 15
+                    } else {
+                        isCellToggled = hOffset < -screenWidth / 15
+                    }
+                }
+            }
+            .onEnded { value in
+                withAnimation(.easeInOut) {
+                    if isCellToggled {
+                        anchor = -anchorWidth
+                    } else {
+                        anchor = 0
+                    }
+                    hOffset = anchor
+                }
+            }
     }
 }
 
