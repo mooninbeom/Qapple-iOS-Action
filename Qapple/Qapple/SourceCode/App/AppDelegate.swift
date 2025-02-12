@@ -106,24 +106,7 @@ extension AppDelegate: UNUserNotificationCenterDelegate {
                                 -> Void) {
         
         let userInfo = notification.request.content.userInfo
-        if let questionId = userInfo["questionId"],
-           let idString = questionId as? String,
-           let id = Int(idString) {
-            evaluateQuestionPushNotification(id)
-        }
-        
-        if let boardId = userInfo["boardId"],
-           let idString = boardId as? String,
-           let id = Int(idString) {
-            Task {
-                do {
-                    let response = try await bulletinBoardRepository.fetchSingleBoard(id)
-                    mainFlowStore.send(.pushToComment(response))
-                } catch {
-                    print("Failed to fetch single board")
-                }
-            }
-        }
+        pushNotificationTapped(userInfo: userInfo)
         
         
         // Do Something With MSG Data...
@@ -142,24 +125,7 @@ extension AppDelegate: UNUserNotificationCenterDelegate {
                                 didReceive response: UNNotificationResponse,
                                 withCompletionHandler completionHandler: @escaping () -> Void) {
         let userInfo = response.notification.request.content.userInfo
-        if let questionId = userInfo["questionId"],
-           let idString = questionId as? String,
-           let id = Int(idString) {
-            evaluateQuestionPushNotification(id)
-        }
-        
-        if let boardId = userInfo["boardId"],
-           let idString = boardId as? String,
-           let id = Int(idString) {
-            Task {
-                do {
-                    let response = try await bulletinBoardRepository.fetchSingleBoard(id)
-                    mainFlowStore.send(.pushToComment(response))
-                } catch {
-                    
-                }
-            }
-        }
+        pushNotificationTapped(userInfo: userInfo)
         
         // Do Something With MSG Data...
         if let messageID = userInfo[gcmMessageIDKey] {
@@ -175,6 +141,27 @@ extension AppDelegate: UNUserNotificationCenterDelegate {
     func application(_ application: UIApplication, didReceiveRemoteNotification userInfo: [AnyHashable : Any], fetchCompletionHandler completionHandler: @escaping (UIBackgroundFetchResult) -> Void) {
         
         completionHandler(.newData)
+    }
+    
+    private func pushNotificationTapped(userInfo: [AnyHashable: Any]) {
+        if let questionId = userInfo["questionId"],
+           let idString = questionId as? String,
+           let id = Int(idString) {
+            evaluateQuestionPushNotification(id)
+        }
+        
+        if let boardId = userInfo["boardId"],
+           let idString = boardId as? String,
+           let id = Int(idString) {
+            Task {
+                do {
+                    let response = try await bulletinBoardRepository.fetchSingleBoard(id)
+                    mainFlowStore.send(.pushToComment(response))
+                } catch {
+                    print("Failed to fetch single board")
+                }
+            }
+        }
     }
     
     private func evaluateQuestionPushNotification(_ id: Int) {
