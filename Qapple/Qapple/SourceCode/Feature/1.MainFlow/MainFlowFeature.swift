@@ -22,6 +22,11 @@ struct MainFlowFeature {
         case questionTab(QuestionTabFeature.Action)
         case bulletinBoardTab(BulletinBoardFeature.Action)
         case profileTab(ProfileFeature.Action)
+        
+        case pushToAnswerList(Question)
+        case pushToWriteAnswer(Question)
+        case pushToComment(BulletinBoard)
+        
         case path(StackActionOf<Path>)
     }
     
@@ -96,6 +101,18 @@ struct MainFlowFeature {
                 
             case .profileTab(.peopleWhoMadeQappleButtonTapped):
                 state.path.append(.peopleWhoMadeQapple)
+                return .none
+                
+            case let .pushToAnswerList(question):
+                state.path.append(.answerList(.init(question: question)))
+                return .none
+                
+            case let .pushToWriteAnswer(question):
+                state.path.append(.writeAnswer(.init(question: question)))
+                return .none
+                
+            case let .pushToComment(board):
+                state.path.append(.comment(.init(board: board)))
                 return .none
                 
             case let .path(stackAction):
