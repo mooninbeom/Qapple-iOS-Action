@@ -56,7 +56,7 @@ private struct NotificationContentView: View {
                             store.send(.onPagenationCellAppear(index))
                         }
                         
-                        Separator()
+                        QPDivider()
                     }
                     
                     Text("알림은 7일간 보관됩니다.")

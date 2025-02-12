@@ -219,6 +219,28 @@ private struct AnswerPreviewList: View {
     }
 }
 
+// MARK: - SeeAllButton
+
+private struct SeeAllButton: View {
+    
+    let action: () -> Void
+    
+    var body: some View {
+        Button {
+            action()
+        } label: {
+            HStack(spacing: 1) {
+                Text("전체보기")
+                    .font(.pretendard(.medium, size: 14))
+                    .foregroundStyle(TextLabel.main)
+                    .frame(height: 10)
+                
+                Image(.arrowRight)
+            }
+        }
+    }
+}
+
 // MARK: - Preview
 
 #Preview {

@@ -120,7 +120,7 @@ private struct BulletionBoardListView: View {
                         }
                     )
                     if index != store.bulletinBoardList.endIndex - 1 {
-                        QappleDivider()
+                        QPDivider()
                     }
                 }
             }

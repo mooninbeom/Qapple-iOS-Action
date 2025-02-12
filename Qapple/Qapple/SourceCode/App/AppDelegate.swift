@@ -64,8 +64,6 @@ class AppDelegate: NSObject, UIApplicationDelegate{
         } catch {
             print("디바이스 토큰 에러")
         }
-        
-        LegacyKeychainService.shared.deviceToken = deviceTokenString
       
         // deviceToken을 Firebase 메세징에 전달해 APNs 토큰을 설정
         Messaging.messaging().apnsToken = deviceToken
