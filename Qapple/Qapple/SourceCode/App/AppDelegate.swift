@@ -147,7 +147,8 @@ extension AppDelegate: UNUserNotificationCenterDelegate {
         if let questionId = userInfo["questionId"],
            let idString = questionId as? String,
            let id = Int(idString) {
-            evaluateQuestionPushNotification(id)
+            // TODO: API 업데이트 후 추후 적용
+//            evaluateQuestionPushNotification(id)
         }
         
         if let boardId = userInfo["boardId"],
