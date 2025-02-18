@@ -13,14 +13,18 @@ import FirebaseMessaging
 class AppDelegate: NSObject, UIApplicationDelegate{
     
     @Dependency(\.keychainService) var keychainService
+    @Dependency(\.bulletinBoardRepository) var bulletinBoardRepository
+    @Dependency(\.questionRepository) var questionRepository
     
     let gcmMessageIDKey = "gcm.message_id"
+    
+    let mainFlowStore = QappleApp.mainFlowStore
     
     // 앱이 켜졌을 때
     func application(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey : Any]? = nil) -> Bool {
         
         UIApplication.shared.registerForRemoteNotifications()
-      
+        
         // 파이어베이스 설정
         FirebaseApp.configure()
         
@@ -64,7 +68,7 @@ class AppDelegate: NSObject, UIApplicationDelegate{
         } catch {
             print("디바이스 토큰 에러")
         }
-      
+        
         // deviceToken을 Firebase 메세징에 전달해 APNs 토큰을 설정
         Messaging.messaging().apnsToken = deviceToken
     }
@@ -79,15 +83,14 @@ extension AppDelegate: MessagingDelegate{
     
     // fcm 등록 토큰을 받았을 때
     func messaging(_ messaging: Messaging, didReceiveRegistrationToken fcmToken: String?) {
-
-//        print("토큰을 받았다")
-//        // Store this token to firebase and retrieve when to send message to someone...
-//        let dataDict: [String: String] = ["token": fcmToken ?? ""]
-//        
-//        // Store token in Firestore For Sending Notifications From Server in Future...
-//        
-//        print(dataDict)
-     
+        //        print("토큰을 받았다")
+        //        // Store this token to firebase and retrieve when to send message to someone...
+        //        let dataDict: [String: String] = ["token": fcmToken ?? ""]
+        //
+        //        // Store token in Firestore For Sending Notifications From Server in Future...
+        //
+        //        print(dataDict)
+        
     }
 }
 
@@ -95,67 +98,92 @@ extension AppDelegate: MessagingDelegate{
 
 @available(iOS 10, *)
 extension AppDelegate: UNUserNotificationCenterDelegate {
-  
+    
     // 푸시 메세지가 앱이 켜져있을 때 나올 때
-  func userNotificationCenter(_ center: UNUserNotificationCenter,
-                              willPresent notification: UNNotification,
-                              withCompletionHandler completionHandler: @escaping (UNNotificationPresentationOptions)
+    func userNotificationCenter(_ center: UNUserNotificationCenter,
+                                willPresent notification: UNNotification,
+                                withCompletionHandler completionHandler: @escaping (UNNotificationPresentationOptions)
                                 -> Void) {
-      
-    let userInfo = notification.request.content.userInfo
-
-    
-    // Do Something With MSG Data...
-    if let messageID = userInfo[gcmMessageIDKey] {
-        print("Message ID: \(messageID)")
+        
+        let userInfo = notification.request.content.userInfo
+        pushNotificationTapped(userInfo: userInfo)
+        
+        
+        // Do Something With MSG Data...
+        if let messageID = userInfo[gcmMessageIDKey] {
+            print("Message ID: \(messageID)")
+        }
+        
+        
+        print(userInfo)
+        
+        completionHandler([[.banner, .badge, .sound]])
     }
     
-    
-    print(userInfo)
-
-    completionHandler([[.banner, .badge, .sound]])
-  }
-
     // 푸시메세지를 받았을 때
-  func userNotificationCenter(_ center: UNUserNotificationCenter,
-                              didReceive response: UNNotificationResponse,
-                              withCompletionHandler completionHandler: @escaping () -> Void) {
-    let userInfo = response.notification.request.content.userInfo
-
-    // Do Something With MSG Data...
-    if let messageID = userInfo[gcmMessageIDKey] {
-        print("Message ID: \(messageID)")
+    func userNotificationCenter(_ center: UNUserNotificationCenter,
+                                didReceive response: UNNotificationResponse,
+                                withCompletionHandler completionHandler: @escaping () -> Void) {
+        let userInfo = response.notification.request.content.userInfo
+        pushNotificationTapped(userInfo: userInfo)
+        
+        // Do Something With MSG Data...
+        if let messageID = userInfo[gcmMessageIDKey] {
+            print("Message ID: \(messageID)")
+        }
+        
+        print(userInfo)
+        
+        completionHandler()
     }
-    
-    if let questionId = userInfo["questionId"] {
-        let idString = questionId as! String
-        PushNotificationService.shared.questionId = Int(idString)
-    }
-      
-    if let boardId = userInfo["boardId"] {
-        let idString = boardId as! String
-        PushNotificationService.shared.boardId = Int(idString)
-    }
-      
-    print(userInfo)
-
-    completionHandler()
-  }
     
     // 앱이 종료된 상태에서 push 알림을 눌렀을 때
     func application(_ application: UIApplication, didReceiveRemoteNotification userInfo: [AnyHashable : Any], fetchCompletionHandler completionHandler: @escaping (UIBackgroundFetchResult) -> Void) {
         
-        print(#function)
-        if let questionId = userInfo["questionId"] {
-            let idString = questionId as! String
-            PushNotificationService.shared.questionId = Int(idString)
-        }
-        
-        if let boardId = userInfo["boardId"] {
-            let idString = boardId as! String
-            PushNotificationService.shared.boardId = Int(idString)
-        }
-        
         completionHandler(.newData)
+    }
+    
+    private func pushNotificationTapped(userInfo: [AnyHashable: Any]) {
+        if let questionId = userInfo["questionId"],
+           let idString = questionId as? String,
+           let id = Int(idString) {
+            // TODO: API 업데이트 후 추후 적용
+//            evaluateQuestionPushNotification(id)
+        }
+        
+        if let boardId = userInfo["boardId"],
+           let idString = boardId as? String,
+           let id = Int(idString) {
+            Task {
+                do {
+                    let response = try await bulletinBoardRepository.fetchSingleBoard(id)
+                    mainFlowStore.send(.pushToComment(response))
+                } catch {
+                    print("Failed to fetch single board")
+                }
+            }
+        }
+    }
+    
+    private func evaluateQuestionPushNotification(_ id: Int) {
+        var hasNext = true
+        var threshold: String?
+        while hasNext {
+            Task {
+                let response = try await questionRepository.fetchQuestionList(threshold)
+                response.0.forEach {
+                    if $0.id == id {
+                        if $0.isAnswered {
+                            mainFlowStore.send(.pushToAnswerList($0))
+                        } else {
+                            mainFlowStore.send(.pushToWriteAnswer($0))
+                        }
+                        return
+                    }
+                }
+                threshold = response.2.threshold
+                hasNext = response.2.hasNext
+            }
+        }
     }
 }

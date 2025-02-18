@@ -65,9 +65,9 @@ extension QappleRepository {
     }
     
     /// 로그인
-    static func makeSignIn() -> (_ code: String, _ diviceToken: String) async throws -> SignInDTO {
-        return { code, diviceToken in
-            let url = try QappleAPI.Member.signIn(code: code, deviceToken: diviceToken).url()
+    static func makeSignIn() -> (_ code: String, _ deviceToken: String) async throws -> SignInDTO {
+        return { code, deviceToken in
+            let url = try QappleAPI.Member.signIn(code: code, deviceToken: deviceToken).url()
             let response: BaseResponse<SignInDTO> = try await NetworkService.shared.get(url: url)
             return response.result
         }

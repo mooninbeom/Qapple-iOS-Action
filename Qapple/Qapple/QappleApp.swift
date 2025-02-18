@@ -13,7 +13,7 @@ struct QappleApp: App {
     
     @UIApplicationDelegateAdaptor private var appDelegate: AppDelegate
     
-    private let mainFlowStore = Store(initialState: .init()) {
+    static let mainFlowStore = Store(initialState: .init()) {
         MainFlowFeature()
     }
     
@@ -24,7 +24,7 @@ struct QappleApp: App {
     var body: some Scene {
         WindowGroup {
             if signUpFlowStore.isSignIn {
-                MainFlowView(store: mainFlowStore)
+                MainFlowView(store: QappleApp.mainFlowStore)
             } else {
                 SignUpFlowView(store: signUpFlowStore)
             }
