@@ -6,6 +6,7 @@
 //
 
 import ComposableArchitecture
+import QappleRepository
 import Foundation
 
 struct AnswerRepository {
@@ -23,33 +24,82 @@ struct AnswerRepository {
 // MARK: - DependencyKey
 
 extension AnswerRepository: DependencyKey {
+    
     private static let networkService = NetworkService.shared
+    
+    @Dependency(\.keychainService) static var keychainService
+    
+    private static let server: Server = .test
     
     static let liveValue = Self(
         fetchAnswerListOfProfile: { threshold in
-            let url = try QappleAPI.Answer.listOfProfile(threshold: threshold, pageSize: 25).url()
-            let response: BaseResponse<AnswersOfProfileDTO> = try await NetworkService.shared.get(url: url)
-            return response.result.toEntityWithThreshold
+            let response = try await AnswerAPI.fetchListOfMine(
+                threshold: threshold,
+                pageSize: 30,
+                server: server,
+                accessToken: keychainService.fetchData(.accessToken)
+            )
+            let answerList = response.content.map {
+                Answer(
+                    id: $0.answerId,
+                    content: $0.content,
+                    authorNickname: $0.nickname,
+                    publishedDate: $0.writeAt.ISO8601ToDate,
+                    isReported: false,
+                    isMine: true,
+                    isResignMember: false
+                )
+            }
+            let paginationInfo = QappleAPI.PaginationInfo(
+                threshold: response.threshold,
+                hasNext: response.hasNext
+            )
+            return (answerList, paginationInfo)
         },
         fetchAnswerPreviewList: { questionId in
-            let url = try QappleAPI.Answer.listOfQuestion(
+            let response = try await AnswerAPI.fetchListOfQuestion(
                 questionId: Int(questionId),
                 threshold: nil,
-                pageSize: 3
-            ).url()
-            
-            let response: BaseResponse<AnswersOfQuestionDTO> = try await networkService.get(url: url)
-            return response.result.toEntity
+                pageSize: 3,
+                server: server,
+                accessToken: keychainService.fetchData(.accessToken)
+            )
+            return response.content.map {
+                Answer(
+                    id: $0.answerId,
+                    content: $0.content,
+                    authorNickname: $0.nickname,
+                    publishedDate: $0.writeAt.ISO8601ToDate,
+                    isReported: $0.isReported,
+                    isMine: $0.isMine,
+                    isResignMember: $0.nickname == "알 수 없음"
+                )
+            }
         },
         fetchAnswerListOfQuestion: { questionId, threshold in
-            let url = try QappleAPI.Answer.listOfQuestion(
-                questionId: questionId,
+            let response = try await AnswerAPI.fetchListOfQuestion(
+                questionId: Int(questionId),
                 threshold: threshold,
-                pageSize: 25
-            ).url()
-            
-            let response: BaseResponse<AnswersOfQuestionDTO> = try await networkService.get(url: url)
-            return response.result.toEntityWithInfo
+                pageSize: 30,
+                server: server,
+                accessToken: keychainService.fetchData(.accessToken)
+            )
+            let answerList = response.content.map {
+                Answer(
+                    id: $0.answerId,
+                    content: $0.content,
+                    authorNickname: $0.nickname,
+                    publishedDate: $0.writeAt.ISO8601ToDate,
+                    isReported: $0.isReported,
+                    isMine: $0.isMine,
+                    isResignMember: $0.nickname == "알 수 없음"
+                )
+            }
+            let paginationInfo = QappleAPI.PaginationInfo(
+                threshold: response.threshold,
+                hasNext: response.hasNext
+            )
+            return (answerList, response.total, paginationInfo)
         },
         postAnswer: { questionId, answer in
             let url = try QappleAPI.Answer.post(questionId: questionId).url()
