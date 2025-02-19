@@ -22,7 +22,7 @@ struct QappleRepository {
     
     var certification: (_ signUpToken: String, _ email: String) async throws -> Bool
     var certificationCodeCheck: (_ signUpToken: String, _ email: String, _ certCode: String) async throws -> Bool
-    var fetchMyPage: () async throws -> MyProfile
+    var fetchMyPage: () async throws -> Void
     var editMyPage: (_ nickname: String, _ profileImage: String?) async throws -> EditProfileDTO
     var nicknameCheck: (_ nickname: String) async throws -> Bool
     var resign: () async throws -> Bool

@@ -28,11 +28,10 @@ extension QappleRepository {
     }
     
     /// 마이페이지 프로필 조회
-    static func makeFetchMyPage() -> () async throws -> MyProfile {
+    static func makeFetchMyPage() -> () async throws -> Void {
         return {
             let url = try QappleAPI.Member.myPage.url()
             let response: BaseResponse<MyPageDTO> = try await NetworkService.shared.get(url: url)
-            return response.result.toEntity
         }
     }
     
