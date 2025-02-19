@@ -7,9 +7,9 @@
 
 import Foundation
 import ComposableArchitecture
+import QappleRepository
 
 struct BulletinBoardRepository {
-    
     var fetchBulletinBoardList: (_ threshold: Int?) async throws -> ([BulletinBoard], QappleAPI.PaginationInfo)
     var postBoard: (_ content: String) async throws -> Void
     var fetchSingleBoard: (_ boardId: Int) async throws -> BulletinBoard
@@ -18,37 +18,114 @@ struct BulletinBoardRepository {
     var searchBoard: (_ keyword: String?, _ threshold: Int?) async throws -> ([BulletinBoard], QappleAPI.PaginationInfo)
 }
 
+// MARK: - DependencyKey
+
 extension BulletinBoardRepository: DependencyKey {
+    
+    @Dependency(\.keychainService) static var keychainService
+    
+    private static let repositoryService = RepositoryService.shared
+    
+    private static func accessToken() throws -> String {
+        try keychainService.fetchData(.accessToken)
+    }
     
     static let liveValue = Self(
         fetchBulletinBoardList: { threshold in
-            let url = try QappleAPI.Board.list(threshold: threshold, pageSize: 25).url()
-            let response: BaseResponse<BulletinBoardDTO> = try await NetworkService.shared.get(url: url)
-            return response.result.toEntityWithThreshold
+            let response = try await BoardAPI.fetchList(
+                threshold: threshold,
+                pageSize: 25,
+                server: repositoryService.server,
+                accessToken: accessToken()
+            )
+            let list = response.content.map {
+                BulletinBoard(
+                    id: $0.boardId,
+                    writerId: $0.writerId,
+                    writerNickname: $0.writerNickname,
+                    content: $0.content,
+                    heartCount: $0.heartCount,
+                    commentCount: $0.commentCount,
+                    createAt: $0.createdAt.ISO8601ToDate,
+                    isMine: $0.isMine,
+                    isReported: $0.isReported,
+                    isLiked: $0.isLiked
+                )
+            }
+            let paginationInfo = QappleAPI.PaginationInfo(
+                threshold: response.threshold,
+                hasNext: response.hasNext
+            )
+            return (list, paginationInfo)
         },
         postBoard: { content in
-            let url = try QappleAPI.Board.post.url()
-            let requestBody: PostBoardRequest = PostBoardRequest(content: content, boardType: "FREEBOARD")
-            let response: BaseResponse<PostBoardDTO> = try await NetworkService.shared.post(url: url, body: requestBody)
+            let _ = try await BoardAPI.create(
+                content: content,
+                boardType: .freeBoard,
+                server: repositoryService.server,
+                accessToken: accessToken()
+            )
         },
         fetchSingleBoard: { boardId in
-            let url = try QappleAPI.Board.single(boardId: boardId).url()
-            let response: BaseResponse<BulletinBoardDTO.Content> = try await NetworkService.shared.get(url: url)
-            return response.result.toEntity
+            let response = try await BoardAPI.fetchSingle(
+                boardId: boardId,
+                server: repositoryService.server,
+                accessToken: accessToken()
+            )
+            return BulletinBoard(
+                id: response.boardId,
+                writerId: response.writerId,
+                writerNickname: response.writerNickname,
+                content: response.content,
+                heartCount: response.heartCount,
+                commentCount: response.commentCount,
+                createAt: response.createdAt.ISO8601ToDate,
+                isMine: response.isMine,
+                isReported: response.isReported,
+                isLiked: response.isLiked
+            )
         },
         deleteBoard: { boardId in
-            let url = try QappleAPI.Board.delete(boardId: boardId).url()
-            let response: BaseResponse<DeleteBoardDTO> = try await NetworkService.shared.delete(url: url)
+            let _ = try await BoardAPI.delete(
+                boardId: boardId,
+                server: repositoryService.server,
+                accessToken: accessToken()
+            )
         },
         likeBoard: { boardId in
-            let url = try QappleAPI.Board.like(boardId: boardId).url()
-            let requestBody: LikeBoardRequest = LikeBoardRequest(boardId: boardId)
-            let response: BaseResponse<LikeBoardDTO> = try await NetworkService.shared.post(url: url, body: requestBody)
+            let _ = try await BoardAPI.like(
+                boardId: boardId,
+                server: repositoryService.server,
+                accessToken: accessToken()
+            )
         },
         searchBoard: { keyword, threshold in
-            let url = try QappleAPI.Board.search(keyword: keyword, threshold: threshold, pageSize: 25).url()
-            let response: BaseResponse<SearchBoardDTO> = try await NetworkService.shared.get(url: url)
-            return response.result.toEntityWithThreshold
+            let response = try await BoardAPI.search(
+                keyword: keyword ?? "",
+                threshold: threshold,
+                pageSize: 25,
+                server: repositoryService.server,
+                accessToken: accessToken()
+            )
+            let list = response.content.map {
+                BulletinBoard(
+                    id: $0.boardId,
+                    writerId: $0.writerId,
+                    writerNickname: $0.writerNickname,
+                    content: $0.content,
+                    heartCount: $0.heartCount,
+                    commentCount: $0.commentCount,
+                    createAt: $0.createdAt.ISO8601ToDate,
+                    isMine: $0.isMine,
+                    isReported: $0.isReported,
+                    isLiked: $0.isLiked
+                )
+            }
+            let paginationInfo = QappleAPI.PaginationInfo(
+                threshold: response.threshold,
+                hasNext: response.hasNext
+            )
+            return (list, paginationInfo)
         }
     )
     
@@ -75,12 +152,16 @@ extension BulletinBoardRepository: DependencyKey {
     )
 }
 
+// MARK: - DependencyValues
+
 extension DependencyValues {
     var bulletinBoardRepository: BulletinBoardRepository {
         get { self[BulletinBoardRepository.self] }
         set { self[BulletinBoardRepository.self] = newValue }
     }
 }
+
+// MARK: - Stub
 
 extension BulletinBoardRepository {
     
