@@ -25,19 +25,21 @@ struct AnswerRepository {
 
 extension AnswerRepository: DependencyKey {
     
-    private static let networkService = NetworkService.shared
-    
     @Dependency(\.keychainService) static var keychainService
     
-    private static let server: Server = .test
+    private static let repositoryService = RepositoryService.shared
+    
+    private static func accessToken() throws -> String {
+        try keychainService.fetchData(.accessToken)
+    }
     
     static let liveValue = Self(
         fetchAnswerListOfProfile: { threshold in
             let response = try await AnswerAPI.fetchListOfMine(
                 threshold: threshold,
                 pageSize: 30,
-                server: server,
-                accessToken: keychainService.fetchData(.accessToken)
+                server: repositoryService.server,
+                accessToken: accessToken()
             )
             let answerList = response.content.map {
                 Answer(
@@ -61,8 +63,8 @@ extension AnswerRepository: DependencyKey {
                 questionId: Int(questionId),
                 threshold: nil,
                 pageSize: 3,
-                server: server,
-                accessToken: keychainService.fetchData(.accessToken)
+                server: repositoryService.server,
+                accessToken: accessToken()
             )
             return response.content.map {
                 Answer(
@@ -81,8 +83,8 @@ extension AnswerRepository: DependencyKey {
                 questionId: Int(questionId),
                 threshold: threshold,
                 pageSize: 30,
-                server: server,
-                accessToken: keychainService.fetchData(.accessToken)
+                server: repositoryService.server,
+                accessToken: accessToken()
             )
             let answerList = response.content.map {
                 Answer(
@@ -102,13 +104,19 @@ extension AnswerRepository: DependencyKey {
             return (answerList, response.total, paginationInfo)
         },
         postAnswer: { questionId, answer in
-            let url = try QappleAPI.Answer.post(questionId: questionId).url()
-            let requestBody = PostAnswerRequest(answer: answer)
-            let _: BaseResponse<PostAnswerDTO> = try await networkService.post(url: url, body: requestBody)
+            let _ = try await AnswerAPI.create(
+                content: answer,
+                questionId: questionId,
+                server: repositoryService.server,
+                accessToken: accessToken()
+            )
         },
         deleteAnswer: { answerId in
-            let url = try QappleAPI.Answer.delete(answerId: answerId).url()
-            let _: BaseResponse<DeleteAnswerDTO> = try await networkService.delete(url: url)
+            let _ = try await AnswerAPI.delete(
+                answerId: answerId,
+                server: repositoryService.server,
+                accessToken: accessToken()
+            )
         }
     )
     

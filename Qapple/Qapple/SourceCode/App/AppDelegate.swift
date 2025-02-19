@@ -23,6 +23,9 @@ class AppDelegate: NSObject, UIApplicationDelegate{
     // 앱이 켜졌을 때
     func application(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey : Any]? = nil) -> Bool {
         
+        // 기본 서버 설정
+        RepositoryService.shared.configureServer(to: .test)
+        
         UIApplication.shared.registerForRemoteNotifications()
         
         // 파이어베이스 설정
