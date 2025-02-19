@@ -6,6 +6,7 @@
 //
 
 import ComposableArchitecture
+import QappleRepository
 import SwiftUI
 
 struct ReportView: View {
@@ -50,7 +51,7 @@ private struct ReportList: View {
     
     var body: some View {
         VStack(spacing: 0) {
-            ForEach(ReportFeature.ReportType.allCases, id: \.rawValue) { reportType in
+            ForEach(ReportType.allCases, id: \.rawValue) { reportType in
                 Button {
                     store.send(.reportCellTapped(reportType))
                 } label: {
