@@ -6,6 +6,7 @@
 //
 
 import Foundation
+import QappleRepository
 import ComposableArchitecture
 
 
@@ -89,28 +90,67 @@ struct CommentRepository {
     ]
 }
 
-
+// MARK: - DependencyKey
 
 extension CommentRepository: DependencyKey {
+    
+    @Dependency(\.keychainService) static var keychainService
+    
+    private static let repositoryService = RepositoryService.shared
+    
+    private static func accessToken() throws -> String {
+        try keychainService.fetchData(.accessToken)
+    }
+    
     static let liveValue: CommentRepository = Self(
         fetchBoardCommentList: { boardId, threshold in
-            let url = try QappleAPI.BoardComment.list(boardId: boardId, threshold: threshold, pageSize: 25).url()
-            let response: BaseResponse<BoardCommentsDTO> = try await NetworkService.shared.get(url: url)
-            return response.result.toEntityWithThreshold
+            let response = try await BoardCommentAPI.fetchList(
+                boardId: boardId,
+                threshold: threshold,
+                pageSize: 25,
+                server: repositoryService.server,
+                accessToken: accessToken()
+            )
+            let list = response.content.map {
+                BoardComment(
+                    id: $0.boardCommentId,
+                    writeId: $0.writerId,
+                    content: $0.content,
+                    heartCount: $0.heartCount,
+                    isLiked: $0.isLiked,
+                    isMine: $0.isMine,
+                    isReport: $0.isReport,
+                    createdAt: $0.createdAt.ISO8601ToDate,
+                    anonymityId: -2
+                )
+            }
+            let paginationInfo = QappleAPI.PaginationInfo(
+                threshold: response.threshold,
+                hasNext: response.hasNext
+            )
+            return (list, paginationInfo)
         },
         deleteBoardComment: { boardCommentId in
-            let url = try QappleAPI.BoardComment.delete(commentId: boardCommentId).url()
-            let response: BaseResponse<DeleteBoardCommentsDTO> = try await NetworkService.shared.delete(url: url)
+            let response = try await BoardCommentAPI.delete(
+                commentId: boardCommentId,
+                server: repositoryService.server,
+                accessToken: accessToken()
+            )
         },
         postBoardComment: { boardId, content in
-            let url = try QappleAPI.BoardComment.post(boardId: boardId).url()
-            let requestBody: PostBoardCommentsRequest = PostBoardCommentsRequest(comment: content)
-            let response: BaseResponse<PostBoardCommentsDTO> = try await NetworkService.shared.post(url: url, body: requestBody)
+            let response = try await BoardCommentAPI.create(
+                boardId: boardId,
+                content: content,
+                server: repositoryService.server,
+                accessToken: accessToken()
+            )
         },
         likeBoardComment: { boardCommentId in
-            let url = try QappleAPI.BoardComment.like(commentId: boardCommentId).url()
-            let requestBody: LikeBoardCommentsRequest = LikeBoardCommentsRequest(commentId: boardCommentId)
-            let response: BaseResponse<LikeBoardCommentsDTO> = try await NetworkService.shared.patch(url: url, body: requestBody)
+            let response = try await BoardCommentAPI.like(
+                commentId: boardCommentId,
+                server: repositoryService.server,
+                accessToken: accessToken()
+            )
         }
     )
     
@@ -129,6 +169,8 @@ extension CommentRepository: DependencyKey {
         }
     )
 }
+
+// MARK: - DependencyValues
 
 extension DependencyValues {
     var commentRepository: CommentRepository {
