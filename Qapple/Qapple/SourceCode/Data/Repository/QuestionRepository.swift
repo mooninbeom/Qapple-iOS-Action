@@ -24,7 +24,6 @@ extension QuestionRepository: DependencyKey {
         fetchQuestionList: { threshold in
             let accessToken = try keychainService.fetchData(.accessToken)
             let server = RepositoryService.shared.server
-            let threshold = (threshold == nil) ? nil : Int(threshold!)
             
             let response = try await QuestionAPI.fetchQuestionList(
                 threshold: threshold,

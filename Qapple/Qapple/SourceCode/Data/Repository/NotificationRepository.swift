@@ -6,6 +6,7 @@
 //
 
 import Foundation
+import QappleRepository
 import ComposableArchitecture
 
 
@@ -50,26 +51,80 @@ struct NotificationRepository {
 
 
 extension NotificationRepository: DependencyKey {
+    
+    @Dependency(\.keychainService) private static var keychainService
+    
     static let liveValue: NotificationRepository = Self(
         fetchNotificationList: { threshold in
-            let url = try QappleAPI.Notification.list(threshold: threshold, pageSize: 25).url()
-            let response: BaseResponse<NotificationsDTO> = try await NetworkService.shared.get(url: url)
-            return response.result.toEntityWithThreshold
+            let server = RepositoryService.shared.server
+            let accessToken = try keychainService.fetchData(.accessToken)
+            
+            let response = try await NotificationAPI.fetchNotifications(
+                threshold: threshold,
+                pageSize: 25,
+                server: server,
+                accessToken: accessToken
+            )
+            
+            let result = response.content.map {
+                QappleNotification(
+                    id: $0.questionId ?? "",
+                    boardId: $0.boardId ?? "",
+                    boardCommentId: $0.boardCommentId,
+                    title: $0.title,
+                    subtitle: $0.subtitle,
+                    content: $0.content ?? "",
+                    createAt: $0.createdAt.ISO8601ToDate,
+                    isReadStatus: false
+                )
+            }
+            let paginationInfo = QappleAPI.PaginationInfo(
+                threshold: response.threshold,
+                hasNext: response.hasNext
+            )
+            
+            return (result, paginationInfo)
         },
         fetchSingleBoard: { boardId in
-            let url = try QappleAPI.Board.single(boardId: boardId).url()
-            let response: BaseResponse<BulletinBoardDTO.Content> = try await NetworkService.shared.get(url: url)
-            return response.result.toEntity
+            let server = RepositoryService.shared.server
+            let accessToken = try keychainService.fetchData(.accessToken)
+            
+            let response = try await BoardAPI.fetchSingle(
+                boardId: boardId,
+                server: server,
+                accessToken: accessToken
+            )
+            let result = BulletinBoard(
+                id: response.boardId,
+                writerId: response.writerId,
+                writerNickname: response.writerNickname,
+                content: response.content,
+                heartCount: response.heartCount,
+                commentCount: response.commentCount,
+                createAt: response.createdAt.ISO8601ToDate,
+                isMine: response.isMine,
+                isReported: response.isReported,
+                isLiked: response.isLiked
+            )
+            
+            return result
         },
         isAnsweredQuestion: { questionId in
             var hasNext = true
             var threshold: String?
             
+            let server = RepositoryService.shared.server
+            let accessToken = try keychainService.fetchData(.accessToken)
+            
             while hasNext {
-                let url = try QappleAPI.Question.list(threshold: threshold, pageSize: 30).url()
-                let response: BaseResponse<QuestionsDTO> = try await NetworkService.shared.get(url: url)
+                let response = try await QuestionAPI.fetchQuestionList(
+                    threshold: threshold,
+                    pageSize: 25,
+                    server: server,
+                    accessToken: accessToken
+                )
                 
-                if let question = response.result.content.first(where: { $0.questionId == questionId }) {
+                if let question = response.content.first(where: { $0.questionId == questionId }) {
                     let entity = Question(
                         id: question.questionId,
                         content: question.content,
@@ -81,8 +136,8 @@ extension NotificationRepository: DependencyKey {
                     return (question.isAnswered, entity)
                 }
                 
-                hasNext = response.result.hasNext
-                threshold = response.result.threshold
+                hasNext = response.hasNext
+                threshold = response.threshold
             }
             
             // id에 맞는 질문 찾기 실패시 에러 던지기
