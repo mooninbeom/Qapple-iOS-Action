@@ -11,12 +11,4 @@ struct MyPageDTO: Codable {
     let nickname: String
     let profileImage: String?
     let joinDate: String
-    
-    var toEntity: MyProfile {
-        return MyProfile(
-            nickname: nickname,
-            profileImage: profileImage,
-            joinDate: joinDate
-        )
-    }
 }

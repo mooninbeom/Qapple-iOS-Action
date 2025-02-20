@@ -6,6 +6,7 @@
 //
 
 import ComposableArchitecture
+import QappleRepository
 import Foundation
 
 struct MemberRepository {
@@ -25,55 +26,97 @@ extension MemberRepository: DependencyKey {
     
     @Dependency(\.keychainService) static var keychainService
     
+    private static let repositoryService = RepositoryService.shared
+    
+    private static func accessToken() throws -> String {
+        try keychainService.fetchData(.accessToken)
+    }
+    
     static let liveValue = Self(
         signIn: { code in
             let deviceToken = try keychainService.fetchData(.deviceToken)
-            let url = try QappleAPI.Member.signIn(code: code, deviceToken: deviceToken).url()
-            let response: BaseResponse<SignInDTO> = try await NetworkService.shared.signIn(url: url)
-            try keychainService.createData(.accessToken, response.result.accessToken ?? "")
-            try keychainService.createData(.refreshToken, response.result.refreshToken ?? "")
-            return response.result.isMember
+            let response = try await MemberAPI.signIn(
+                code: code,
+                deviceToken: deviceToken,
+                server: repositoryService.server
+            )
+            try keychainService.createData(
+                .accessToken,
+                response.accessToken ?? ""
+            )
+            try keychainService.createData(
+                .refreshToken,
+                response.refreshToken ?? ""
+            )
+            return response.isMember
         },
         signUp: { email, nickname in
-            let url = try QappleAPI.Member.signUp.url()
             let refreshToken = try keychainService.fetchData(.refreshToken)
             let deviceToken = try keychainService.fetchData(.deviceToken)
-            let requestBody: SignUpRequest = SignUpRequest(signUpToken: refreshToken, email: email, nickname: nickname, deviceToken: deviceToken)
-            let response: BaseResponse<SignUpDTO> = try await NetworkService.shared.post(url: url, body: requestBody)
-            try keychainService.createData(.accessToken, response.result.accessToken ?? "")
-            try keychainService.createData(.refreshToken, response.result.refreshToken ?? "")
-            return ()
+            let response = try await MemberAPI.signUp(
+                signUpToken: refreshToken,
+                email: email,
+                nickname: nickname,
+                deviceToken: deviceToken,
+                server: repositoryService.server
+            )
+            try keychainService.createData(
+                .accessToken,
+                response.accessToken ?? ""
+            )
+            try keychainService.createData(
+                .refreshToken,
+                response.refreshToken ?? ""
+            )
         },
         sendCertificationEmail: { email in
             let refreshToken = try keychainService.fetchData(.refreshToken)
-            let url = try QappleAPI.Member.certification(signUpToken: refreshToken, email: email).url()
-            let response: BaseResponse<Bool> = try await NetworkService.shared.get(url: url)
-            return response.result
+            let response = try await MemberAPI.sendCertificationEmail(
+                signUpToken: refreshToken,
+                email: email,
+                server: repositoryService.server
+            )
+            return response
         },
         checkAuthCode: { email, certCode in
             let refreshToken = try keychainService.fetchData(.refreshToken)
-            let url = try QappleAPI.Member.certificationCodeCheck(signUpToken: refreshToken, email: email, certCode: certCode).url()
-            let response: BaseResponse<Bool> = try await NetworkService.shared.get(url: url)
-            return response.result
+            let response = try await MemberAPI.checkAuthCode(
+                signUpToken: refreshToken,
+                email: email,
+                certCode: certCode,
+                server: repositoryService.server
+            )
+            return response
         },
         checkNicknameDuplicate: { nickname in
-            let url = try QappleAPI.Member.nicknameCheck(nickname: nickname).url()
-            let response: BaseResponse<Bool> = try await NetworkService.shared.get(url: url)
-            return response.result
+            let response = try await MemberAPI.checkNicknameDuplicate(
+                nickname: nickname,
+                server: repositoryService.server,
+                accessToken: accessToken()
+            )
+            return response
         },
         fetchMyPage: {
-            let url = try QappleAPI.Member.myPage.url()
-            let response: BaseResponse<MyPageDTO> = try await NetworkService.shared.get(url: url)
-            return response.result.toEntity
+            let response = try await MemberAPI.fetchProfile(server: repositoryService.server, accessToken: accessToken())
+            return MyProfile(
+                nickname: response.nickname,
+                profileImage: response.profileImage,
+                joinDate: response.joinDate
+            )
         },
         editMyPage: { nickname, profileImage in
-            let url = try QappleAPI.Member.myPageEdit.url()
-            let requestBody: EditProfileRequest = EditProfileRequest(nickname: nickname, profileImage: profileImage)
-            let response: BaseResponse<EditProfileDTO> = try await NetworkService.shared.post(url: url, body: requestBody)
+            let response = try await MemberAPI.updateProfile(
+                nickname: nickname,
+                profileImage: profileImage,
+                server: repositoryService.server,
+                accessToken: accessToken()
+            )
         },
         resign: {
-            let url = try QappleAPI.Member.resign.url()
-            let response: BaseResponse<ResignDTO> = try await NetworkService.shared.get(url: url)
+            let response = try await MemberAPI.resign(
+                server: repositoryService.server,
+                accessToken: accessToken()
+            )
         }
     )
     
