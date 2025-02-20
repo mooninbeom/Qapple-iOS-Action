@@ -6,6 +6,7 @@
 //
 
 import ComposableArchitecture
+import QappleRepository
 import Foundation
 
 struct QuestionRepository {
@@ -16,17 +17,54 @@ struct QuestionRepository {
 // MARK: - DependencyKey
 
 extension QuestionRepository: DependencyKey {
+
+    @Dependency(\.keychainService) static var keychainService
     
     static let liveValue = Self(
         fetchQuestionList: { threshold in
-            let url = try QappleAPI.Question.list(threshold: threshold, pageSize: 25).url()
-            let response: BaseResponse<QuestionsDTO> = try await NetworkService.shared.get(url: url)
-            return response.result.toEntityWithInfo
+            let accessToken = try keychainService.fetchData(.accessToken)
+            let server = RepositoryService.shared.server
+            
+            let response = try await QuestionAPI.fetchQuestionList(
+                threshold: threshold,
+                pageSize: 25,
+                server: server,
+                accessToken: accessToken
+            )
+            
+            let result = response.content.map {
+                Question(
+                    id: $0.questionId,
+                    content: $0.content,
+                    publishedDate: $0.livedAt?.ISO8601ToDate ?? .now,
+                    isAnswered: $0.isAnswered,
+                    isLived: $0.questionStatus == ("LIVE")
+                )
+            }
+            let paginationInfo = QappleAPI.PaginationInfo(
+                threshold: response.threshold,
+                hasNext: response.hasNext
+            )
+            
+            return (result, response.total, paginationInfo)
         },
         fetchMainQuestion: {
-            let url = try QappleAPI.Question.listOfMain.url()
-            let response: BaseResponse<MainQuestionDTO> = try await NetworkService.shared.get(url: url)
-            return response.result.toEntity
+            let accessToken = try keychainService.fetchData(.accessToken)
+            let server = RepositoryService.shared.server
+            
+            let response = try await QuestionAPI.fetchMainQuestion(
+                server: server,
+                accessToken: accessToken
+            )
+            let result = Question(
+                id: response.questionId,
+                content: response.content,
+                publishedDate: .now,
+                isAnswered: response.isAnswered,
+                isLived: response.questionStatus == "LIVE"
+            )
+            
+            return result
         }
     )
     
