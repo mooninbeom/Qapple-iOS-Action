@@ -6,36 +6,51 @@
 //
 
 import ComposableArchitecture
+import QappleRepository
 import Foundation
 
 struct ReportRepository {
-    var reportAnswer: (_ answerId: Int, _ reportType: ReportFeature.ReportType) async throws -> Void
-    var reportBoard: (_ boardId: Int, _ reportType: ReportFeature.ReportType) async throws -> Void
-    var reportComment: (_ commentId: Int, _ reportType: ReportFeature.ReportType) async throws -> Void
+    var reportAnswer: (_ answerId: Int, _ reportType: ReportType) async throws -> Void
+    var reportBoard: (_ boardId: Int, _ reportType: ReportType) async throws -> Void
+    var reportComment: (_ commentId: Int, _ reportType: ReportType) async throws -> Void
 }
 
 // MARK: - DependencyKey
 
 extension ReportRepository: DependencyKey {
     
+    @Dependency(\.keychainService) static var keychainService
+    
+    private static let repositoryService = RepositoryService.shared
+    
+    private static func accessToken() throws -> String {
+        try keychainService.fetchData(.accessToken)
+    }
+    
     static let liveValue = Self(
         reportAnswer: { answerId, reportType in
-            let url = try QappleAPI.Reports.answer.url()
-            let reportType = "QUESTION_" + reportType.rawValue
-            let requestBody: AnswerReportsRequest = AnswerReportsRequest(answerId: answerId, reportType: reportType)
-            let _: BaseResponse<AnswerReportsDTO> = try await NetworkService.shared.post(url: url, body: requestBody)
+            let _ = try await ReportAPI.reportAnswer(
+                answerId: answerId,
+                reportType: reportType,
+                server: repositoryService.server,
+                accessToken: accessToken()
+            )
         },
         reportBoard: { boardId, reportType in
-            let url = try QappleAPI.Reports.board.url()
-            let reportType = "BOARD_" + reportType.rawValue
-            let requestBody: BoardReportsRequest = .init(boardId: boardId, boardReportType: reportType)
-            let _: BaseResponse<BoardReportsDTO> = try await NetworkService.shared.post(url: url, body: requestBody)
+            let _ = try await ReportAPI.reportBoard(
+                boardId: boardId,
+                reportType: reportType,
+                server: repositoryService.server,
+                accessToken: accessToken()
+            )
         },
         reportComment: { commentId, reportType in
-            let url = try QappleAPI.Reports.boardComment.url()
-            let reportType = "COMMENT_" + reportType.rawValue
-            let requestBody: BoardCommentReportsRequest = .init(boardCommentId: commentId, boardCommentReportType: reportType)
-            let _: BaseResponse<BoardCommentReportsDTO> = try await NetworkService.shared.post(url: url, body: requestBody)
+            let _ = try await ReportAPI.reportBoardComment(
+                boardCommentId: commentId,
+                reportType: reportType,
+                server: repositoryService.server,
+                accessToken: accessToken()
+            )
         }
     )
 }
