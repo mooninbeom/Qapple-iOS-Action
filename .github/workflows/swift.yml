@@ -24,4 +24,9 @@ jobs:
       run: xcrun simctl list
     - uses: actions/checkout@v4
     - name: Build
-      run: xcodebuild clean build -project Qapple/Qapple.xcodeproj -scheme Qapple -destination 'platform=iOS Simulator,name=iPhone 16 Pro,OS=18.1'
+      run: |
+        xcodebuild clean build \
+        -project Qapple/Qapple.xcodeproj \
+        -scheme Qapple \
+        -destination 'platform=iOS Simulator,name=iPhone 16 Pro,OS=18.1' \
+        -skipMacroValidation
