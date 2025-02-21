@@ -210,3 +210,14 @@ extension MainFlowFeature {
         case report(ReportFeature)
     }
 }
+
+// MARK: - MainFlowTab
+
+extension MainFlowFeature {
+    
+    enum MainFlowTab {
+        case question
+        case bulletinBoard
+        case profile
+    }
+}

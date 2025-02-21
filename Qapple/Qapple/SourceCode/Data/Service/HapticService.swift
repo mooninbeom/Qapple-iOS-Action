@@ -7,18 +7,15 @@
 
 import UIKit
 
-struct HapticService {
-    
-    private init() {}
+enum HapticService {
     
     private static let notificationGenerator = UINotificationFeedbackGenerator()
-    private static let impactGenerator = UIImpactFeedbackGenerator(style: .medium)
     
     static func notification(type: UINotificationFeedbackGenerator.FeedbackType) {
         notificationGenerator.notificationOccurred(type)
     }
     
     static func impact(style: UIImpactFeedbackGenerator.FeedbackStyle) {
-        impactGenerator.impactOccurred()
+        UIImpactFeedbackGenerator(style: style).impactOccurred()
     }
 }
