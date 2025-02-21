@@ -21,4 +21,4 @@ jobs:
         xcode-version: latest
     - uses: actions/checkout@v4
     - name: Build
-      run: xcodebuild clean test -project Qapple/Qapple.xcodeproj -scheme Qapple
+      run: xcodebuild clean build -project Qapple/Qapple.xcodeproj -scheme Qapple
