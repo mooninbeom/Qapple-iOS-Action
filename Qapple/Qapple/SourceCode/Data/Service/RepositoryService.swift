@@ -38,7 +38,7 @@ final class RepositoryService {
         _server = server
     }
     
-    /// AccessToken 및 Server 설정, 토큰을 재발급 로직을 추가해 API를 호출합니다.
+    /// AccessToken 및 Server 설정, 토큰 재발급 로직을 추가해 API를 호출합니다.
     func request<T: Decodable>(
         handler: @escaping (Server, AccessToken) async throws -> T
     ) async throws -> T {
@@ -48,18 +48,25 @@ final class RepositoryService {
             return try await handler(server, accessToken)
         } catch NetworkError.authenticationFailed {
             
-            // 2-1. 네트워킹 실패(403 에러 발생)시, Token 재발급
-            let refresh = try await TokenAPI.refresh(
-                server: server,
-                accessToken: accessToken
-            )
-            
-            // 2-2. Keychain 내 기존 Token값 업데이트
-            try keychainService.createData(.accessToken, refresh.accessToken)
-            try keychainService.createData(.refreshToken, refresh.refreshToken)
-            
-            // 2-3. 재발급 받은 Token으로 API 재호출
-            return try await handler(server, refresh.accessToken)
+            do {
+                // 2-1. 네트워킹 실패(403 에러 발생)시, Token 재발급
+                let refresh = try await TokenAPI.refresh(
+                    server: server,
+                    accessToken: accessToken
+                )
+                
+                // 2-2. Keychain 내 기존 Token값 업데이트
+                try keychainService.createData(.accessToken, refresh.accessToken)
+                try keychainService.createData(.refreshToken, refresh.refreshToken)
+                
+                // 2-3. 재발급 받은 Token으로 API 재호출
+                return try await handler(server, refresh.accessToken)
+            } catch {
+                
+                // 2-4. 만약 토큰 재발급에도 실패할 시, 로그인 화면으로 이동
+                await QappleApp.mainFlowStore.send(.refreshTokenFailed)
+                throw error
+            }
         } catch {
             // 3. 이외의 네트워킹 오류 발생시 그대로 던지기
             throw error
