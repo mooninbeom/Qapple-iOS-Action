@@ -20,4 +20,4 @@ jobs:
         xcode-version: latest
     - uses: actions/checkout@v4
     - name: Build
-      run: xcodebuild clean build -project Qapple/Qapple.xcodeproj -scheme Qapple -destination 'platform=iOS Simulator,name=iPhone 16 Pro,OS=18.0'
+      run: xcodebuild clean build -project Qapple/Qapple.xcodeproj -scheme Qapple -destination 'platform=iOS Simulator,name=iPhone 16 Pro,OS=latest'
