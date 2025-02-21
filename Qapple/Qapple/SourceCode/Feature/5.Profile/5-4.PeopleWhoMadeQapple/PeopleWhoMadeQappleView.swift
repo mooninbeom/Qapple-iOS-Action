@@ -13,10 +13,10 @@ struct PeopleWhoMadeQappleView: View {
     
     var body: some View {
         VStack(spacing: 0) {
-            NavigationBar(
+            QPNavigationBar(
                 title: "캐플을 만든 사람들",
                 leadingView: {
-                    NavigationButton(buttonType: .back) {
+                    QPNavigationButton(buttonType: .back) {
                         dismiss()
                     }
                 }

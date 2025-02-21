@@ -15,11 +15,11 @@ struct CommentView: View {
     
     var body: some View {
         VStack(spacing: 0) {
-            NavigationBar(
+            QPNavigationBar(
                 title: "댓글",
                 backgroundColor: Background.first,
                 leadingView: {
-                    NavigationButton(buttonType: .back) {
+                    QPNavigationButton(buttonType: .back) {
                         store.send(.backButtonTapped)
                     }
                 }

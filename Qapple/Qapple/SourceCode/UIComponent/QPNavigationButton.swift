@@ -1,5 +1,5 @@
 //
-//  NavigationButton.swift
+//  QPNavigationButton.swift
 //  Qapple
 //
 //  Created by 김민준 on 1/24/25.
@@ -7,7 +7,7 @@
 
 import SwiftUI
 
-struct NavigationButton: View {
+struct QPNavigationButton: View {
     
     enum ButtonType {
         case text(String, Color)
@@ -58,10 +58,10 @@ struct NavigationButton: View {
 
 #Preview {
     VStack {
-        NavigationButton(buttonType: .text("확인", .button)) {}
-        NavigationButton(buttonType: .back) {}
-        NavigationButton(buttonType: .xmark) {}
-        NavigationButton(buttonType: .systemImage("pencil.circle.fill", .button)) {}
-        NavigationButton(buttonType: .image(.appLogo)) {}
+        QPNavigationButton(buttonType: .text("확인", .button)) {}
+        QPNavigationButton(buttonType: .back) {}
+        QPNavigationButton(buttonType: .xmark) {}
+        QPNavigationButton(buttonType: .systemImage("pencil.circle.fill", .button)) {}
+        QPNavigationButton(buttonType: .image(.appLogo)) {}
     }
 }

@@ -46,7 +46,7 @@ struct WriteAnswerView: View {
             state: \.sheet?.anonymityNotice,
             action: \.sheet.anonymityNotice
         )) { _ in
-            AnonymityNoticeSheet()
+            QPAnonymityNoticeSheet()
         }
     }
     
@@ -66,15 +66,15 @@ private struct WriteAnswerNavigationBar: View {
     let store: StoreOf<WriteAnswerFeature>
     
     var body: some View {
-        NavigationBar(
+        QPNavigationBar(
             title: "답변하기",
             leadingView: {
-                NavigationButton(buttonType: .text("취소", .wh)) {
+                QPNavigationButton(buttonType: .text("취소", .wh)) {
                     store.send(.dismissButtonTapped)
                 }
             },
             trailingView: {
-                NavigationButton(buttonType: .text("완료", completeButtonColor)) {
+                QPNavigationButton(buttonType: .text("완료", completeButtonColor)) {
                     store.send(.completeButtonTapped)
                 }
                 .disabled(store.answerText.isEmpty || store.isLoading)
@@ -98,7 +98,7 @@ private struct AnswerTextField: View {
     var body: some View {
         ZStack {
             if store.answerText.isEmpty {
-                MainContentPlaceholder()
+                QPMainContentPlaceholder()
             }
             
             TextField(text: $store.answerText, axis: .vertical) {}

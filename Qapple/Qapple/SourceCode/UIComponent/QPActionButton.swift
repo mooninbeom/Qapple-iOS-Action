@@ -1,5 +1,5 @@
 //
-//  ActionButton.swift
+//  QPActionButton.swift
 //  Qapple
 //
 //  Created by 김민준 on 1/24/25.
@@ -7,7 +7,7 @@
 
 import SwiftUI
 
-struct ActionButton: View {
+struct QPActionButton: View {
     
     let title: String
     let isActive: Bool
@@ -46,6 +46,6 @@ struct ActionButton: View {
         Color.first
             .ignoresSafeArea()
         
-        ActionButton("버튼입니당", isActive: true) {}
+        QPActionButton("버튼입니당", isActive: true) {}
     }
 }

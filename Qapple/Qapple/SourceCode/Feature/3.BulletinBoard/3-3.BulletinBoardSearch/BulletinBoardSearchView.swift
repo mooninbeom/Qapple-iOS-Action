@@ -16,11 +16,11 @@ struct BulletinBoardSearchView: View {
         GeometryReader { proxy in
             ZStack {
                 VStack(spacing: 0) {
-                    NavigationBar(
+                    QPNavigationBar(
                         title: "검색하기",
                         backgroundColor: Background.first,
                         leadingView: {
-                            NavigationButton(buttonType: .back) {
+                            QPNavigationButton(buttonType: .back) {
                                 store.send(.backButtonTapped)
                             }
                         }

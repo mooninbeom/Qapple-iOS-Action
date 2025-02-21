@@ -14,7 +14,7 @@ struct CompleteAnswerView: View {
     
     var body: some View {
         VStack(spacing: 0) {
-            NavigationBar()
+            QPNavigationBar()
             
             HStack {
                 Text("답변 등록이 완료됐어요!\n이제 다른 답변을 확인해볼까요?")
@@ -35,7 +35,7 @@ struct CompleteAnswerView: View {
             
             Spacer()
             
-            ActionButton("확인", isActive: true) {
+            QPActionButton("확인", isActive: true) {
                 store.send(.confirmButtonTapped(store.question))
             }
             .padding(.bottom, 16)

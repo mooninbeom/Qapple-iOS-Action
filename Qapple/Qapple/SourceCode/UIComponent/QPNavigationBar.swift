@@ -1,5 +1,5 @@
 //
-//  NavigationBar.swift
+//  QPNavigationBar.swift
 //  Capple
 //
 //  Created by Kyungsoo Lee on 2/25/24.
@@ -7,7 +7,7 @@
 
 import SwiftUI
 
-struct NavigationBar<Leading: View, Center: View, Trailing: View>: View {
+struct QPNavigationBar<Leading: View, Center: View, Trailing: View>: View {
     
     let title: String?
     let backgroundColor: Color
@@ -61,7 +61,7 @@ struct NavigationBar<Leading: View, Center: View, Trailing: View>: View {
 #Preview {
     ZStack {
         Color.first.ignoresSafeArea()
-        NavigationBar(
+        QPNavigationBar(
             title: "테스트"
         )
     }

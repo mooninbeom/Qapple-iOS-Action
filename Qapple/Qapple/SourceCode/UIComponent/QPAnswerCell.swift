@@ -1,5 +1,5 @@
 //
-//  AnswerCell.swift
+//  QPAnswerCell.swift
 //  Qapple
 //
 //  Created by 김민준 on 1/21/25.
@@ -7,7 +7,7 @@
 
 import SwiftUI
 
-struct AnswerCell: View {
+struct QPAnswerCell: View {
     
     enum State {
         case normal
@@ -286,11 +286,11 @@ private struct ReportedCell: View {
         Color.first.ignoresSafeArea()
         
         VStack(alignment: .leading, spacing: 0) {
-            AnswerCell(answer: answers[0], index: 0, state: .normal) {}
-            AnswerCell(answer: answers[1], index: 1, state: .normal) {}
-            AnswerCell(answer: answers[2], index: 2, state: .normal) {}
-            AnswerCell(answer: answers[3], index: 3, state: .normal) {}
-            AnswerCell(answer: answers[1], index: 4, state: .written) {}
+            QPAnswerCell(answer: answers[0], index: 0, state: .normal) {}
+            QPAnswerCell(answer: answers[1], index: 1, state: .normal) {}
+            QPAnswerCell(answer: answers[2], index: 2, state: .normal) {}
+            QPAnswerCell(answer: answers[3], index: 3, state: .normal) {}
+            QPAnswerCell(answer: answers[1], index: 4, state: .written) {}
         }
     }
 }

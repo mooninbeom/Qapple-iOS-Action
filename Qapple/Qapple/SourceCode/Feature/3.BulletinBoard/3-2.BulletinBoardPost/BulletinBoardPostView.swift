@@ -34,7 +34,7 @@ struct BulletinBoardPostView: View {
         .alert($store.scope(state: \.alert, action: \.alert))
         .sheet(item: $store.scope(state: \.sheet?.anonymityNotice, action: \.sheet.anonymityNotice)
         ) { _ in
-            AnonymityNoticeSheet()
+            QPAnonymityNoticeSheet()
         }
     }
 }
@@ -46,15 +46,15 @@ private struct BulletinBoardPostNavigationBar: View {
     let store: StoreOf<BulletinBoardPostFeature>
 
     var body: some View {
-        NavigationBar(
+        QPNavigationBar(
             title: "게시글 작성",
             leadingView: {
-                NavigationButton(buttonType: .text("취소", .icon)) {
+                QPNavigationButton(buttonType: .text("취소", .icon)) {
                     store.send(.cancelButtonTapped)
                 }
             },
             trailingView: {
-                NavigationButton(buttonType: .text("완료", store.boardText.isEmpty ? .disable : .button)) {
+                QPNavigationButton(buttonType: .text("완료", store.boardText.isEmpty ? .disable : .button)) {
                     if !store.boardText.isEmpty {
                         store.send(.postBoardButtonTapped)
                     }
@@ -75,7 +75,7 @@ private struct BoardTextField: View {
     var body: some View {
         ZStack {
             if store.boardText.isEmpty {
-                MainContentPlaceholder()
+                QPMainContentPlaceholder()
             }
 
             TextField(text: $store.boardText, axis: .vertical) {}
