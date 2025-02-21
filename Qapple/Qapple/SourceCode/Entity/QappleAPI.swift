@@ -15,4 +15,9 @@ enum QappleAPI {
         var threshold: String
         var hasNext: Bool
     }
+    
+    struct Token {
+        let accessToken: String
+        let refreshToken: String
+    }
 }
