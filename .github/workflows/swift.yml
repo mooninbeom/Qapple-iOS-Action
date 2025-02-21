@@ -30,3 +30,11 @@ jobs:
         -scheme Qapple \
         -destination 'platform=iOS Simulator,name=iPhone 16 Pro,OS=18.1' \
         -skipMacroValidation
+
+    - name: UnitTest run
+      run: |
+        xcodebuild clean test \
+        -project Qapple/Qapple.xcodeproj \
+        -scheme QappleTests \
+        -destination 'platform=iOS Simulator,name=iPhone 16 Pro,OS=18.1' \
+        -skipMacroValidation
