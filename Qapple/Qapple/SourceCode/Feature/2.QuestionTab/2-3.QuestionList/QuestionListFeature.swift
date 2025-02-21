@@ -81,6 +81,7 @@ struct QuestionListFeature {
                 
             case let .questionCellTapped(question):
                 if !question.isAnswered {
+                    HapticService.notification(type: .warning)
                     state.alert = .answeringCheck
                 }
                 return .none

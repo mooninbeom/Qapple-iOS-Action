@@ -122,6 +122,7 @@ struct MainFlowFeature {
                     return .none
                     
                 case let .element(id: _, action: .completeAnswer(.confirmButtonTapped(question))):
+                    state.path.removeAll()
                     state.path.append(.answerList(.init(question: question)))
                     return .none
                     
