@@ -85,7 +85,7 @@ private struct BoardTextField: View {
                 .padding(.horizontal, 24)
                 .autocorrectionDisabled()
                 .multilineTextAlignment(.center)
-                .onChange(of: store.boardText) { _ in
+                .onChange(of: store.boardText) { _, _ in
                     store.send(.boardTextChanged)
                 }
         }

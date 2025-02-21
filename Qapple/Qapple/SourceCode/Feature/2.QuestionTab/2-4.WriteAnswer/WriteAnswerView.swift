@@ -27,11 +27,11 @@ struct WriteAnswerView: View {
             Spacer()
             
             AnswerTextField(store: store, isTextFieldFocused: $isTextFieldFocused)
-                .padding(.horizontal, 24)
             
             Spacer()
             
             Bottom(store: store)
+                .padding(.bottom, 12)
                 .padding(.horizontal, 24)
         }
         .background(.first)
@@ -69,7 +69,7 @@ private struct WriteAnswerNavigationBar: View {
         QPNavigationBar(
             title: "답변하기",
             leadingView: {
-                QPNavigationButton(buttonType: .text("취소", .wh)) {
+                QPNavigationButton(buttonType: .text("취소", .icon)) {
                     store.send(.dismissButtonTapped)
                 }
             },
@@ -104,6 +104,7 @@ private struct AnswerTextField: View {
             TextField(text: $store.answerText, axis: .vertical) {}
                 .foregroundStyle(.wh)
                 .font(.pretendard(.semiBold, size: store.answerTextFontSize))
+                .padding(.horizontal, 24)
                 .focused($isTextFieldFocused)
                 .autocorrectionDisabled()
                 .multilineTextAlignment(.center)
