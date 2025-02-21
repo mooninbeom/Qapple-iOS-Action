@@ -15,6 +15,10 @@ jobs:
     runs-on: macos-latest
 
     steps:
+    - name: Set up XCode
+      uses: maxim-lobanov/setup-xcode@2
+      with:
+        xcode-version: '16.0'
     - uses: actions/checkout@v4
     - name: Build
       run: xcodebuild clean test -project Qapple/Qapple.xcodeproj -scheme Qapple
