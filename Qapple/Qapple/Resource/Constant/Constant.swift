@@ -10,6 +10,7 @@ import Foundation
 enum Constant {
     static let appleId = "6480340462"
     static let academyEmail = "@pos.idserve.net"
+    static let gcmMessageIDKey = "gcm.message_id"
 }
 
 // MARK: - InMemory

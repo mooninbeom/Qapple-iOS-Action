@@ -10,183 +10,92 @@ import SwiftUI
 import Firebase
 import FirebaseMessaging
 
-class AppDelegate: NSObject, UIApplicationDelegate{
+class AppDelegate: NSObject, UIApplicationDelegate {
+    
+    let mainFlowStore = QappleApp.mainFlowStore
     
     @Dependency(\.keychainService) var keychainService
     @Dependency(\.bulletinBoardRepository) var bulletinBoardRepository
     @Dependency(\.questionRepository) var questionRepository
+}
+
+// MARK: - UIApplicationDelegate
+
+extension AppDelegate {
     
-    let gcmMessageIDKey = "gcm.message_id"
-    
-    let mainFlowStore = QappleApp.mainFlowStore
-    
-    // 앱이 켜졌을 때
-    func application(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey : Any]? = nil) -> Bool {
-        
-        // 기본 서버 설정
+    /// 앱이 켜졌을 때
+    func application(
+        _ application: UIApplication,
+        didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey : Any]? = nil
+    ) -> Bool {
         RepositoryService.shared.configureServer(to: .test)
-        
-        UIApplication.shared.registerForRemoteNotifications()
-        
-        // 파이어베이스 설정
-        FirebaseApp.configure()
-        
-        // Setting Up Notifications...
-        // 원격 알림 등록
-        if #available(iOS 10.0, *) {
-            // For iOS 10 display notification (sent via APNS)
-            UNUserNotificationCenter.current().delegate = self
-            
-            let authOption: UNAuthorizationOptions = [.alert, .badge, .sound]
-            UNUserNotificationCenter.current().requestAuthorization(
-                options: authOption,
-                completionHandler: {_, _ in })
-        } else {
-            let settings: UIUserNotificationSettings =
-            UIUserNotificationSettings(types: [.alert, .badge, .sound], categories: nil)
-            application.registerUserNotificationSettings(settings)
-        }
-        
-        // APNs에 기기 등록을 요청
-        application.registerForRemoteNotifications()
-        
-        
-        // Setting Up Cloud Messaging...
-        // 메세징 델리겟
-        Messaging.messaging().delegate = self
-        
-        UNUserNotificationCenter.current().delegate = self
-        
+        setupPushNotification(application)
+        setupFirebase()
         return true
     }
     
-    // fcm 토큰이 등록 되었을 때
-    func application(_ application: UIApplication, didRegisterForRemoteNotificationsWithDeviceToken deviceToken: Data) {
-        
+    /// DeviceToken으로 원격 Notification에 등록 되었을 때
+    func application(
+        _ application: UIApplication,
+        didRegisterForRemoteNotificationsWithDeviceToken deviceToken: Data
+    ) {
         let deviceTokenString = deviceToken.map { String(format: "%02x", $0) }.joined()
-        
-        // Device Token 업데이트
-        do {
-            try keychainService.createData(.deviceToken, deviceTokenString)
-        } catch {
-            print("디바이스 토큰 에러")
-        }
+        try? keychainService.createData(.deviceToken, deviceTokenString)
         
         // deviceToken을 Firebase 메세징에 전달해 APNs 토큰을 설정
         Messaging.messaging().apnsToken = deviceToken
     }
     
-    func application(_ application: UIApplication, didFailToRegisterForRemoteNotificationsWithError error: Error) {
-        // print("❌ [Device Token Failed]\n" + error.localizedDescription + "\n")
-    }
-}
-
-// Cloud Messaging...
-extension AppDelegate: MessagingDelegate{
-    
-    // fcm 등록 토큰을 받았을 때
-    func messaging(_ messaging: Messaging, didReceiveRegistrationToken fcmToken: String?) {
-        //        print("토큰을 받았다")
-        //        // Store this token to firebase and retrieve when to send message to someone...
-        //        let dataDict: [String: String] = ["token": fcmToken ?? ""]
-        //
-        //        // Store token in Firestore For Sending Notifications From Server in Future...
-        //
-        //        print(dataDict)
-        
-    }
-}
-
-// User Notifications...[AKA InApp Notification...]
-
-@available(iOS 10, *)
-extension AppDelegate: UNUserNotificationCenterDelegate {
-    
-    // 푸시 메세지가 앱이 켜져있을 때 나올 때
-    func userNotificationCenter(_ center: UNUserNotificationCenter,
-                                willPresent notification: UNNotification,
-                                withCompletionHandler completionHandler: @escaping (UNNotificationPresentationOptions)
-                                -> Void) {
-        
-        let userInfo = notification.request.content.userInfo
-        pushNotificationTapped(userInfo: userInfo)
-        
-        
-        // Do Something With MSG Data...
-        if let messageID = userInfo[gcmMessageIDKey] {
-            print("Message ID: \(messageID)")
-        }
-        
-        
-        print(userInfo)
-        
-        completionHandler([[.banner, .badge, .sound]])
-    }
-    
-    // 푸시메세지를 받았을 때
-    func userNotificationCenter(_ center: UNUserNotificationCenter,
-                                didReceive response: UNNotificationResponse,
-                                withCompletionHandler completionHandler: @escaping () -> Void) {
-        let userInfo = response.notification.request.content.userInfo
-        pushNotificationTapped(userInfo: userInfo)
-        
-        // Do Something With MSG Data...
-        if let messageID = userInfo[gcmMessageIDKey] {
-            print("Message ID: \(messageID)")
-        }
-        
-        print(userInfo)
-        
-        completionHandler()
-    }
-    
-    // 앱이 종료된 상태에서 push 알림을 눌렀을 때
-    func application(_ application: UIApplication, didReceiveRemoteNotification userInfo: [AnyHashable : Any], fetchCompletionHandler completionHandler: @escaping (UIBackgroundFetchResult) -> Void) {
-        
+    /// 앱이 종료된 상태에서 PUSH 알림을 눌렀을 때
+    func application(
+        _ application: UIApplication,
+        didReceiveRemoteNotification userInfo: [AnyHashable : Any],
+        fetchCompletionHandler completionHandler: @escaping (UIBackgroundFetchResult) -> Void
+    ) {
         completionHandler(.newData)
     }
+}
+
+// MARK: - Helper
+
+extension AppDelegate {
     
-    private func pushNotificationTapped(userInfo: [AnyHashable: Any]) {
-        if let questionId = userInfo["questionId"],
-           let idString = questionId as? String,
-           let id = Int(idString) {
-            // TODO: API 업데이트 후 추후 적용
-//            evaluateQuestionPushNotification(id)
-        }
+    /// Push Notification을 설정합니다.
+    private func setupPushNotification(_ application: UIApplication) {
+        UIApplication.shared.registerForRemoteNotifications()
         
-        if let boardId = userInfo["boardId"],
-           let idString = boardId as? String,
-           let id = Int(idString) {
-            Task {
-                do {
-                    let response = try await bulletinBoardRepository.fetchSingleBoard(id)
-                    mainFlowStore.send(.pushToComment(response))
-                } catch {
-                    print("Failed to fetch single board")
-                }
-            }
-        }
+        // 원격 알림 등록
+        UNUserNotificationCenter.current().delegate = self
+        
+        // Push 알림 권한 요청
+        requestPushNotificationAutorization()
+        
+        // APNs에 기기 등록을 요청
+        application.registerForRemoteNotifications()
+        
+        UNUserNotificationCenter.current().delegate = self
     }
     
-    private func evaluateQuestionPushNotification(_ id: Int) {
-        var hasNext = true
-        var threshold: String?
-        while hasNext {
-            Task {
-                let response = try await questionRepository.fetchQuestionList(threshold)
-                response.0.forEach {
-                    if $0.id == id {
-                        if $0.isAnswered {
-                            mainFlowStore.send(.pushToAnswerList($0))
-                        } else {
-                            mainFlowStore.send(.pushToWriteAnswer($0))
-                        }
-                        return
-                    }
-                }
-                threshold = response.2.threshold
-                hasNext = response.2.hasNext
-            }
-        }
+    /// FireBase를 설정합니다.
+    private func setupFirebase() {
+        
+        // 파이어베이스 설정
+        FirebaseApp.configure()
+        
+        // 메세징 델리겟
+        Messaging.messaging().delegate = self
+    }
+    
+    /// Push Notification 권한을 요청합니다.
+    private func requestPushNotificationAutorization() {
+        let authOption: UNAuthorizationOptions = [.alert, .badge, .sound]
+        UNUserNotificationCenter.current().requestAuthorization(
+            options: authOption,
+            completionHandler: { _, _ in }
+        )
     }
 }
+
+// MARK: - MessagingDelegate
+
+extension AppDelegate: MessagingDelegate {}
