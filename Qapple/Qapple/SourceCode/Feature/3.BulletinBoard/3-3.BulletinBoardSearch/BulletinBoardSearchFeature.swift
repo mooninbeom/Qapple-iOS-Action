@@ -129,7 +129,7 @@ struct BulletinBoardSearchFeature {
                         .cancellable(id: "searchDebounce", cancelInFlight: true)
                 )
                 
-            case let .boardCellTapped(board):
+            case .boardCellTapped:
                 return .none
                 
             case let .seeMoreAction(board):

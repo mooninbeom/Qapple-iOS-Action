@@ -91,7 +91,7 @@ struct BulletinBoardFeature {
                 state.paginationInfo = paginationInfo
                 return .none
                 
-            case let .boardCellTapped(board):
+            case .boardCellTapped:
                 return .none
                 
             case .reportButtonTapped:

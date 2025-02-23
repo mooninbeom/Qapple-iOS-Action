@@ -53,7 +53,7 @@ extension AppDelegate: UNUserNotificationCenterDelegate {
     private func pushNotificationTapped(userInfo: [AnyHashable: Any]) {
         if let questionId = userInfo["questionId"],
            let idString = questionId as? String,
-           let id = Int(idString) {
+           let _ = Int(idString) {
             // TODO: API 업데이트 후 추후 적용
             //            evaluateQuestionPushNotification(id)
         }

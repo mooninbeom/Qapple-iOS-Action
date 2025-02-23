@@ -70,7 +70,7 @@ private struct SearchBar: View {
         HStack(spacing: 6) {
             TextField("검색어를 입력해주세요", text: $store.searchText) {}
                 .pretendard(.semiBold, 15)
-                .onChange(of: store.searchText) { _ in
+                .onChange(of: store.searchText) {
                     store.send(.searchTextChanged)
                 }
         }
