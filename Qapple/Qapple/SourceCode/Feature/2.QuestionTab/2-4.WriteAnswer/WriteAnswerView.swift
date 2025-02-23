@@ -27,11 +27,11 @@ struct WriteAnswerView: View {
             Spacer()
             
             AnswerTextField(store: store, isTextFieldFocused: $isTextFieldFocused)
-                .padding(.horizontal, 24)
             
             Spacer()
             
             Bottom(store: store)
+                .padding(.bottom, 12)
                 .padding(.horizontal, 24)
         }
         .background(.first)
@@ -46,7 +46,7 @@ struct WriteAnswerView: View {
             state: \.sheet?.anonymityNotice,
             action: \.sheet.anonymityNotice
         )) { _ in
-            AnonymityNoticeSheet()
+            QPAnonymityNoticeSheet()
         }
     }
     
@@ -66,15 +66,15 @@ private struct WriteAnswerNavigationBar: View {
     let store: StoreOf<WriteAnswerFeature>
     
     var body: some View {
-        NavigationBar(
+        QPNavigationBar(
             title: "답변하기",
             leadingView: {
-                NavigationButton(buttonType: .text("취소", .wh)) {
+                QPNavigationButton(buttonType: .text("취소", .icon)) {
                     store.send(.dismissButtonTapped)
                 }
             },
             trailingView: {
-                NavigationButton(buttonType: .text("완료", completeButtonColor)) {
+                QPNavigationButton(buttonType: .text("완료", completeButtonColor)) {
                     store.send(.completeButtonTapped)
                 }
                 .disabled(store.answerText.isEmpty || store.isLoading)
@@ -98,12 +98,13 @@ private struct AnswerTextField: View {
     var body: some View {
         ZStack {
             if store.answerText.isEmpty {
-                MainContentPlaceholder()
+                QPMainContentPlaceholder()
             }
             
             TextField(text: $store.answerText, axis: .vertical) {}
                 .foregroundStyle(.wh)
                 .font(.pretendard(.semiBold, size: store.answerTextFontSize))
+                .padding(.horizontal, 24)
                 .focused($isTextFieldFocused)
                 .autocorrectionDisabled()
                 .multilineTextAlignment(.center)

@@ -17,20 +17,17 @@ struct QuestionRepository {
 // MARK: - DependencyKey
 
 extension QuestionRepository: DependencyKey {
-
-    @Dependency(\.keychainService) static var keychainService
     
     static let liveValue = Self(
         fetchQuestionList: { threshold in
-            let accessToken = try keychainService.fetchData(.accessToken)
-            let server = RepositoryService.shared.server
-            
-            let response = try await QuestionAPI.fetchQuestionList(
-                threshold: threshold,
-                pageSize: 25,
-                server: server,
-                accessToken: accessToken
-            )
+            let response = try await RepositoryService.shared.request { server, accessToken in
+                try await QuestionAPI.fetchQuestionList(
+                    threshold: threshold,
+                    pageSize: 25,
+                    server: server,
+                    accessToken: accessToken
+                )
+            }
             
             let result = response.content.map {
                 Question(
@@ -49,13 +46,13 @@ extension QuestionRepository: DependencyKey {
             return (result, response.total, paginationInfo)
         },
         fetchMainQuestion: {
-            let accessToken = try keychainService.fetchData(.accessToken)
-            let server = RepositoryService.shared.server
+            let response = try await RepositoryService.shared.request { server, accessToken in
+                try await QuestionAPI.fetchMainQuestion(
+                    server: server,
+                    accessToken: accessToken
+                )
+            }
             
-            let response = try await QuestionAPI.fetchMainQuestion(
-                server: server,
-                accessToken: accessToken
-            )
             let result = Question(
                 id: response.questionId,
                 content: response.content,

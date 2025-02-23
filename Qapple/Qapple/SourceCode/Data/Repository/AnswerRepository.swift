@@ -25,22 +25,16 @@ struct AnswerRepository {
 
 extension AnswerRepository: DependencyKey {
     
-    @Dependency(\.keychainService) static var keychainService
-    
-    private static let repositoryService = RepositoryService.shared
-    
-    private static func accessToken() throws -> String {
-        try keychainService.fetchData(.accessToken)
-    }
-    
     static let liveValue = Self(
         fetchAnswerListOfProfile: { threshold in
-            let response = try await AnswerAPI.fetchListOfMine(
-                threshold: threshold,
-                pageSize: 30,
-                server: repositoryService.server,
-                accessToken: accessToken()
-            )
+            let response = try await RepositoryService.shared.request { server, accessToken in
+                try await AnswerAPI.fetchListOfMine(
+                    threshold: threshold,
+                    pageSize: 30,
+                    server: server,
+                    accessToken: accessToken
+                )
+            }
             let answerList = response.content.map {
                 Answer(
                     id: $0.answerId,
@@ -59,13 +53,15 @@ extension AnswerRepository: DependencyKey {
             return (answerList, paginationInfo)
         },
         fetchAnswerPreviewList: { questionId in
-            let response = try await AnswerAPI.fetchListOfQuestion(
-                questionId: Int(questionId),
-                threshold: nil,
-                pageSize: 3,
-                server: repositoryService.server,
-                accessToken: accessToken()
-            )
+            let response = try await RepositoryService.shared.request { server, accessToken in
+                try await AnswerAPI.fetchListOfQuestion(
+                    questionId: Int(questionId),
+                    threshold: nil,
+                    pageSize: 3,
+                    server: server,
+                    accessToken: accessToken
+                )
+            }
             return response.content.map {
                 Answer(
                     id: $0.answerId,
@@ -79,13 +75,15 @@ extension AnswerRepository: DependencyKey {
             }
         },
         fetchAnswerListOfQuestion: { questionId, threshold in
-            let response = try await AnswerAPI.fetchListOfQuestion(
-                questionId: Int(questionId),
-                threshold: threshold,
-                pageSize: 30,
-                server: repositoryService.server,
-                accessToken: accessToken()
-            )
+            let response = try await RepositoryService.shared.request { server, accessToken in
+                try await AnswerAPI.fetchListOfQuestion(
+                    questionId: Int(questionId),
+                    threshold: threshold,
+                    pageSize: 30,
+                    server: server,
+                    accessToken: accessToken
+                )
+            }
             let answerList = response.content.map {
                 Answer(
                     id: $0.answerId,
@@ -104,19 +102,23 @@ extension AnswerRepository: DependencyKey {
             return (answerList, response.total, paginationInfo)
         },
         postAnswer: { questionId, answer in
-            let _ = try await AnswerAPI.create(
-                content: answer,
-                questionId: questionId,
-                server: repositoryService.server,
-                accessToken: accessToken()
-            )
+            let response = try await RepositoryService.shared.request { server, accessToken in
+                try await AnswerAPI.create(
+                    content: answer,
+                    questionId: questionId,
+                    server: server,
+                    accessToken: accessToken
+                )
+            }
         },
         deleteAnswer: { answerId in
-            let _ = try await AnswerAPI.delete(
-                answerId: answerId,
-                server: repositoryService.server,
-                accessToken: accessToken()
-            )
+            let response = try await RepositoryService.shared.request { server, accessToken in
+                try await AnswerAPI.delete(
+                    answerId: answerId,
+                    server: server,
+                    accessToken: accessToken
+                )
+            }
         }
     )
     

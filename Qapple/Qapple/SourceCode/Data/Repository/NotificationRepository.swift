@@ -17,54 +17,22 @@ struct NotificationRepository {
     var fetchNotificationList: (_ threshold: Int?) async throws -> ([QappleNotification], QappleAPI.PaginationInfo)
     var fetchSingleBoard: (_ boardId: Int) async throws -> BulletinBoard
     var isAnsweredQuestion: (_ questionId: Int) async throws -> (Bool, Question)
-    
-    private static let dummyNoti: [QappleNotification] = {
-        var result = [QappleNotification]()
-        for i in 0 ..< 25 {
-            result.append(.init(
-                id: String(i),
-                boardId: String(i),
-                boardCommentId: nil,
-                title: "테스트입니다 \(i)",
-                subtitle: nil,
-                content: "테스트 컨텐츠 입니다 \(i)",
-                createAt: Date(timeIntervalSinceNow: Double(-60*60*60*i)),
-                isReadStatus: false
-            ))
-        }
-        return result
-    }()
-    
-    private static let dummyBoard = BulletinBoard(
-        id: 1,
-        writerId: 1,
-        writerNickname: "이호창",
-        content: "특전사",
-        heartCount: 10,
-        commentCount: 13,
-        createAt: .init(),
-        isMine: false,
-        isReported: false,
-        isLiked: true
-    )
 }
 
+// MARK: - DependencyKey
 
 extension NotificationRepository: DependencyKey {
     
-    @Dependency(\.keychainService) private static var keychainService
-    
     static let liveValue: NotificationRepository = Self(
         fetchNotificationList: { threshold in
-            let server = RepositoryService.shared.server
-            let accessToken = try keychainService.fetchData(.accessToken)
-            
-            let response = try await NotificationAPI.fetchNotifications(
-                threshold: threshold,
-                pageSize: 25,
-                server: server,
-                accessToken: accessToken
-            )
+            let response = try await RepositoryService.shared.request { server, accessToken in
+                try await NotificationAPI.fetchNotifications(
+                    threshold: threshold,
+                    pageSize: 25,
+                    server: server,
+                    accessToken: accessToken
+                )
+            }
             
             let result = response.content.map {
                 QappleNotification(
@@ -86,14 +54,14 @@ extension NotificationRepository: DependencyKey {
             return (result, paginationInfo)
         },
         fetchSingleBoard: { boardId in
-            let server = RepositoryService.shared.server
-            let accessToken = try keychainService.fetchData(.accessToken)
+            let response = try await RepositoryService.shared.request { server, accessToken in
+                try await BoardAPI.fetchSingle(
+                    boardId: boardId,
+                    server: server,
+                    accessToken: accessToken
+                )
+            }
             
-            let response = try await BoardAPI.fetchSingle(
-                boardId: boardId,
-                server: server,
-                accessToken: accessToken
-            )
             let result = BulletinBoard(
                 id: response.boardId,
                 writerId: response.writerId,
@@ -113,16 +81,15 @@ extension NotificationRepository: DependencyKey {
             var hasNext = true
             var threshold: String?
             
-            let server = RepositoryService.shared.server
-            let accessToken = try keychainService.fetchData(.accessToken)
-            
             while hasNext {
-                let response = try await QuestionAPI.fetchQuestionList(
-                    threshold: threshold,
-                    pageSize: 25,
-                    server: server,
-                    accessToken: accessToken
-                )
+                let response = try await RepositoryService.shared.request { server, accessToken in
+                    try await QuestionAPI.fetchQuestionList(
+                        threshold: threshold,
+                        pageSize: 25,
+                        server: server,
+                        accessToken: accessToken
+                    )
+                }
                 
                 if let question = response.content.first(where: { $0.questionId == questionId }) {
                     let entity = Question(
@@ -166,10 +133,46 @@ extension NotificationRepository: DependencyKey {
     )
 }
 
+// MARK: - DependencyValues
 
 extension DependencyValues {
     var notificationRepository: NotificationRepository {
         get { self[NotificationRepository.self] }
         set { self[NotificationRepository.self] = newValue }
     }
+}
+
+// MARK: - Test Value
+
+extension NotificationRepository {
+    
+    private static let dummyNoti: [QappleNotification] = {
+        var result = [QappleNotification]()
+        for i in 0 ..< 25 {
+            result.append(.init(
+                id: String(i),
+                boardId: String(i),
+                boardCommentId: nil,
+                title: "테스트입니다 \(i)",
+                subtitle: nil,
+                content: "테스트 컨텐츠 입니다 \(i)",
+                createAt: Date(timeIntervalSinceNow: Double(-60*60*60*i)),
+                isReadStatus: false
+            ))
+        }
+        return result
+    }()
+    
+    private static let dummyBoard = BulletinBoard(
+        id: 1,
+        writerId: 1,
+        writerNickname: "이호창",
+        content: "특전사",
+        heartCount: 10,
+        commentCount: 13,
+        createAt: .init(),
+        isMine: false,
+        isReported: false,
+        isLiked: true
+    )
 }

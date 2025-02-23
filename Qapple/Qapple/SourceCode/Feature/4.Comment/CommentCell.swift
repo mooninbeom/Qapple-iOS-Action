@@ -6,8 +6,6 @@
 //
 
 import SwiftUI
-import ComposableArchitecture
-
 
 struct CommentCell: View {
     let comment: BoardComment
@@ -252,25 +250,6 @@ private struct CommentReportButton: View {
 
 
 #Preview {
-    let store = StoreOf<CommentFeature>(
-        initialState: CommentFeature.State(
-            board: BulletinBoard(
-                id: 1,
-                writerId: 1,
-                writerNickname: "이호창",
-                content: "특전사",
-                heartCount: 10,
-                commentCount: 13,
-                createAt: .init(),
-                isMine: false,
-                isReported: false,
-                isLiked: true
-            )
-        )
-    ) {
-        CommentFeature()
-    }
-    
     let comment = BoardComment(
         id: 4,
         writeId: 5,

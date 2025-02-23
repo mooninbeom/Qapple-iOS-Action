@@ -14,6 +14,7 @@ struct SignUpFlowFeature {
     struct State: Equatable {
         @Shared(.inMemory(Constant.isSignIn)) var isSignIn = false
         @Presents var alert: AlertState<Action.Alert>?
+        var isFirstLaunch = true
         var socialLogin = SocialLoginFeature.State()
         var path = StackState<Path.State>()
     }
@@ -38,6 +39,7 @@ struct SignUpFlowFeature {
         Reduce { state, action in
             switch action {
             case .onAppear:
+                guard state.isFirstLaunch else { return .none }
                 return .run { send in
                     do {
                         try await appleLoginService.autoLogin()
@@ -48,11 +50,13 @@ struct SignUpFlowFeature {
                 }
                 
             case .autoLoginResponse:
+                state.isFirstLaunch = false
                 state.$isSignIn.withLock { $0 = true }
                 return .none
                 
             case let .socialLogin(.delegate(.signInResponse(isSignUp))):
                 if isSignUp {
+                    state.isFirstLaunch = false
                     state.$isSignIn.withLock { $0 = true }
                     HapticService.notification(type: .success)
                 } else {

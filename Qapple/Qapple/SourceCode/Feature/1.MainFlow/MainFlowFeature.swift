@@ -12,6 +12,7 @@ struct MainFlowFeature {
     
     @ObservableState
     struct State: Equatable {
+        @Shared(.inMemory(Constant.isSignIn)) var isSignIn = false
         var questionTab = QuestionTabFeature.State()
         var bulletinBoardTab = BulletinBoardFeature.State()
         var profileTab = ProfileFeature.State()
@@ -26,6 +27,7 @@ struct MainFlowFeature {
         case pushToAnswerList(Question)
         case pushToWriteAnswer(Question)
         case pushToComment(BulletinBoard)
+        case refreshTokenFailed
         
         case path(StackActionOf<Path>)
     }
@@ -115,6 +117,11 @@ struct MainFlowFeature {
                 state.path.append(.comment(.init(board: board)))
                 return .none
                 
+            case .refreshTokenFailed:
+                state.$isSignIn.withLock { $0 = false }
+                state.path.removeAll()
+                return .none
+                
             case let .path(stackAction):
                 switch stackAction {
                 case let .element(id: _, action: .writeAnswer(.postAnswerResponse(question))):
@@ -122,6 +129,7 @@ struct MainFlowFeature {
                     return .none
                     
                 case let .element(id: _, action: .completeAnswer(.confirmButtonTapped(question))):
+                    state.path.removeAll()
                     state.path.append(.answerList(.init(question: question)))
                     return .none
                     
@@ -208,5 +216,16 @@ extension MainFlowFeature {
         case peopleWhoMadeQapple
         case notificationList(NotificationFeature)
         case report(ReportFeature)
+    }
+}
+
+// MARK: - MainFlowTab
+
+extension MainFlowFeature {
+    
+    enum MainFlowTab {
+        case question
+        case bulletinBoard
+        case profile
     }
 }

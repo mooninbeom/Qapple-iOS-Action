@@ -30,6 +30,7 @@ struct NotificationFeature {
         case notificationCellTapped(Int)
         case reportedBoard
         case unknownError
+        case networkingFailed
         
         case backButtonTapped
         
@@ -57,8 +58,12 @@ struct NotificationFeature {
                 state.threshold = nil
                 state.hasNext = false
                 return .run { send in
-                    let result = try await notificationRepository.fetchNotificationList(nil)
-                    await send(.fetchNotifications(result.0, result.1))
+                    do {
+                        let result = try await notificationRepository.fetchNotificationList(nil)
+                        await send(.fetchNotifications(result.0, result.1))
+                    } catch {
+                        await send(.networkingFailed)
+                    }
                 }
                 
             case let .onPagenationCellAppear(index):
@@ -125,9 +130,15 @@ struct NotificationFeature {
                 state.isLoading = false
                 state.alert = .reportedBoard
                 return .none
+                
             case .unknownError:
                 state.isLoading = false
                 state.alert = .unknownError
+                return .none
+                
+            case .networkingFailed:
+                HapticService.notification(type: .error)
+                state.alert = .failedNetworking
                 return .none
                 
             case .backButtonTapped:

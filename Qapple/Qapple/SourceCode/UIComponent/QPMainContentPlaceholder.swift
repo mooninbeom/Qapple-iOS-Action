@@ -1,5 +1,5 @@
 //
-//  MainContentPlaceholder.swift
+//  QPMainContentPlaceholder.swift
 //  Qapple
 //
 //  Created by 김민준 on 2/7/25.
@@ -7,7 +7,7 @@
 
 import SwiftUI
 
-struct MainContentPlaceholder: View {
+struct QPMainContentPlaceholder: View {
     var body: some View {
         VStack(spacing: 16) {
             Text("자유롭게 생각을\n작성해주세요")
@@ -24,5 +24,5 @@ struct MainContentPlaceholder: View {
 }
 
 #Preview {
-    MainContentPlaceholder()
+    QPMainContentPlaceholder()
 }

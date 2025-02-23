@@ -12,22 +12,27 @@ struct MainFlowView: View {
     
     @Bindable var store: StoreOf<MainFlowFeature>
     
+    @State private var tab: MainFlowFeature.MainFlowTab = .question
+    
     var body: some View {
         NavigationStack(path: $store.scope(state: \.path, action: \.path)) {
-            TabView {
+            TabView(selection: $tab) {
                 QuestionTabView(store: store.scope(state: \.questionTab, action: \.questionTab))
+                    .tag(MainFlowFeature.MainFlowTab.question)
                     .tabItem {
                         Image(systemName: "questionmark.bubble.fill")
                         Text("오늘의 질문")
                     }
                 
                 BulletinBoardView(store: store.scope(state: \.bulletinBoardTab, action: \.bulletinBoardTab))
+                    .tag(MainFlowFeature.MainFlowTab.bulletinBoard)
                     .tabItem {
                         Image(systemName: "list.clipboard.fill")
                         Text("게시판")
                     }
                 
                 ProfileView(store: store.scope(state: \.profileTab, action: \.profileTab))
+                    .tag(MainFlowFeature.MainFlowTab.profile)
                     .tabItem {
                         Image(systemName: "person.fill")
                         Text("내 정보")
@@ -35,6 +40,9 @@ struct MainFlowView: View {
             }
             .tint(.button)
             .fixedTabBarBackground(color: .first)
+            .onChange(of: tab) {
+                HapticService.impact(style: .soft)
+            }
         } destination: { store in
             switch store.case {
             case let .writeAnswer(store): WriteAnswerView(store: store)

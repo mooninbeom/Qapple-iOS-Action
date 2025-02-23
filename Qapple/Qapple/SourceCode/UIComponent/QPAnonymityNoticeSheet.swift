@@ -1,5 +1,5 @@
 //
-//  AnonymityNoticeSheet.swift
+//  QPAnonymityNoticeSheet.swift
 //  Qapple
 //
 //  Created by 김민준 on 1/24/25.
@@ -7,7 +7,7 @@
 
 import SwiftUI
 
-struct AnonymityNoticeSheet: View {
+struct QPAnonymityNoticeSheet: View {
     
     @Environment(\.dismiss) var dismiss
     
@@ -44,7 +44,7 @@ struct AnonymityNoticeSheet: View {
                     .lineSpacing(6)
                     .padding(.top, 32)
                 
-                ActionButton("확인", isActive: true) {
+                QPActionButton("확인", isActive: true) {
                     dismiss()
                 }
                 .padding(.top, 8)
@@ -86,5 +86,5 @@ private struct NoticeCell: View {
 // MARK: - Preview
 
 #Preview {
-    AnonymityNoticeSheet()
+    QPAnonymityNoticeSheet()
 }

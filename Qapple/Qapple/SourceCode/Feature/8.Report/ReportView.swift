@@ -15,10 +15,10 @@ struct ReportView: View {
     
     var body: some View {
         VStack(alignment: .leading, spacing: 0) {
-            NavigationBar(
+            QPNavigationBar(
                 title: "신고하기",
                 leadingView: {
-                    NavigationButton(buttonType: .back) {
+                    QPNavigationButton(buttonType: .back) {
                         store.send(.backButtonTapped)
                     }
                 }

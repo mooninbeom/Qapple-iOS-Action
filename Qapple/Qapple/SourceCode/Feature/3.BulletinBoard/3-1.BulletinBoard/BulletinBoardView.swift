@@ -54,14 +54,14 @@ private struct BulletinBoardContentView: View {
     
     var body: some View {
         VStack(spacing: 0) {
-            NavigationBar(
+            QPNavigationBar(
                 title: "게시판",
                 trailingView: {
                     HStack(spacing: 12) {
-                        NavigationButton(buttonType: .image(.noticeIcon)) {
+                        QPNavigationButton(buttonType: .image(.noticeIcon)) {
                             store.send(.notificationButtonTapped)
                         }
-                        NavigationButton(buttonType: .image(.search)) {
+                        QPNavigationButton(buttonType: .image(.search)) {
                             store.send(.searchButtonTapped)
                         }
                     }
@@ -69,7 +69,7 @@ private struct BulletinBoardContentView: View {
                 }
             )
             
-            AcademyPlanDayCounter(
+            QPAcademyDayCounter(
                 academyEvents: store.academyEvents
             )
             .padding(.top, 8)

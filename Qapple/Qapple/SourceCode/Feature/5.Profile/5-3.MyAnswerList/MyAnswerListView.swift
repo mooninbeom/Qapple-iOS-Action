@@ -15,10 +15,10 @@ struct MyAnswerListView: View {
     var body: some View {
         ZStack {
             VStack(alignment: .leading, spacing: 0) {
-                NavigationBar(
+                QPNavigationBar(
                     title: "내 답변",
                     leadingView: {
-                        NavigationButton(buttonType: .back) {
+                        QPNavigationButton(buttonType: .back) {
                             store.send(.backButtonTapped)
                         }
                     }
@@ -63,7 +63,7 @@ private struct MyAnswerList: View {
                 LazyVStack(spacing: 0) {
                     ForEach(enumerated(store.myAnswerList), id: \.element.id) {
                         index, answer in
-                        AnswerCell(
+                        QPAnswerCell(
                             answer: answer,
                             index: index,
                             state: .written,

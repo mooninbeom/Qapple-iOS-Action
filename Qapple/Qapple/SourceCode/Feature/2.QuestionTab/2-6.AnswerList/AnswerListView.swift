@@ -55,10 +55,10 @@ private struct AnswerListNavigationBar: View {
     let store: StoreOf<AnswerListFeature>
     
     var body: some View {
-        NavigationBar(
+        QPNavigationBar(
             title: "답변 리스트",
             leadingView: {
-                NavigationButton(buttonType: .back) {
+                QPNavigationButton(buttonType: .back) {
                     store.send(.backButtonTapped)
                 }
             }
@@ -132,7 +132,7 @@ private struct AnswerList: View {
             LazyVStack {
                 ForEach(enumerated(store.answerList), id: \.element.id) {
                     index, answer in
-                    AnswerCell(
+                    QPAnswerCell(
                         answer: answer,
                         index: index,
                         state: .normal,
