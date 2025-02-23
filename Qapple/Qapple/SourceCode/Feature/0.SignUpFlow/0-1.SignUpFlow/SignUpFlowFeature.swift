@@ -50,8 +50,8 @@ struct SignUpFlowFeature {
                 }
                 
             case .autoLoginResponse:
-                // state.isFirstLaunch = false
-                // state.$isSignIn.withLock { $0 = true }
+                state.isFirstLaunch = false
+                state.$isSignIn.withLock { $0 = true }
                 return .none
                 
             case let .socialLogin(.delegate(.signInResponse(isSignUp))):
