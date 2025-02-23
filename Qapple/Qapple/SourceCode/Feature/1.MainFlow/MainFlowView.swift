@@ -40,7 +40,7 @@ struct MainFlowView: View {
             }
             .tint(.button)
             .fixedTabBarBackground(color: .first)
-            .onChange(of: tab) { _, _ in
+            .onChange(of: tab) {
                 HapticService.impact(style: .soft)
             }
         } destination: { store in
