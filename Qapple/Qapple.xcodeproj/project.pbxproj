@@ -521,7 +521,7 @@
 			isa = XCRemoteSwiftPackageReference;
 			repositoryURL = "https://github.com/Team-Capple/Qapple-Repository.git";
 			requirement = {
-				branch = develop;
+				branch = main;
 				kind = branch;
 			};
 		};
