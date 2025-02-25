@@ -28,6 +28,7 @@ struct ProfileEditView: View {
                         store.send(.successButtonTapped)
                     }
                     .disabled(store.nicknameCheck && store.nicknameChange)
+                    .disabled(store.isLoading)
                 }
             )
             
@@ -60,6 +61,7 @@ struct ProfileEditView: View {
             )
             .padding(.top, 32)
             .padding(.horizontal, 24)
+            .disabled(store.isLoading)
             .onChange(of: store.nickname) { _, nickname in
                 store.send(.nicknameChanged(nickname))
             }

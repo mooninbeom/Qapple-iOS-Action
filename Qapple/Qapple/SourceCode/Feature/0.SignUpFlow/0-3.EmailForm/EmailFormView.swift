@@ -56,6 +56,7 @@ struct EmailFormView: View {
             )
             .padding(.top, 64)
             .padding(.horizontal, 24)
+            .disabled(store.isLoading)
             
             Spacer()
         }

@@ -63,7 +63,7 @@ struct AuthCodeFormView: View {
             )
             .padding(.top, 64)
             .padding(.horizontal, 24)
-            .disabled(store.isAuthCheckComplete)
+            .disabled(store.isAuthCheckComplete || store.isLoading)
             .onChange(of: store.authCodeText) { _, value in
                 store.send(.typeAuthCode(value))
             }

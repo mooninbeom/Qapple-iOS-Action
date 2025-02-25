@@ -63,6 +63,7 @@ struct NicknameFormView: View {
             )
             .padding(.top, 64)
             .padding(.horizontal, 24)
+            .disabled(store.isLoading)
             .onChange(of: store.nicknameText) { _, value in
                 store.send(.typeNicknameText(value))
             }

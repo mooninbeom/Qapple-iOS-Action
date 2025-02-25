@@ -57,6 +57,7 @@ struct TermsAgreementView: View {
             }
             .padding(.bottom, 16)
             .padding(.horizontal, 24)
+            .disabled(store.isLoading)
         }
         .background(.first)
         .navigationBarBackButtonHidden()

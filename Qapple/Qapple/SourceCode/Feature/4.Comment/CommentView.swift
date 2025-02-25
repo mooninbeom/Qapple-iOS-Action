@@ -65,7 +65,6 @@ struct CommentView: View {
             }
         }
         .alert($store.scope(state: \.alert, action: \.alert))
-        
     }
     
     private var seperator: some View {
