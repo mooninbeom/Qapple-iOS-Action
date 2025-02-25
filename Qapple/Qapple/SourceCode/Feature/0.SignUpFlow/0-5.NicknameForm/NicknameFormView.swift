@@ -78,6 +78,7 @@ struct NicknameFormView: View {
         }
         .background(.first)
         .navigationBarBackButtonHidden()
+        .popGestureEnabled(true)
         .loadingIndicator(isLoading: store.isLoading)
     }
     

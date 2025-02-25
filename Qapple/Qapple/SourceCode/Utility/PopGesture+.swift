@@ -24,31 +24,29 @@ final class PopGestureManager {
     
     /// Pop 제스처를 허용하는 변수 업데이트
     @MainActor
-    func updateAllowPopGesture(_ bool: Bool) async {
+    func updateAllowPopGesture(_ bool: Bool) {
         isAllowPopGestureValue = bool
     }
 }
 
 // MARK: - ViewModifier
 
-struct PopGestureDisabledViewModifier: ViewModifier {
+struct PopGestureViewModifier: ViewModifier {
+    
+    let isActive: Bool
+    
     func body(content: Content) -> some View {
         content
             .task {
-                await PopGestureManager.shared.updateAllowPopGesture(false)
-            }
-            .onDisappear {
-                Task {
-                    await PopGestureManager.shared.updateAllowPopGesture(true)
-                }
+                PopGestureManager.shared.updateAllowPopGesture(isActive)
             }
     }
 }
 
 extension View {
     
-    func popGestureDisabled() -> some View {
-        modifier(PopGestureDisabledViewModifier())
+    func popGestureEnabled(_ isActive: Bool) -> some View {
+        modifier(PopGestureViewModifier(isActive: isActive))
     }
 }
 

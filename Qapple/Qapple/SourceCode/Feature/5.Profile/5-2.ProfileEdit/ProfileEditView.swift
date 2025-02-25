@@ -71,6 +71,7 @@ struct ProfileEditView: View {
         .background(.second)
         .navigationBarBackButtonHidden()
         .navigationBarTitleDisplayMode(.inline)
+        .popGestureEnabled(true)
         .loadingIndicator(isLoading: store.isLoading)
         .alert($store.scope(state: \.alert, action: \.alert))
     }

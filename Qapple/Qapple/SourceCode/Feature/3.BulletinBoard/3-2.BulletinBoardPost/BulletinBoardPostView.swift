@@ -25,7 +25,7 @@ struct BulletinBoardPostView: View {
         }
         .background(.first)
         .navigationBarBackButtonHidden()
-        .popGestureDisabled()
+        .popGestureEnabled(false)
         .onTapGesture {
             isTextFieldFocused.toggle()
         }

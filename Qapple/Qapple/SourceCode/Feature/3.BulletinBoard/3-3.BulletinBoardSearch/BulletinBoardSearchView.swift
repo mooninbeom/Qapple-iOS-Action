@@ -38,6 +38,7 @@ struct BulletinBoardSearchView: View {
             }
             .background(Background.first)
             .navigationBarBackButtonHidden()
+            .popGestureEnabled(true)
         }
         .onAppear {
             if !store.searchText.isEmpty {

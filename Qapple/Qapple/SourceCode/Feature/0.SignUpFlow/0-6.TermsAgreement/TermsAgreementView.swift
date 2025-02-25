@@ -61,6 +61,7 @@ struct TermsAgreementView: View {
         }
         .background(.first)
         .navigationBarBackButtonHidden()
+        .popGestureEnabled(true)
         .loadingIndicator(isLoading: store.isLoading)
         .alert($store.scope(state: \.alert, action: \.alert))
         .sheet(item: $store.scope(state: \.sheet, action: \.sheet)) { sheet in

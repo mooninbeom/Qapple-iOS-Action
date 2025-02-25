@@ -39,6 +39,7 @@ struct ReportView: View {
         }
         .background(.first)
         .navigationBarBackButtonHidden()
+        .popGestureEnabled(true)
         .loadingIndicator(isLoading: store.isLoading)
         .alert($store.scope(state: \.alert, action: \.alert))
     }

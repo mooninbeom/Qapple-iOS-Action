@@ -51,6 +51,7 @@ struct CommentView: View {
             hideKeyboard()
         }
         .navigationBarBackButtonHidden()
+        .popGestureEnabled(true)
         .onAppear {
             store.send(.onAppear)
         }

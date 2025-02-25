@@ -29,6 +29,7 @@ struct AnswerListView: View {
         }
         .background(.first)
         .navigationBarBackButtonHidden()
+        .popGestureEnabled(true)
         .onAppear {
             store.send(.onAppear)
         }
