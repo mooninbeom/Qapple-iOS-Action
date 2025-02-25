@@ -18,6 +18,7 @@ struct BulletinBoardFeature {
         var paginationInfo = QappleAPI.PaginationInfo(threshold: "", hasNext: false)
         var academyEvents: [AcademyEvent] = [.macro, .epilogue]
         var isLoading: Bool = false
+        var isFirstLaunch = true
     }
     
     enum Action {
@@ -58,8 +59,8 @@ struct BulletinBoardFeature {
         Reduce { state,action in
             switch action {
             case .onAppear, .refresh:
-                return .run { send in
-                    await send(.toggleLoading(true), animation: .bouncy)
+                return .run { [isFirstLaunch = state.isFirstLaunch] send in
+                    if isFirstLaunch { await send(.toggleLoading(true), animation: .bouncy) }
                     do {
                         let response = try await bulletinBoardRepository.fetchBulletinBoardList(nil)
                         await send(.bulletinBoardListResponse(response.0, response.1))
@@ -82,6 +83,7 @@ struct BulletinBoardFeature {
                 }
                 
             case let .bulletinBoardListResponse(bulletinBoardList, paginationInfo):
+                state.isFirstLaunch = false
                 state.bulletinBoardList = bulletinBoardList
                 state.paginationInfo = paginationInfo
                 return .none
