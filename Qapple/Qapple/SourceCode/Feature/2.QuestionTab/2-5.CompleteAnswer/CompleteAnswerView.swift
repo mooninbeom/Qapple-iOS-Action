@@ -43,7 +43,7 @@ struct CompleteAnswerView: View {
         .padding(.horizontal, 24)
         .background(.first)
         .navigationBarBackButtonHidden()
-        .popGestureDisabled()
+        .popGestureEnabled(false)
     }
 }
 

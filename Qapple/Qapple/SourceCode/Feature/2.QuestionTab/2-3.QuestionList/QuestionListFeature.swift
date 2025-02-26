@@ -16,6 +16,7 @@ struct QuestionListFeature {
         var totalCount: QappleAPI.TotalCount = 0
         var paginationInfo = QappleAPI.PaginationInfo(threshold: "", hasNext: false)
         var isLoading = false
+        var isFirstLaunch = true
         @Presents var alert: AlertState<Action.Alert>?
     }
     
@@ -40,8 +41,8 @@ struct QuestionListFeature {
         Reduce { state, action in
             switch action {
             case .onAppear, .refresh:
-                return .run { send in
-                    await send(.toggleLoading(true), animation: .bouncy)
+                return .run { [isFirstLaunch = state.isFirstLaunch] send in
+                    if isFirstLaunch { await send(.toggleLoading(true), animation: .bouncy) }
                     do {
                         let response = try await fetchQuestionList(nil)
                         await send(.questionListResponse(response.0, response.1, response.2))
@@ -64,6 +65,7 @@ struct QuestionListFeature {
                 }
                 
             case let .questionListResponse(questionList, totalCount, paginationInfo):
+                state.isFirstLaunch = false
                 state.questionList = questionList
                 state.totalCount = totalCount
                 state.paginationInfo = paginationInfo

@@ -56,11 +56,13 @@ struct EmailFormView: View {
             )
             .padding(.top, 64)
             .padding(.horizontal, 24)
+            .disabled(store.isLoading)
             
             Spacer()
         }
         .background(.first)
         .navigationBarBackButtonHidden()
+        .popGestureEnabled(true)
         .loadingIndicator(isLoading: store.isLoading)
         .alert($store.scope(state: \.alert, action: \.alert))
         .onTapGesture {

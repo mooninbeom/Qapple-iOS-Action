@@ -15,13 +15,10 @@ struct LoadingIndicatorModifier: ViewModifier {
         content
             .overlay {
                 if isLoading {
-                    ZStack {
-                        Color.black.opacity(0.0001).ignoresSafeArea()
-                        ProgressView()
-                            .scaleEffect(1.5)
-                            .progressViewStyle(.circular)
-                            .tint(.primary)
-                    }
+                    ProgressView()
+                        .scaleEffect(1.5)
+                        .progressViewStyle(.circular)
+                        .tint(.primary)
                 }
             }
     }

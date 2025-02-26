@@ -51,6 +51,7 @@ struct CommentView: View {
             hideKeyboard()
         }
         .navigationBarBackButtonHidden()
+        .popGestureEnabled(true)
         .onAppear {
             store.send(.onAppear)
         }
@@ -65,7 +66,6 @@ struct CommentView: View {
             }
         }
         .alert($store.scope(state: \.alert, action: \.alert))
-        
     }
     
     private var seperator: some View {
