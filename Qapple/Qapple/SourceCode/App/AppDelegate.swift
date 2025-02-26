@@ -29,7 +29,7 @@ class AppDelegate: NSObject, UIApplicationDelegate{
         UIApplication.shared.registerForRemoteNotifications()
         
         // 파이어베이스 설정
-        FirebaseApp.configure()
+//        FirebaseApp.configure()
         
         // Setting Up Notifications...
         // 원격 알림 등록
