@@ -14,10 +14,10 @@ struct TermsAgreementView: View {
     
     var body: some View {
         VStack(alignment: .leading, spacing: 0) {
-            NavigationBar(
+            QPNavigationBar(
                 title: "약관 동의",
                 leadingView: {
-                    NavigationButton(buttonType: .back) {
+                    QPNavigationButton(buttonType: .back) {
                         store.send(.backButtonTapped)
                     }
                 }
@@ -52,7 +52,7 @@ struct TermsAgreementView: View {
             
             Spacer()
             
-            ActionButton("다음", isActive: store.isAllTermsAgree) {
+            QPActionButton("다음", isActive: store.isAllTermsAgree) {
                 store.send(.nextButtonTapped)
             }
             .padding(.bottom, 16)

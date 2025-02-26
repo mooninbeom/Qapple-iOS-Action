@@ -37,10 +37,10 @@ private struct NotificationContentView: View {
     
     var body: some View {
         VStack(spacing: 0) {
-            NavigationBar(
+            QPNavigationBar(
                 title: "알림",
                 leadingView: {
-                    NavigationButton(buttonType: .back) {
+                    QPNavigationButton(buttonType: .back) {
                         store.send(.backButtonTapped)
                     }
                 }

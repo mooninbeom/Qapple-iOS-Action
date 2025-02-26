@@ -14,7 +14,7 @@ struct SignUpCompleteView: View {
     
     var body: some View {
         VStack(alignment: .leading, spacing: 0) {
-            NavigationBar()
+            QPNavigationBar()
             
             Text("캐플에 오신 것을 환영합니다.\n당신의 이야기를 들려주세요!")
                 .foregroundStyle(.main)
@@ -25,7 +25,7 @@ struct SignUpCompleteView: View {
             
             Spacer()
             
-            ActionButton("시작하기", isActive: true) {
+            QPActionButton("시작하기", isActive: true) {
                 store.send(.startButtonTapped)
             }
             .padding(.bottom, 16)

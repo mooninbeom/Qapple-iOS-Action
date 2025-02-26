@@ -15,16 +15,16 @@ struct ProfileEditView: View {
     
     var body: some View {
         VStack(alignment: .leading, spacing: 0) {
-            NavigationBar(
+            QPNavigationBar(
                 title: "프로필 수정",
                 backgroundColor: .second,
                 leadingView: {
-                    NavigationButton(buttonType: .back) {
+                    QPNavigationButton(buttonType: .back) {
                         store.send(.backButtonTapped)
                     }
                 },
                 trailingView: {
-                    NavigationButton(buttonType: .text("완료", store.nicknameCheck && !store.nicknameChange ? .text : .sub4)) {
+                    QPNavigationButton(buttonType: .text("완료", store.nicknameCheck && !store.nicknameChange ? .text : .sub4)) {
                         store.send(.successButtonTapped)
                     }
                     .disabled(store.nicknameCheck && store.nicknameChange)

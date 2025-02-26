@@ -15,10 +15,10 @@ struct NicknameFormView: View {
     
     var body: some View {
         VStack(alignment: .leading, spacing: 0) {
-            NavigationBar(
+            QPNavigationBar(
                 title: "회원가입",
                 leadingView: {
-                    NavigationButton(buttonType: .back) {
+                    QPNavigationButton(buttonType: .back) {
                         store.send(.backButtonTapped)
                     }
                 }
@@ -69,7 +69,7 @@ struct NicknameFormView: View {
             
             Spacer()
             
-            ActionButton("다음", isActive: store.isNicknameCheckComplete) {
+            QPActionButton("다음", isActive: store.isNicknameCheckComplete) {
                 store.send(.nextButtonTapped)
             }
             .padding(.bottom, 16)

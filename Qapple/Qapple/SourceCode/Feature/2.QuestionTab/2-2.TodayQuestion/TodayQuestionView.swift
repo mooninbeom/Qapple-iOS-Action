@@ -206,7 +206,7 @@ private struct AnswerPreviewList: View {
         VStack(spacing: 0) {
             ForEach(enumerated(store.answerPreviewList), id: \.element.id) {
                 index, answer in
-                AnswerCell(
+                QPAnswerCell(
                     answer: answer,
                     index: index,
                     state: .normal,

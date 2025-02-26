@@ -14,6 +14,7 @@ struct SignUpFlowFeature {
     struct State: Equatable {
         @Shared(.inMemory(Constant.isSignIn)) var isSignIn = false
         @Presents var alert: AlertState<Action.Alert>?
+        var isFirstLaunch = true
         var socialLogin = SocialLoginFeature.State()
         var path = StackState<Path.State>()
     }
@@ -22,7 +23,7 @@ struct SignUpFlowFeature {
         case onAppear
         case autoLoginResponse
         case socialLogin(SocialLoginFeature.Action)
-        case networkingFailed
+        case networkingFailed(Error)
         case path(StackActionOf<Path>)
         case alert(PresentationAction<Alert>)
         
@@ -38,21 +39,24 @@ struct SignUpFlowFeature {
         Reduce { state, action in
             switch action {
             case .onAppear:
+                guard state.isFirstLaunch else { return .none }
                 return .run { send in
                     do {
                         try await appleLoginService.autoLogin()
                         await send(.autoLoginResponse)
                     } catch {
-                        await send(.networkingFailed)
+                        await send(.networkingFailed(error))
                     }
                 }
                 
             case .autoLoginResponse:
+                state.isFirstLaunch = false
                 state.$isSignIn.withLock { $0 = true }
                 return .none
                 
             case let .socialLogin(.delegate(.signInResponse(isSignUp))):
                 if isSignUp {
+                    state.isFirstLaunch = false
                     state.$isSignIn.withLock { $0 = true }
                     HapticService.notification(type: .success)
                 } else {
@@ -60,9 +64,9 @@ struct SignUpFlowFeature {
                 }
                 return .none
                 
-            case .networkingFailed:
+            case let .networkingFailed(error):
                 HapticService.notification(type: .error)
-                state.alert = .failedNetworking
+                state.alert = .failedNetworking(with: error)
                 return .none
                 
             case let .path(stackAction):

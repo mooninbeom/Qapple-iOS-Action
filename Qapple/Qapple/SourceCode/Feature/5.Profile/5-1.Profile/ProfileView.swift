@@ -15,7 +15,7 @@ struct ProfileView: View {
     
     var body: some View {
         VStack(alignment: .leading, spacing: 0) {
-            NavigationBar(
+            QPNavigationBar(
                 title: "프로필",
                 backgroundColor: .second
             )

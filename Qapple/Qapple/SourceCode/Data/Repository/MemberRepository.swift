@@ -28,10 +28,6 @@ extension MemberRepository: DependencyKey {
     
     private static let repositoryService = RepositoryService.shared
     
-    private static func accessToken() throws -> String {
-        try keychainService.fetchData(.accessToken)
-    }
-    
     static let liveValue = Self(
         signIn: { code in
             let deviceToken = try keychainService.fetchData(.deviceToken)
@@ -40,14 +36,8 @@ extension MemberRepository: DependencyKey {
                 deviceToken: deviceToken,
                 server: repositoryService.server
             )
-            try keychainService.createData(
-                .accessToken,
-                response.accessToken ?? ""
-            )
-            try keychainService.createData(
-                .refreshToken,
-                response.refreshToken ?? ""
-            )
+            try keychainService.createData(.accessToken, response.accessToken ?? "")
+            try keychainService.createData(.refreshToken, response.refreshToken ?? "")
             return response.isMember
         },
         signUp: { email, nickname in
@@ -60,14 +50,8 @@ extension MemberRepository: DependencyKey {
                 deviceToken: deviceToken,
                 server: repositoryService.server
             )
-            try keychainService.createData(
-                .accessToken,
-                response.accessToken ?? ""
-            )
-            try keychainService.createData(
-                .refreshToken,
-                response.refreshToken ?? ""
-            )
+            try keychainService.createData(.accessToken, response.accessToken ?? "")
+            try keychainService.createData(.refreshToken, response.refreshToken ?? "")
         },
         sendCertificationEmail: { email in
             let refreshToken = try keychainService.fetchData(.refreshToken)
@@ -89,15 +73,22 @@ extension MemberRepository: DependencyKey {
             return response
         },
         checkNicknameDuplicate: { nickname in
-            let response = try await MemberAPI.checkNicknameDuplicate(
-                nickname: nickname,
-                server: repositoryService.server,
-                accessToken: accessToken()
-            )
+            let response = try await RepositoryService.shared.request { server, accessToken in
+                try await MemberAPI.checkNicknameDuplicate(
+                    nickname: nickname,
+                    server: server,
+                    accessToken: accessToken
+                )
+            }
             return response
         },
         fetchMyPage: {
-            let response = try await MemberAPI.fetchProfile(server: repositoryService.server, accessToken: accessToken())
+            let response = try await RepositoryService.shared.request { server, accessToken in
+                try await MemberAPI.fetchProfile(
+                    server: server,
+                    accessToken: accessToken
+                )
+            }
             return MyProfile(
                 nickname: response.nickname,
                 profileImage: response.profileImage,
@@ -105,18 +96,22 @@ extension MemberRepository: DependencyKey {
             )
         },
         editMyPage: { nickname, profileImage in
-            let response = try await MemberAPI.updateProfile(
-                nickname: nickname,
-                profileImage: profileImage,
-                server: repositoryService.server,
-                accessToken: accessToken()
-            )
+            let _ = try await RepositoryService.shared.request { server, accessToken in
+                try await MemberAPI.updateProfile(
+                    nickname: nickname,
+                    profileImage: profileImage,
+                    server: server,
+                    accessToken: accessToken
+                )
+            }
         },
         resign: {
-            let response = try await MemberAPI.resign(
-                server: repositoryService.server,
-                accessToken: accessToken()
-            )
+            let _ = try await RepositoryService.shared.request { server, accessToken in
+                try await MemberAPI.resign(
+                    server: server,
+                    accessToken: accessToken
+                )
+            }
         }
     )
     

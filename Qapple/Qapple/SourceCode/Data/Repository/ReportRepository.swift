@@ -19,38 +19,36 @@ struct ReportRepository {
 
 extension ReportRepository: DependencyKey {
     
-    @Dependency(\.keychainService) static var keychainService
-    
-    private static let repositoryService = RepositoryService.shared
-    
-    private static func accessToken() throws -> String {
-        try keychainService.fetchData(.accessToken)
-    }
-    
     static let liveValue = Self(
         reportAnswer: { answerId, reportType in
-            let _ = try await ReportAPI.reportAnswer(
-                answerId: answerId,
-                reportType: reportType,
-                server: repositoryService.server,
-                accessToken: accessToken()
-            )
+            let _ = try await RepositoryService.shared.request { server, accessToken in
+                try await ReportAPI.reportAnswer(
+                    answerId: answerId,
+                    reportType: reportType,
+                    server: server,
+                    accessToken: accessToken
+                )
+            }
         },
         reportBoard: { boardId, reportType in
-            let _ = try await ReportAPI.reportBoard(
-                boardId: boardId,
-                reportType: reportType,
-                server: repositoryService.server,
-                accessToken: accessToken()
-            )
+            let _ = try await RepositoryService.shared.request { server, accessToken in
+                try await ReportAPI.reportBoard(
+                    boardId: boardId,
+                    reportType: reportType,
+                    server: server,
+                    accessToken: accessToken
+                )
+            }
         },
         reportComment: { commentId, reportType in
-            let _ = try await ReportAPI.reportBoardComment(
-                boardCommentId: commentId,
-                reportType: reportType,
-                server: repositoryService.server,
-                accessToken: accessToken()
-            )
+            let _ = try await RepositoryService.shared.request { server, accessToken in
+                try await ReportAPI.reportBoardComment(
+                    boardCommentId: commentId,
+                    reportType: reportType,
+                    server: server,
+                    accessToken: accessToken
+                )
+            }
         }
     )
 }

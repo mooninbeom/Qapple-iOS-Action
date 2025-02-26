@@ -35,6 +35,9 @@ struct QuestionTabView: View {
             }
             .background(.first)
             .tabViewStyle(PageTabViewStyle(indexDisplayMode: .never))
+            .onChange(of: store.questionTab) { _, _ in
+                HapticService.impact(style: .light)
+            }
         }
     }
 }

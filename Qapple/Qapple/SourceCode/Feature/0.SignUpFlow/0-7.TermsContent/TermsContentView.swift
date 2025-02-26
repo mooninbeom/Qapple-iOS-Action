@@ -16,10 +16,10 @@ struct TermsContentView: View {
     
     var body: some View {
         VStack(alignment: .leading, spacing: 0) {
-            NavigationBar(
+            QPNavigationBar(
                 title: title,
                 leadingView: {
-                    NavigationButton(buttonType: .xmark) {
+                    QPNavigationButton(buttonType: .xmark) {
                         dismiss()
                     }
                 }

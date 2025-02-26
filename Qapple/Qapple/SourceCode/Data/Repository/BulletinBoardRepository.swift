@@ -22,22 +22,16 @@ struct BulletinBoardRepository {
 
 extension BulletinBoardRepository: DependencyKey {
     
-    @Dependency(\.keychainService) static var keychainService
-    
-    private static let repositoryService = RepositoryService.shared
-    
-    private static func accessToken() throws -> String {
-        try keychainService.fetchData(.accessToken)
-    }
-    
     static let liveValue = Self(
         fetchBulletinBoardList: { threshold in
-            let response = try await BoardAPI.fetchList(
-                threshold: threshold,
-                pageSize: 25,
-                server: repositoryService.server,
-                accessToken: accessToken()
-            )
+            let response = try await RepositoryService.shared.request { server, accessToken in
+                try await BoardAPI.fetchList(
+                    threshold: threshold,
+                    pageSize: 30,
+                    server: server,
+                    accessToken: accessToken
+                )
+            }
             let list = response.content.map {
                 BulletinBoard(
                     id: $0.boardId,
@@ -59,19 +53,23 @@ extension BulletinBoardRepository: DependencyKey {
             return (list, paginationInfo)
         },
         postBoard: { content in
-            let _ = try await BoardAPI.create(
-                content: content,
-                boardType: .freeBoard,
-                server: repositoryService.server,
-                accessToken: accessToken()
-            )
+            let _ = try await RepositoryService.shared.request { server, accessToken in
+                try await BoardAPI.create(
+                    content: content,
+                    boardType: .freeBoard,
+                    server: server,
+                    accessToken: accessToken
+                )
+            }
         },
         fetchSingleBoard: { boardId in
-            let response = try await BoardAPI.fetchSingle(
-                boardId: boardId,
-                server: repositoryService.server,
-                accessToken: accessToken()
-            )
+            let response = try await RepositoryService.shared.request { server, accessToken in
+                try await BoardAPI.fetchSingle(
+                    boardId: boardId,
+                    server: server,
+                    accessToken: accessToken
+                )
+            }
             return BulletinBoard(
                 id: response.boardId,
                 writerId: response.writerId,
@@ -86,27 +84,33 @@ extension BulletinBoardRepository: DependencyKey {
             )
         },
         deleteBoard: { boardId in
-            let _ = try await BoardAPI.delete(
-                boardId: boardId,
-                server: repositoryService.server,
-                accessToken: accessToken()
-            )
+            let _ = try await RepositoryService.shared.request { server, accessToken in
+                try await BoardAPI.delete(
+                    boardId: boardId,
+                    server: server,
+                    accessToken: accessToken
+                )
+            }
         },
         likeBoard: { boardId in
-            let _ = try await BoardAPI.like(
-                boardId: boardId,
-                server: repositoryService.server,
-                accessToken: accessToken()
-            )
+            let _ = try await RepositoryService.shared.request { server, accessToken in
+                try await BoardAPI.like(
+                    boardId: boardId,
+                    server: server,
+                    accessToken: accessToken
+                )
+            }
         },
         searchBoard: { keyword, threshold in
-            let response = try await BoardAPI.search(
-                keyword: keyword ?? "",
-                threshold: threshold,
-                pageSize: 25,
-                server: repositoryService.server,
-                accessToken: accessToken()
-            )
+            let response = try await RepositoryService.shared.request { server, accessToken in
+                try await BoardAPI.search(
+                    keyword: keyword ?? "",
+                    threshold: threshold,
+                    pageSize: 30,
+                    server: server,
+                    accessToken: accessToken
+                )
+            }
             let list = response.content.map {
                 BulletinBoard(
                     id: $0.boardId,
