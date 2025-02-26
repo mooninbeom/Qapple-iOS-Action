@@ -31,6 +31,10 @@ jobs:
     #    -destination 'platform=iOS Simulator,name=iPhone 16 Pro,OS=18.1' \
     #    -skipMacroValidation
 
+    - name: Clean Derived Data
+      run: |
+        rm -rf ~/Library/Developer/Xcode/DerivedData/*
+
     - name: UnitTest run
       run: |
         xcodebuild clean test \
