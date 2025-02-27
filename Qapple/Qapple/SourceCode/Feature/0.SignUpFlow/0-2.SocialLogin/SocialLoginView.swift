@@ -39,6 +39,7 @@ struct SocialLoginView: View {
             .frame(height: 56)
             .padding(.bottom, 40)
             .signInWithAppleButtonStyle(.whiteOutline)
+            .disabled(store.isLoading)
         }
         .padding(.horizontal, 24)
         .background(LinearGradient.backgroundGradient)

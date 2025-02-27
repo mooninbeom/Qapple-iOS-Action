@@ -25,7 +25,7 @@ struct BulletinBoardPostView: View {
         }
         .background(.first)
         .navigationBarBackButtonHidden()
-        .popGestureDisabled()
+        .popGestureEnabled(false)
         .onTapGesture {
             isTextFieldFocused.toggle()
         }
@@ -59,7 +59,7 @@ private struct BulletinBoardPostNavigationBar: View {
                         store.send(.postBoardButtonTapped)
                     }
                 }
-                .disabled(store.boardText.isEmpty)
+                .disabled(store.boardText.isEmpty || store.isLoading)
             }
         )
     }

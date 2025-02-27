@@ -36,7 +36,7 @@ struct WriteAnswerView: View {
         }
         .background(.first)
         .navigationBarBackButtonHidden()
-        .popGestureDisabled()
+        .popGestureEnabled(false)
         .loadingIndicator(isLoading: store.isLoading)
         .alert($store.scope(state: \.alert, action: \.alert))
         .onTapGesture {

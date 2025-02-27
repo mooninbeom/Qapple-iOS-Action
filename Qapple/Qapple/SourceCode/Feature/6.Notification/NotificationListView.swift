@@ -22,6 +22,7 @@ struct NotificationListView: View {
             NotificationContentView(store: store)
         }
         .navigationBarBackButtonHidden()
+        .popGestureEnabled(true)
         .loadingIndicator(isLoading: store.isLoading)
         .alert($store.scope(state: \.alert, action: \.alert))
         .onAppear {

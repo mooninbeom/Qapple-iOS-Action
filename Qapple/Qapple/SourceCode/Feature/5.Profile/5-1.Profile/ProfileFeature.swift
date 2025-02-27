@@ -20,6 +20,7 @@ struct ProfileFeature {
         var joinDate: String = ""
         var profileImage: String?
         var isLoading = false
+        var isFirstLaunch = true
     }
     
     enum Action {
@@ -90,8 +91,8 @@ struct ProfileFeature {
                 }
                 
             case .getProfile:
-                return .run { send in
-                    await send(.toggleLoading(true), animation: .bouncy)
+                return .run { [isFirstLaunch = state.isFirstLaunch] send in
+                    if isFirstLaunch { await send(.toggleLoading(true), animation: .bouncy) }
                     do {
                         let data = try await memberRepository.fetchMyPage()
                         await send(.fetchProfile(data))
@@ -102,6 +103,7 @@ struct ProfileFeature {
                 }
                 
             case let .fetchProfile(profile):
+                state.isFirstLaunch = false
                 state.nickname = profile.nickname
                 state.joinDate = profile.joinDate
                 if let profileImage = profile.profileImage {

@@ -18,6 +18,7 @@ struct TodayQuestionFeature {
         var answerPreviewList: [Answer] = []
         var timeRemainingForQuestion: TimeInterval = 0
         var isLoading = true
+        var isFirstLaunch = true
         @Presents var sheet: Sheet.State?
         @Presents var alert: AlertState<Action.Alert>?
     }
@@ -53,8 +54,8 @@ struct TodayQuestionFeature {
         Reduce { state, action in
             switch action {
             case .onAppear, .refresh:
-                return .run { send in
-                    await send(.toggleLoading(true), animation: .bouncy)
+                return .run { [isFirstLaunch = state.isFirstLaunch] send in
+                    if isFirstLaunch { await send(.toggleLoading(true), animation: .bouncy) }
                     do {
                         let mainQuestion = try await fetchMainQuestion()
                         let answerList = try await answerRepository.fetchAnswerPreviewList(mainQuestion.id)
@@ -74,6 +75,7 @@ struct TodayQuestionFeature {
                 }
                 
             case let .mainQuestionResponse(mainQuestion):
+                state.isFirstLaunch = false
                 state.todayQuestion = mainQuestion
                 if isQuestionLiveTime {
                     state.questionState = mainQuestion.isAnswered ? .complete : .ready
