@@ -20,7 +20,7 @@ jobs:
     - name: Check XCode version
       run: xcodebuild -version
     - name: List available Simulators
-      run: xcrun simctl list
+      run: xcrun simctl list devices
     - name: Branch Checkout ✔
       uses: actions/checkout@v4
     - name: UnitTest run
@@ -28,5 +28,5 @@ jobs:
         xcodebuild clean test \
         -project Qapple/Qapple.xcodeproj \
         -scheme Qapple \
-        -destination 'platform=iOS Simulator,name=iPhone 16 Pro,OS=18.1' \
+        -destination 'id=F80CC2E8-BF9A-40DA-A0D0-CF1135D821D1' \
         -skipMacroValidation
