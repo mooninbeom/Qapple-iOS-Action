@@ -26,6 +26,11 @@ jobs:
       run: xcrun simctl list
       
     - uses: actions/checkout@v4
+
+    - name: Boot Simulator
+      run: |
+        xcrun simctl boot "iPhone 16 Pro" || echo "Simulator already booted"
+        sleep 15
     
     - name: UnitTest run
       run: |
