@@ -23,11 +23,28 @@ jobs:
       run: xcrun simctl list devices
     - name: Branch Checkout ✔
       uses: actions/checkout@v4
-    - name: UnitTest run
+    #- name: UnitTest run
+    #  run: |
+    #    xcodebuild \
+    #    -project Qapple/Qapple.xcodeproj \
+    #    -scheme Qapple \
+    #    -destination 'platform=iOS Simulator,name=iPhone 16 Pro,OS=18.1' \
+    #    -skipMacroValidation \
+    #    clean test | xcpretty
+
+    - name: Build-for-testing
       run: |
-        xcodebuild \
-        -project Qapple/Qapple.xcodeproj \
-        -scheme Qapple \
-        -destination 'platform=iOS Simulator,name=iPhone 16 Pro,OS=18.1' \
-        -skipMacroValidation \
-        clean test | xcpretty
+        xcodebuild clean build build-for-testing \
+        - project Qapple/Qapple.xcodeproj \
+        - scheme Qapple \
+        - destination 'platform=iOS Simulator,name=iPhone 16 Pro,OS=18.1' \
+        - skipMacroValidation | xcpretty
+
+    - name: Test-without-building
+      run: |
+        xcodebuild test-without-building \
+        - project Qapple/Qapple.xcodeproj \
+        - scheme Qapple \
+        - destination 'platform=iOS Simulator,name=iPhone 16 Pro,OS=18.1' \
+        - skipMacroValidation | xcpretty
+
