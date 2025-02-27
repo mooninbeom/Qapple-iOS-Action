@@ -25,8 +25,9 @@ jobs:
       uses: actions/checkout@v4
     - name: UnitTest run
       run: |
-        xcodebuild clean build \
+        xcodebuild \
         -project Qapple/Qapple.xcodeproj \
         -scheme Qapple \
         -destination 'platform=iOS Simulator,name=iPhone 16 Pro,OS=18.1' \
-        -skipMacroValidation
+        -skipMacroValidation \
+        clean test | xcpretty
