@@ -35,16 +35,16 @@ jobs:
     - name: Build-for-testing
       run: |
         xcodebuild clean build build-for-testing \
-        - project Qapple/Qapple.xcodeproj \
-        - scheme Qapple \
-        - destination 'platform=iOS Simulator,name=iPhone 16 Pro,OS=18.1' \
-        - skipMacroValidation | xcpretty
+        -project Qapple/Qapple.xcodeproj \
+        -scheme Qapple \
+        -destination 'platform=iOS Simulator,name=iPhone 16 Pro,OS=18.1' \
+        -skipMacroValidation | xcpretty
 
     - name: Test-without-building
       run: |
         xcodebuild test-without-building \
-        - project Qapple/Qapple.xcodeproj \
-        - scheme Qapple \
-        - destination 'platform=iOS Simulator,name=iPhone 16 Pro,OS=18.1' \
-        - skipMacroValidation | xcpretty
+        -project Qapple/Qapple.xcodeproj \
+        -scheme Qapple \
+        -destination 'platform=iOS Simulator,name=iPhone 16 Pro,OS=18.1' \
+        -skipMacroValidation | xcpretty
 
