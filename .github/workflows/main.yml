@@ -32,6 +32,10 @@ jobs:
     #    -skipMacroValidation \
     #    clean test | xcpretty
 
+    - name: Shutdown, Erase
+      run: |
+        xcrun simctl shutdown all; xcrun simctl erase all
+
     - name: Boot Simulator
       run: |
         xcrun simctl boot "iPhone 16 Pro" && sleep 15
