@@ -32,6 +32,10 @@ jobs:
     #    -skipMacroValidation \
     #    clean test | xcpretty
 
+    - name: Boot Simulator
+      run: |
+        xcrun simctl boot "iPhone 16 Pro" && sleep 15
+
     - name: Build-for-testing
       run: |
         xcodebuild clean build build-for-testing \
