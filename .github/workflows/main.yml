@@ -28,5 +28,5 @@ jobs:
         xcodebuild clean test \
         -project Qapple/Qapple.xcodeproj \
         -scheme Qapple \
-        -destination 'id=F80CC2E8-BF9A-40DA-A0D0-CF1135D821D1' \
+        -destination 'platform=iOS Simulator,name=iPhone 15 Pro,OS=17.5' \
         -skipMacroValidation
